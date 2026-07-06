@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-1 Linuxとは | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-1 Linuxとは・ディストリビューションの選び方</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>Linuxが社内のどこで動いているかを挙げられる</li>
+<li>ディストリビューションの系統(Debian系/RHEL系)と選定観点を説明できる</li>
+<li>「なぜサーバーはCUIなのか」に答えられる</li>
+</ul>
+<small>📺 動画「世界はLinuxでできている」(10分)を先にどうぞ。</small></div>
+
+<h2>1. 世界はLinuxでできている</h2>
+<p>Webサーバーの大多数、社内のNAS、ルーターやFWの中身、スマホ(Android)、クラウドの仮想マシン——<strong class="mark">情シスが触る「箱」の中身はかなりの割合でLinux</strong>です。ミライ商事でも社内ポータル(nginx)と監視サーバーがLinuxで動いています。</p>
+<ul class="plain">
+<li><strong>カーネル</strong>: Linuxの本体(OSの芯)。ハードウェアを管理する</li>
+<li><strong>ディストリビューション(ディストリ)</strong>: カーネル+コマンド群+パッケージ管理などを束ねた「配布パッケージ」。UbuntuやRed Hatはこれ</li>
+<li><strong>ライセンス</strong>: GPL等のオープンソース。無償で使えるが、<strong>商用サポートを買う</strong>という選択肢がある(ここが企業選定の肝)</li>
+</ul>
+
+<h2>2. ディストリビューション系統図</h2>
+<div class="diagram">
+  <div class="row"><span class="box">Debian系</span><span class="arrow">→</span><span class="box g">Ubuntu / Ubuntu Server<br><small>本講座の標準。情報が豊富</small></span></div>
+  <div class="row"><span class="box">RHEL系</span><span class="arrow">→</span><span class="box w">RHEL(商用サポート付き)<br><small>+互換のAlmaLinux/Rocky Linux</small></span></div>
+  <small>2大系統。コマンドの基本は共通だが、パッケージ管理(apt / dnf)と細部の流儀が異なる。</small>
+</div>
+<div class="tblwrap"><table>
+<tr><th>観点</th><th>Ubuntu(Debian系)</th><th>RHEL系</th></tr>
+<tr><td>サポート</td><td>LTS版は5年(無償)</td><td>商用契約で長期・手厚い</td></tr>
+<tr><td>パッケージ管理</td><td><code>apt</code>(.deb)</td><td><code>dnf</code>(.rpm)</td></tr>
+<tr><td>採用場面</td><td>クラウド・Web・学習</td><td>基幹系・ベンダー製品の動作要件</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ LTSとサポート期限(EOL)</strong>: LTS(長期サポート版)以外は9ヶ月程度で更新が止まります。サーバーには必ずLTS(例: Ubuntu 24.04 LTS)を選び、<strong>EOL管理は情シスの責任</strong>と心得ましょう(Part 6-4に続く伏線です)。</div>
+
+<h2>3. なぜサーバーはCUI(黒い画面)なのか</h2>
+<ul class="plain">
+<li><strong>軽い</strong>: GUIを描かない分、資源をサービスに回せる</li>
+<li><strong>遠隔・自動化と相性抜群</strong>: SSH越しに文字だけで完結。手順はそのままスクリプトになる</li>
+<li><strong>再現性</strong>: 「このコマンドを打つ」は誰がやっても同じ。GUIの「ここをクリック」より手順書が正確になる</li>
+</ul>
+<div class="irohabox">黒い画面は「不親切」じゃなくて「合理的」なんです。慣れるとGUIより速くて、しかも作業ログが全部残る。3-3章からたっぷり触りますよ!</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>サーバー・NAS・ネットワーク機器の中身はLinuxだらけ</li>
+<li>系統はDebian系(Ubuntu)とRHEL系。サーバーはLTS一択、EOL管理は情シスの責任</li>
+<li>CUIは軽さ・遠隔・自動化・再現性のための合理的な選択</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part3-ch01">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="../part2/2-8-troubleshoot.html">← Part 2</a>
+  <a href="3-02-build-lab.html">3-2 学習環境構築 →</a>
+</footer>
+</div>
+</body>
+</html>

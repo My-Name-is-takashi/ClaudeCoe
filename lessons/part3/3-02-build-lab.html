@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-2 学習環境構築 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-2 学習環境構築(VirtualBox+Ubuntu Server)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 このラボのゴール(所要 約120分)</strong>
+<ul>
+<li>仮想マシンに Ubuntu Server 24.04 LTS をインストールする</li>
+<li>スナップショットで「壊しても戻せる」自分専用サーバーを持つ</li>
+<li>ホストPCからSSH接続できる状態にする(Part 3全ラボの母艦になります)</li>
+</ul>
+<small>📺 動画「仮想化ってなに?」(8分)を先にどうぞ。</small></div>
+
+<h2>STEP 0: 仮想化のイメージを掴む</h2>
+<div class="diagram">
+  <div class="row"><span class="box g">仮想マシン=「PCの中のPC」</span></div>
+  <div class="row"><span class="box">ホストOS(あなたのWindows/Mac)</span><span class="arrow">→</span><span class="box">VirtualBox(ハイパーバイザー)</span><span class="arrow">→</span><span class="box w">ゲストOS(Ubuntu Server)</span></div>
+  <small>壊しても消しても本体は無傷。スナップショット=セーブポイント。</small>
+</div>
+
+<h2>STEP 1: VirtualBox とISOの入手(15分)</h2>
+<ol class="plain">
+<li>VirtualBox 公式サイトから自分のOS用インストーラーを取得して導入</li>
+<li>Ubuntu 公式サイトから <strong>Ubuntu Server 24.04 LTS</strong> のISOを取得(Desktop版ではなくServer版!)</li>
+<li>可能ならISOのチェックサム(SHA256)を照合(ダウンロード破損・改ざり検知の作法)</li>
+</ol>
+
+<h2>STEP 2: VM作成(15分)</h2>
+<div class="tblwrap"><table>
+<tr><th>設定</th><th>推奨値</th><th>意味</th></tr>
+<tr><td>名前</td><td>mirai-lab01</td><td>以後の教材はこの名前で呼びます</td></tr>
+<tr><td>CPU</td><td>2コア</td><td>ホストの物理コアの半分以下に</td></tr>
+<tr><td>メモリ</td><td>2048MB(余裕があれば4096)</td><td>ホストが8GBなら2048に留める</td></tr>
+<tr><td>ディスク</td><td>25GB(可変サイズ)</td><td>可変なら実使用分しか消費しない</td></tr>
+<tr><td>ネットワーク</td><td>アダプター1: NAT<br>アダプター2: ホストオンリー</td><td>NAT=外へ出る用 / ホストオンリー=ホストからSSHする用の2枚構成</td></tr>
+</table></div>
+
+<h2>STEP 3: Ubuntu Server インストール(30分)</h2>
+<ol class="plain">
+<li>VMを起動しISOから boot → 言語は English 推奨(サーバーはエラーメッセージ検索性が命)</li>
+<li>ネットワーク: 2枚のNICが見えることを確認(DHCPのままでOK)</li>
+<li>ストレージ: 「Use an entire disk」でOK(LVMはチェックのまま)</li>
+<li>プロファイル: ユーザー名 <code>mirai</code> / サーバー名 <code>mirai-lab01</code> / 強いパスワード</li>
+<li><strong class="mark">「Install OpenSSH server」に必ずチェック</strong>(これを忘れると後でひと手間)</li>
+<li>インストール完了 → 再起動 → ログインプロンプトが出れば成功!</li>
+</ol>
+
+<h2>STEP 4: SSH接続とスナップショット(20分)</h2>
+<pre><code><span class="cm"># VMのコンソールでIPを確認(ホストオンリー側: 192.168.56.x のはず)</span>
+ip a
+
+<span class="cm"># ホストPC(Windowsのターミナル/PowerShell)から接続</span>
+ssh mirai@192.168.56.101   <span class="cm"># ←表示されたIPに読み替え</span>
+<span class="cm"># 初回は「fingerprintを信頼するか」→ yes。パスワードを入れてログイン</span>
+
+<span class="cm"># つながったら、中を少し見てみる</span>
+hostname && whoami && ip a && df -h</code></pre>
+<ol class="plain">
+<li>SSHでログインできたら、いったん <code>exit</code></li>
+<li>VirtualBoxで <strong>スナップショット作成</strong>: 名前「clean-install」— これが今後の「セーブポイント」</li>
+</ol>
+<div class="warnbox"><strong>⚠️ 以後の全ラボの約束</strong>: 大きな変更の前にスナップショット。壊れたら「clean-install」に戻して再挑戦。<strong>壊すことを恐れない環境</strong>こそ、この章の成果物です。</div>
+
+<h2>うまくいかないとき(FAQ)</h2>
+<ul class="plain">
+<li><strong>VMが起動しない/64bitが選べない</strong> → BIOSで仮想化支援(VT-x/AMD-V)が無効。有効化する。WindowsではHyper-V/メモリ整合性との競合も確認</li>
+<li><strong>ホストオンリーのIPが付かない</strong> → VirtualBoxの「ホストネットワークマネージャー」でDHCP有効を確認、VM内で <code>ip a</code> の2枚目を確認</li>
+<li><strong>SSHで接続拒否</strong> → OpenSSH選択漏れ。VMコンソールで <code>sudo apt install openssh-server</code></li>
+</ul>
+<div class="casebox"><strong>🔀 代替手順</strong>: メモリ8GB未満のPC → <strong>WSL2</strong>(Windows)や <strong>UTM</strong>(Apple Silicon Mac)でUbuntuを導入してもPart 3の大半のラボは実施できます(スナップショット相当はWSLのexport/importで代用)。</div>
+
+<div class="irohabox">おめでとうございます、あなたは今日から「自分のサーバー」を持つ人になりました!ここから先のラボは、全部この子(mirai-lab01)と一緒です。</div>
+
+<footer class="nav">
+  <a href="3-01-what-is-linux.html">← 3-1 Linuxとは</a>
+  <a href="3-03-commands1.html">3-3 基本コマンドI →</a>
+</footer>
+</div>
+</body>
+</html>

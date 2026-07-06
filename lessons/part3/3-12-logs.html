@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-12 ログの読み方とトラブルシュート | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-12 ログの読み方とトラブルシュート</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li><code>/var/log</code> と <code>journalctl</code> から障害原因を特定する型を身につける</li>
+<li>nginxアクセスログのフォーマットを読解できる</li>
+<li>logrotate によるログ肥大対策を知る</li>
+</ul></div>
+
+<h2>1. ログの地図 〜どこに何が書かれるか〜</h2>
+<div class="tblwrap"><table>
+<tr><th>場所</th><th>内容</th><th>見るとき</th></tr>
+<tr><td><code>journalctl -u サービス名</code></td><td>各サービスの動作ログ</td><td>サービスが落ちた・上がらない</td></tr>
+<tr><td><code>/var/log/syslog</code></td><td>システム全般</td><td>「何が起きたか分からない」ときの起点</td></tr>
+<tr><td><code>/var/log/auth.log</code></td><td>ログイン・sudoの記録</td><td>不正アクセス調査・操作の追跡</td></tr>
+<tr><td><code>/var/log/nginx/access.log</code></td><td>Webへの全アクセス</td><td>誰が何を見たか、攻撃の痕跡</td></tr>
+<tr><td><code>/var/log/nginx/error.log</code></td><td>nginxのエラー</td><td>502・SSL・設定ミスの調査</td></tr>
+</table></div>
+
+<h2>2. アクセスログの読解(1行を分解する)</h2>
+<pre><code>192.168.10.5 - - [06/Jul/2026:09:12:01 +0900] "GET /index.html HTTP/1.1" 200 5120 "-" "Mozilla/5.0 ..."
+<span class="cm">└─誰が      └─いつ                        └─何を          └─結果 └─サイズ      └─何のブラウザで</span></code></pre>
+<div class="tblwrap"><table>
+<tr><th>コード</th><th>意味</th><th>代表的な原因</th></tr>
+<tr><td>200</td><td>成功</td><td>正常</td></tr>
+<tr><td>301/302</td><td>リダイレクト</td><td>http→https誘導など(正常なことが多い)</td></tr>
+<tr><td>403</td><td>アクセス拒否</td><td>パーミッション(3-6章!)・拒否設定</td></tr>
+<tr><td>404</td><td>存在しない</td><td>パス間違い・消したファイルへのリンク</td></tr>
+<tr><td>500</td><td>サーバー内エラー</td><td>アプリのバグ・設定ミス</td></tr>
+<tr><td><strong>502</strong></td><td>不正なゲートウェイ</td><td><strong class="mark">背後のアプリ(PHP-FPM等)が死んでいる</strong></td></tr>
+<tr><td>503</td><td>過負荷・メンテ中</td><td>リソース枯渇・意図的な停止</td></tr>
+</table></div>
+
+<h2>3. 調査の型 〜5ステップ〜</h2>
+<pre><code>① 症状の時刻を特定する(「いつから?」)
+② その時刻のログを絞り込む
+   journalctl --since "09:00" --until "09:30"
+   grep "06/Jul/2026:09:1" access.log
+③ エラーだけ抽出する
+   grep -iE "error|crit|fail" error.log | tail -20
+④ 資源を確認する(ログに答えがない時)
+   df -h(ディスク)/ free -h(メモリ)/ top(CPU)
+⑤ エラーメッセージ原文で検索する(最強の武器)</code></pre>
+
+<h2>4. logrotate 〜ログに食い尽くされないために〜</h2>
+<p>ログは放置すると無限に太り、<strong class="mark">ディスクフル→サービス全停止</strong>という最悪の障害を起こします。Ubuntuでは logrotate が日次で圧縮・世代管理していますが、自作アプリのログは対象外。<code>/etc/logrotate.d/</code> に設定を足すのが運用者の責任です。</p>
+<pre><code><span class="cm"># /etc/logrotate.d/myapp の例</span>
+/var/log/myapp/*.log {
+    daily           <span class="cm"># 毎日ローテート</span>
+    rotate 14       <span class="cm"># 14世代保持</span>
+    compress        <span class="cm"># 圧縮する</span>
+    missingok       <span class="cm"># 無くてもエラーにしない</span>
+    notifempty      <span class="cm"># 空ならスキップ</span>
+}</code></pre>
+
+<div class="casebox"><strong>🎭 ケーススタディで腕試し</strong><br>
+壊れたWebサーバーの3つの事件(502 / ディスクフル / 起動失敗)を、ログを読んで解決してください。ここまでのPart 3全部が試されます。</div>
+<a class="quizlink case" href="../../portal/case.html?c=case3-12-logs">🎭 ケーススタディ「ログは全てを知っている」を始める</a>
+<a class="quizlink" href="../../portal/drill.html?d=log">⚡ ログ読解道場で特訓する</a>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>サービスはjournalctl、Webはaccess/error.log、操作はauth.log</li>
+<li>502=背後のアプリ死亡、403=権限、ディスクフル=logrotate漏れを疑う</li>
+<li>調査は「時刻特定→絞り込み→エラー抽出→資源確認→原文検索」の5ステップ</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="3-11-lemp.html">← 3-11 総合演習</a>
+  <a href="../../portal/quiz.html?q=part3-test">3-13 Part 3 修了テスト →</a>
+</footer>
+</div>
+</body>
+</html>

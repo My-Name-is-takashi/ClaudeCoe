@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-6 ユーザー・グループとパーミッション | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-6 ユーザー・グループとパーミッション</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li><code>rwx</code> 表記と数値表記(755/644/600)を相互変換できる</li>
+<li>グループを使ったファイル共有権限を設計・実装できる</li>
+<li><code>sudo</code> の仕組みと作法を理解する</li>
+</ul></div>
+
+<h2>1. ls -l の読み方 〜9文字の暗号を解く〜</h2>
+<pre><code>-rw-r--r-- 1 mirai keiri 1024 Jul  6 10:00 houkoku.txt
+<span class="cm">│└┬┘└┬┘└┬┘   └─所有者  └─グループ</span>
+<span class="cm">│ │  │  └ その他(o): r--(読みのみ)</span>
+<span class="cm">│ │  └ グループ(g): r--(読みのみ)</span>
+<span class="cm">│ └ 所有者(u): rw-(読み書き)</span>
+<span class="cm">└ 先頭: - 普通のファイル / d ディレクトリ / l リンク</span></code></pre>
+<div class="tblwrap"><table>
+<tr><th>記号</th><th>数値</th><th>ファイルでの意味</th><th>ディレクトリでの意味</th></tr>
+<tr><td>r</td><td>4</td><td>読める</td><td>一覧(ls)できる</td></tr>
+<tr><td>w</td><td>2</td><td>書き換えられる</td><td>中にファイルを作成・削除できる</td></tr>
+<tr><td>x</td><td>1</td><td>実行できる</td><td><strong>中に入れる(cd できる)</strong></td></tr>
+</table></div>
+<pre><code>755 = rwx r-x r-x   <span class="cm"># 定番: 公開ディレクトリ・スクリプト</span>
+644 = rw- r-- r--   <span class="cm"># 定番: 一般ファイル・設定ファイル</span>
+600 = rw- --- ---   <span class="cm"># 定番: 秘密のファイル(SSH秘密鍵はコレ)</span></code></pre>
+<div class="warnbox"><strong>⚠️ 777は禁止ワード</strong>: 「動かないから777にした」は誰でも書き換え可能=改ざんし放題の状態。原因を調べずに全開放するのは、玄関の鍵を外して「開かない問題」を解決するのと同じです。</div>
+
+<h2>2. 変更コマンド3兄弟</h2>
+<pre><code>chmod 644 houkoku.txt            <span class="cm"># 権限変更(数値指定)</span>
+chmod g+w houkoku.txt            <span class="cm"># 記号指定: グループに書き込みを追加</span>
+chown mirai:keiri houkoku.txt    <span class="cm"># 所有者:グループを変更(root権限が必要)</span>
+chgrp keiri houkoku.txt          <span class="cm"># グループだけ変更</span></code></pre>
+
+<h2>3. グループで共有を設計する</h2>
+<pre><code><span class="cm"># 「経理チームは読み書き、他部署は閲覧のみ」の共有ディレクトリ</span>
+sudo groupadd keiri                      <span class="cm"># グループ作成</span>
+sudo useradd -m -G keiri tanaka          <span class="cm"># ユーザー作成+keiriに所属(-m ホーム作成)</span>
+sudo mkdir /srv/keiri-share
+sudo chown root:keiri /srv/keiri-share
+sudo chmod 775 /srv/keiri-share          <span class="cm"># 所有者rwx / keiri rwx / 他は r-x</span>
+<span class="cm"># 確認: id tanaka(所属グループ)、ls -ld /srv/keiri-share</span></code></pre>
+
+<h2>4. sudoの作法</h2>
+<ul class="plain">
+<li><code>sudo</code> は「この1コマンドだけ管理者として実行」。<strong class="mark">rootで常時ログインしない</strong>のが鉄則(誤操作が即、全損になるため)</li>
+<li>誰がsudoを使えるかは <code>/etc/sudoers</code>(Ubuntuでは sudo グループ所属)で管理</li>
+<li>sudoの実行は記録される(<code>/var/log/auth.log</code>)——「誰が何をしたか」が追える状態を保つのも情シスの仕事</li>
+</ul>
+
+<div class="trybox"><strong>💪 ラボ: 権限設計演習(75分)</strong>
+<ol>
+<li>上記の手順で keiri グループと共有ディレクトリを作る</li>
+<li>ユーザー <code>tanaka</code>(keiri所属)と <code>suzuki</code>(未所属)を作成</li>
+<li><code>su - tanaka</code> で成り代わり、共有ディレクトリにファイルを作成できることを確認</li>
+<li><code>su - suzuki</code> では閲覧はできるが作成できないことを確認(エラーメッセージを記録)</li>
+<li>「suzukiも書けるようにして」と言われたら、<strong>chmodではなくグループ追加</strong>(<code>sudo usermod -aG keiri suzuki</code>)で対応するのが正道であることを確認</li>
+<li>後片付け: 作成したユーザーとディレクトリを削除(<code>userdel -r</code>)、またはスナップショットへ復帰</li>
+</ol></div>
+<div class="irohabox">「777にしたら動きました!」は情シス見習い最大の罠。動いた理由を説明できない設定は、動いていても事故です。グループ設計で解くクセをつけましょうね。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>9文字は u/g/o × rwx。755・644・600は暗記でOK</li>
+<li>共有は「グループを作って所属させる」が正道。777は禁じ手</li>
+<li>rootに成らずsudoで。操作の記録が残る形を保つ</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part3-ch06">📝 章末クイズに挑戦する(8問)</a>
+<footer class="nav">
+  <a href="3-05-vi.html">← 3-5 viエディタ完全入門</a>
+  <a href="3-07-apt-systemd.html">3-7 パッケージ管理とsystemd →</a>
+</footer>
+</div>
+</body>
+</html>

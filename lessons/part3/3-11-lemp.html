@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-11 総合演習: LEMP構築 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-11 総合演習:Webサーバー環境構築(LEMP)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この総合演習のゴール(所要 約180分)</strong>
+<ul>
+<li>要件書だけを頼りに、Part 3の全スキルで環境を構築しきる</li>
+<li>構築内容を「他人が再現できる手順書」として文書化する(Part 8への伏線)</li>
+</ul></div>
+
+<h2>1. 要件書(これだけを頼りに構築してください)</h2>
+<div class="casebox"><strong>📋 ミライ商事 社内お知らせサイト構築 要件書</strong>
+<ul>
+<li>OS: Ubuntu Server 24.04 LTS(mirai-lab01 を使用可)</li>
+<li>構成: nginx + PHP-FPM + MariaDB(いわゆる LEMP)</li>
+<li>アプリ: 疎通確認用の <code>info.php</code> と、DB接続確認ページ <code>db.php</code> を配置</li>
+<li>公開: HTTPSのみ(自己署名可)。HTTPは443へリダイレクト</li>
+<li>運用: サイト資材とDBを毎日3:00にバックアップ(7世代)</li>
+<li>納品物: ①動くサイト ②構築手順書 ③完成チェックリストの自己検収結果</li>
+</ul></div>
+
+<h2>2. 進め方 〜ヒントは3段階〜</h2>
+<p>まず<strong>自力で構築順序を書き出してから</strong>着手してください。詰まったら下のヒントを1段ずつ開きます(いきなり全部開けたら負けです!)。</p>
+<details><summary>💡 ヒント1: 構築順序(クリックで表示)</summary>
+<ol class="plain">
+<li>スナップショット取得(戻れる場所を作る)</li>
+<li>apt update/upgrade → nginx / php-fpm / mariadb-server を導入</li>
+<li>MariaDB初期設定(<code>mysql_secure_installation</code>)→ アプリ用DB・ユーザー作成</li>
+<li>nginxにPHP-FPM連携のserver定義(location ~ \.php$ を fastcgi_pass へ)</li>
+<li>info.php / db.php 配置 → HTTP で疎通確認</li>
+<li>自己署名証明書 → 443化+リダイレクト</li>
+<li>バックアップスクリプト+cron(3-8章の再利用)</li>
+</ol></details>
+<details><summary>💡 ヒント2: 詰まりやすい箇所</summary>
+<ul class="plain">
+<li>php-fpm のソケットパスは <code>/run/php/php8.3-fpm.sock</code>(バージョンで変わる。<code>ls /run/php/</code> で確認)</li>
+<li>502 Bad Gateway → nginxは動いているがPHP-FPMに届いていない(status確認+ソケットパス)</li>
+<li>db.php の接続エラー → DBユーザーの権限(<code>GRANT</code>)とパスワード、ホスト指定(localhost)を確認</li>
+<li>DBバックアップは <code>mysqldump</code> を tar と組み合わせる</li>
+</ul></details>
+<details><summary>💡 ヒント3: 検証コマンド集</summary>
+<pre><code>systemctl status nginx php8.3-fpm mariadb   # 3役の生存確認
+sudo nginx -t && sudo systemctl reload nginx
+curl -kI https://localhost/                 # 200が返るか(-kは自己署名許容)
+curl -k  https://localhost/info.php | head  # PHPが処理されているか
+sudo -u www-data ls /var/www/site           # 権限は足りているか(3-6章!)
+journalctl -u nginx --since "10 min ago"    # 直近のエラー確認</code></pre></details>
+
+<h2>3. 完成チェックリスト(自己検収・20項目抜粋)</h2>
+<div class="tblwrap"><table>
+<tr><th>#</th><th>確認項目</th><th>合格基準</th></tr>
+<tr><td>1</td><td>https://でトップページ表示</td><td>200 OK(自己署名の警告は許容)</td></tr>
+<tr><td>2</td><td>http://アクセス</td><td>301で443へリダイレクト</td></tr>
+<tr><td>3</td><td>info.php</td><td>PHP情報が表示される(=FPM連携OK)</td></tr>
+<tr><td>4</td><td>db.php</td><td>「DB接続OK」が表示される</td></tr>
+<tr><td>5</td><td>OS再起動後</td><td>全サービスが自動起動し1〜4が再現(enable漏れ検出)</td></tr>
+<tr><td>6</td><td>バックアップ</td><td>cron登録済み+手動実行でtar.gzとdumpが生成される</td></tr>
+<tr><td>7</td><td>世代管理</td><td>8世代目を置くと最古が消える(find -mtime テスト)</td></tr>
+<tr><td>8</td><td>権限</td><td>資材はwww-dataが読める最小権限(777が1つもない)</td></tr>
+<tr><td>9</td><td>設定検証</td><td>nginx -t がクリーン</td></tr>
+<tr><td>10</td><td>手順書</td><td>コマンドを写せば第三者が再現できる粒度</td></tr>
+</table></div>
+
+<h2>4. 提出課題: 構築手順書</h2>
+<ul class="plain">
+<li>構成図(手描き写真でもOK)/ 実行コマンド全量(コピペ可能な形)/ 検証結果(curl出力の貼り付け)/ ハマった点と解決過程</li>
+<li><strong class="mark">「ハマった点」こそ最重要セクション</strong>。あなたの次にこのサーバーを触る人への最高の贈り物です</li>
+<li>この手順書はPart 8-5(ドキュメンテーション)で運用手順書に改訂します。大切に保管!</li>
+</ul>
+<div class="irohabox">要件書だけ渡されて「はい、よろしく」——これが実務の景色です。今日それを一人でやり切ったあなたは、もう「Linux触れます」と胸を張って言えますよ!</div>
+
+<footer class="nav">
+  <a href="3-10-nginx.html">← 3-10 nginx入門</a>
+  <a href="3-12-logs.html">3-12 ログの読み方 →</a>
+</footer>
+</div>
+</body>
+</html>

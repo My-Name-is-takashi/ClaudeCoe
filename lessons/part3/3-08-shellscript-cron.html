@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-8 シェルスクリプト入門とcron | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-8 シェルスクリプト入門とcron</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>バックアップスクリプトを書ける(変数・if・for の最小文法)</li>
+<li>cron で定期実行を仕込める</li>
+<li>事故らないスクリプトの作法(ドライラン・ログ)を身につける</li>
+</ul>
+<small>※ 本講座の方針どおり「プログラミング」には踏み込みません。定型運用の自動化に必要な最小限だけ扱います。</small></div>
+
+<h2>1. 最小文法 〜これだけで運用は回る〜</h2>
+<pre><code>#!/bin/bash                      <span class="cm"># シバン: このファイルはbashで動かす宣言</span>
+TARGET="/srv/keiri-share"        <span class="cm"># 変数(=の前後にスペースを入れない!)</span>
+DEST="/backup"
+DATE=$(date +%Y%m%d)             <span class="cm"># コマンドの結果を変数に入れる</span>
+
+if [ ! -d "$DEST" ]; then        <span class="cm"># if: DESTが無ければ作る(変数は"で囲む)</span>
+  mkdir -p "$DEST"
+fi
+
+for dir in eigyo keiri soumu; do <span class="cm"># for: 繰り返し</span>
+  echo "processing $dir ..."
+done
+
+tar czf "$DEST/backup-$DATE.tar.gz" "$TARGET"
+echo "backup done: $DATE" >> /var/log/mybackup.log</code></pre>
+<ul class="plain">
+<li><strong>終了コード</strong>: 直前のコマンドの成否は <code>$?</code>(0=成功)。<code>コマンドA && コマンドB</code>(成功したら)/ <code>||</code>(失敗したら)で分岐できる</li>
+<li><strong>実行方法</strong>: <code>chmod +x backup.sh</code> して <code>./backup.sh</code></li>
+</ul>
+<div class="warnbox"><strong>⚠️ 事故防止の3作法</strong> ①破壊系(rm等)を含むスクリプトは、まず該当行を <code>echo</code> に置き換えて<strong>ドライラン</strong> ②変数は必ず <code>"$VAR"</code> と引用符で囲む(空だった時の <code>rm -rf /</code> 事故を防ぐ) ③実行結果をログに追記して、あとから追えるようにする。</div>
+
+<h2>2. cron 〜Linux版タスクスケジューラ〜</h2>
+<pre><code>crontab -e     <span class="cm"># 自分の定期ジョブを編集(初回はエディタ選択→viでもnanoでも)</span>
+crontab -l     <span class="cm"># 登録内容の確認</span>
+
+<span class="cm"># 書式: 分 時 日 月 曜日 コマンド</span>
+30 2 * * *   /home/mirai/backup.sh            <span class="cm"># 毎日 2:30</span>
+0  9 * * 1   /home/mirai/weekly-report.sh     <span class="cm"># 毎週月曜 9:00</span>
+*/10 * * * * /home/mirai/check.sh             <span class="cm"># 10分ごと</span>
+0  0 1 * *   /home/mirai/monthly.sh           <span class="cm"># 毎月1日 0:00</span></code></pre>
+<p>読み方のコツ: <strong class="mark">左から「分・時・日・月・曜日」、*は「毎」</strong>。「30 2 * * *」=「毎日、2時30分」。1-3章のWindowsタスクスケジューラと同じ役割です。</p>
+
+<div class="trybox"><strong>💪 ラボ: はじめての運用自動化(120分)</strong>
+<ol>
+<li><code>~/bin/backup.sh</code> を作成: <code>/srv/keiri-share</code>(3-6章で作成)を日付付きtar.gzで <code>/backup</code> に退避する(上のコードを土台に)</li>
+<li>手動実行して <code>/backup</code> にファイルができること、ログが追記されることを確認</li>
+<li>世代管理を追加: <code>find /backup -name "backup-*.tar.gz" -mtime +7 -delete</code> を「まず -delete なしで」試してから組み込む(7世代より古い分を削除)</li>
+<li><code>crontab -e</code> で「毎日2:30」に登録。テスト用に「3分後」の時刻でも登録し、実際に動くことを確認したらテスト行を削除</li>
+<li>仕上げ: 実行に失敗したらログに「FAILED」と書くよう <code>|| echo "FAILED $DATE" >> ログ</code> を追加</li>
+</ol></div>
+<div class="irohabox">自動化のご褒美は「自分が休んでいる間も仕事が回る」こと。ただし<strong>動いたことを確認する仕組み(ログ・監視)</strong>までがセット。「動いているはず」は情シス禁句です!</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>変数・if・for・終了コードだけで運用スクリプトは書ける</li>
+<li>cronは「分 時 日 月 曜日」。まず読めること、次に書けること</li>
+<li>ドライラン・引用符・ログの3作法で事故を防ぐ</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="3-07-apt-systemd.html">← 3-7 パッケージ管理とsystemd</a>
+  <a href="3-09-ssh.html">3-9 SSHとファイル転送 →</a>
+</footer>
+</div>
+</body>
+</html>

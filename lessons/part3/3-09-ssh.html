@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-9 SSHとファイル転送 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-9 SSHとファイル転送</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>公開鍵認証の仕組みを図で説明でき、鍵ペアを作って設定できる</li>
+<li><code>scp</code> / <code>rsync</code> で安全にファイルを転送できる</li>
+<li><code>sshd_config</code> の要塞化(rootログイン禁止・パスワード認証禁止)ができる</li>
+</ul></div>
+
+<h2>1. 公開鍵認証 〜南京錠と鍵〜</h2>
+<div class="diagram">
+  <div class="row"><span class="box g">公開鍵 = 南京錠<br><small>サーバーに置く(見られてOK)</small></span>
+  <span class="box w">秘密鍵 = その鍵<br><small>手元に置く(絶対に渡さない)</small></span></div>
+  <small>サーバーは南京錠で施錠した“お題”を送り、正しい鍵を持つ人だけが解錠できる。パスワードと違い、盗聴・総当たりに強い。</small>
+</div>
+<pre><code><span class="cm"># ① 手元PCで鍵ペア生成(Ed25519が現代の標準)</span>
+ssh-keygen -t ed25519 -C "mirai@lab"
+<span class="cm">   → ~/.ssh/id_ed25519(秘密鍵)と id_ed25519.pub(公開鍵)ができる</span>
+
+<span class="cm"># ② 公開鍵をサーバーへ登録</span>
+ssh-copy-id mirai@192.168.56.101
+<span class="cm">   (Windowsでssh-copy-idが無い場合)</span>
+type $env:USERPROFILE\.ssh\id_ed25519.pub | ssh mirai@192.168.56.101 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+
+<span class="cm"># ③ パスワードを聞かれずログインできれば成功</span>
+ssh mirai@192.168.56.101</code></pre>
+<div class="warnbox"><strong>⚠️ パーミッション要件</strong>: サーバー側 <code>~/.ssh</code> は <code>700</code>、<code>authorized_keys</code> は <code>600</code> でないと鍵認証は動きません(3-6章の知識がここで直結!)。「鍵を入れたのに入れない」の原因第1位です。</div>
+
+<h2>2. sshd_config の要塞化 〜締め出されない手順で〜</h2>
+<pre><code>sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak.20260706   <span class="cm"># ① バックアップ</span>
+sudo vi /etc/ssh/sshd_config                                      <span class="cm"># ② viで編集</span>
+
+PermitRootLogin no          <span class="cm"># rootの直ログイン禁止</span>
+PasswordAuthentication no   <span class="cm"># パスワード認証禁止(鍵のみ)</span>
+
+sudo sshd -t                <span class="cm"># ③ 構文チェック(nginx -t のSSH版)</span>
+sudo systemctl reload ssh   <span class="cm"># ④ 反映</span></code></pre>
+<p><strong class="mark">鉄の掟: 今つながっているSSHセッションを閉じずに、新しいターミナルで接続テスト</strong>。失敗しても既存セッションから設定を戻せます。これを怠って自分を締め出すのが「SSH三大事故」の筆頭です。</p>
+
+<h2>3. ファイル転送: scp と rsync</h2>
+<pre><code>scp report.txt mirai@192.168.56.101:/tmp/          <span class="cm"># 手元→サーバー</span>
+scp mirai@192.168.56.101:/var/log/syslog ./         <span class="cm"># サーバー→手元</span>
+scp -r ./website mirai@192.168.56.101:/srv/         <span class="cm"># ディレクトリごと</span>
+
+rsync -av --delete ./website/ mirai@192.168.56.101:/srv/website/
+<span class="cm"># rsync=差分同期。2回目以降は変更分だけ。--deleteは消えたファイルも同期(要注意オプション)</span></code></pre>
+<p>単発はscp、繰り返し・大量はrsync。<code>~/.ssh/config</code> に接続先を書いておくと <code>ssh lab01</code> だけで入れて世界が変わります:</p>
+<pre><code><span class="cm"># ~/.ssh/config</span>
+Host lab01
+  HostName 192.168.56.101
+  User mirai
+  IdentityFile ~/.ssh/id_ed25519</code></pre>
+
+<div class="trybox"><strong>💪 ラボ: SSH要塞化(90分)</strong>
+<ol>
+<li>鍵ペア生成 → 公開鍵登録 → パスワードなしログイン確認</li>
+<li><code>~/.ssh/config</code> を書いて <code>ssh lab01</code> で入れるようにする</li>
+<li>sshd_config を上の手順で要塞化(<strong>既存セッション維持+別ターミナルで検証</strong>を必ず実践)</li>
+<li>パスワード認証で入れなくなったことを確認: <code>ssh -o PubkeyAuthentication=no lab01</code> → 拒否されればOK</li>
+<li>scpで任意のファイルを往復させ、rsyncで2回目が一瞬で終わることを体感する</li>
+</ol></div>
+<div class="irohabox">秘密鍵はパスワード以上の宝物。チャットで送るのも、共有PCに置くのも厳禁です。「南京錠(公開鍵)は配ってよし、鍵(秘密鍵)は肌身離さず」ですよ!</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>公開鍵=南京錠(サーバーへ)、秘密鍵=手元厳守。~/.sshは700、鍵は600</li>
+<li>設定変更は「バックアップ→vi→sshd -t→reload→別ターミナル検証」</li>
+<li>単発scp・繰り返しrsync。~/.ssh/configで接続を名前化</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part3-ch09">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="3-08-shellscript-cron.html">← 3-8 シェルスクリプトとcron</a>
+  <a href="3-10-nginx.html">3-10 nginx入門 →</a>
+</footer>
+</div>
+</body>
+</html>

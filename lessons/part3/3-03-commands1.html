@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-3 基本コマンドI | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-3 基本コマンドI(ファイル操作・パイプ・リダイレクト)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>ファイル操作の基本コマンドを迷わず使える</li>
+<li>絶対パスと相対パスを使い分けられる</li>
+<li>パイプとリダイレクトでコマンドを組み合わせられる</li>
+</ul></div>
+
+<h2>1. まずは移動と閲覧</h2>
+<pre><code>pwd                 <span class="cm"># 今いる場所(print working directory)</span>
+ls                  <span class="cm"># ファイル一覧。詳細は ls -l、隠しファイル込みは ls -la</span>
+cd /var/log         <span class="cm"># 移動(絶対パス)。cd だけでホームへ、cd .. で1つ上へ</span>
+cat motd            <span class="cm"># 短いファイルを表示</span>
+less syslog         <span class="cm"># 長いファイルを1画面ずつ(q で終了、/文字列 で検索)</span></code></pre>
+<div class="tblwrap"><table>
+<tr><th>パスの種類</th><th>例</th><th>意味</th></tr>
+<tr><td>絶対パス</td><td><code>/etc/nginx/nginx.conf</code></td><td>ルート(/)からの完全な住所。手順書ではこちらを使う</td></tr>
+<tr><td>相対パス</td><td><code>../log/syslog</code></td><td>今いる場所から見た道順(<code>.</code>=ここ、<code>..</code>=1つ上)</td></tr>
+<tr><td>ホーム</td><td><code>~/memo.txt</code></td><td><code>~</code>=自分のホーム(/home/mirai)</td></tr>
+</table></div>
+
+<h2>2. 作る・コピーする・消す</h2>
+<pre><code>mkdir -p work/2026/07     <span class="cm"># -p で深い階層を一気に作成</span>
+touch memo.txt            <span class="cm"># 空ファイル作成</span>
+cp memo.txt memo.bak      <span class="cm"># コピー。ディレクトリごとは cp -r</span>
+mv memo.bak work/         <span class="cm"># 移動 兼 リネーム</span>
+rm work/memo.bak          <span class="cm"># 削除(ゴミ箱はない!)</span></code></pre>
+<div class="warnbox"><strong>⚠️ <code>rm</code> に「元に戻す」はありません</strong>。特に <code>rm -rf</code> は破壊力最大。プロの作法は、<strong>rmの前に同じパス指定で <code>ls</code> を打って対象を目視確認</strong>すること。ここ、テストに出ますよ!</div>
+
+<h2>3. パイプとリダイレクト 〜コマンドの合体技〜</h2>
+<pre><code><span class="cm"># | (パイプ): 左の出力を右の入力へ渡す</span>
+ls -l /etc | less              <span class="cm"># 長い一覧を1画面ずつ</span>
+history | grep ssh             <span class="cm"># 過去に打ったsshコマンドを探す</span>
+
+<span class="cm"># > と >> (リダイレクト): 出力をファイルへ</span>
+ls -l /etc > etc-list.txt      <span class="cm"># 上書き保存</span>
+date >> work-log.txt           <span class="cm"># 追記(ログはこちら)</span>
+
+<span class="cm"># 2> : エラーだけ別ファイルへ</span>
+find / -name "*.conf" 2> /dev/null   <span class="cm"># エラーを捨てて結果だけ見る定番</span></code></pre>
+<p><strong class="mark">「小さな道具をパイプでつなぐ」</strong>のがLinux流。この感覚がPart 3後半のログ調査で効いてきます。</p>
+
+<h2>4. 効率3種の神器</h2>
+<ul class="plain">
+<li><strong>Tab補完</strong>: 途中まで打ってTab。ファイル名の打ち間違いが消滅する</li>
+<li><strong>履歴</strong>: ↑↓で過去のコマンド、<code>Ctrl+R</code> で履歴検索</li>
+<li><strong>ワイルドカード</strong>: <code>*.log</code>(任意文字列)、<code>file?.txt</code>(任意1文字)</li>
+</ul>
+
+<div class="trybox"><strong>💪 ラボ: ファイル操作ノック(前半・90分)</strong>
+<ol>
+<li>mirai-lab01 にSSH接続し、<code>~/dojo</code> ディレクトリを作って移動</li>
+<li>部署ディレクトリ <code>eigyo keiri soumu</code> を一気に作る(ヒント: mkdirは複数引数OK)</li>
+<li>各部署に <code>meibo.txt</code> を touch で作成し、<code>ls */meibo.txt</code> で確認</li>
+<li><code>/etc/hostname</code> を <code>~/dojo</code> にコピーし、<code>hostname.bak</code> にリネーム</li>
+<li><code>ls -l /etc</code> の結果を <code>etc.txt</code> に保存し、<code>less</code> で開いて <code>/ssh</code> と検索</li>
+<li><code>history | grep mkdir</code> で自分の作業履歴を振り返る</li>
+<li>最後に <code>rm -r ~/dojo</code> …の前に <code>ls ~/dojo</code> で対象確認してから削除(作法!)</li>
+</ol></div>
+
+<div class="irohabox">コマンドは「暗記」より「手癖」。今日の7ステップを、明日もう一回、何も見ずにやってみてください。2回目がスラスラできたら合格です!</div>
+
+<a class="quizlink" href="../../portal/drill.html?d=cmd">⚡ コマンド当て道場で特訓する</a>
+<footer class="nav">
+  <a href="3-02-build-lab.html">← 3-2 学習環境構築</a>
+  <a href="3-04-commands2.html">3-4 基本コマンドII →</a>
+</footer>
+</div>
+</body>
+</html>
