@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5-6 SaaSの選定と管理 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 5 クラウドとSaaS管理</div>
+  <h1>5-6 SaaSの選定と管理</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>SaaS選定の評価軸で比較表を作れる</li>
+<li>SaaS台帳でアカウント・コストのライフサイクルを管理できる</li>
+<li>シャドーITに「禁止」以外の選択肢で対処できる</li>
+</ul></div>
+
+<h2>1. 選定の評価軸(比較表の型)</h2>
+<div class="tblwrap"><table>
+<tr><th>軸</th><th>確認ポイント</th></tr>
+<tr><td>機能</td><td>必須要件と歓迎要件を分ける(Fit&Gap)。デモは現場担当者にも触らせる</td></tr>
+<tr><td>セキュリティ</td><td><strong>SSO(SAML/OIDC)対応・MFA・監査ログ・IP制限</strong>。ISMS/SOC2等の認証。データ保存場所(国内?)</td></tr>
+<tr><td>費用</td><td>ユーザー課金か機能課金か。年払い割引。<strong>最低契約数・解約条件</strong></td></tr>
+<tr><td>運用</td><td>SCIM対応(入退社自動化)、API、サポート窓口(日本語?営業時間?)</td></tr>
+<tr><td>撤退容易性</td><td><strong>データのエクスポート形式</strong>。「入れる前に、出る方法を確認する」</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ SSO対応は「あとで」が効かない</strong>: SSO・監査ログが上位プラン限定のSaaSは多い(いわゆるSSO税)。選定時に確認しないと、後からセキュリティ要件を満たすために倍額を払うことになります。</div>
+
+<h2>2. SaaS台帳 〜管理の背骨〜</h2>
+<pre><code>SaaS台帳の必須列(テンプレート)
+サービス名 / 用途 / 契約プラン / 単価×数量 / 更新日(解約通知期限!)
+管理者(社内) / 認証方式(SSO?) / データ分類(個人情報あり?)
+アカウント払い出しフロー / 退職時の処理手順 / 最終棚卸し日</code></pre>
+<ul class="plain">
+<li><strong>更新日と解約通知期限</strong>は最重要列。「解約は60日前通知」を見逃して1年自動更新、は頻発事故</li>
+<li>四半期ごとに<strong>利用実態と突合</strong>: 未使用ライセンスの回収だけで数十万円/年の削減がよく出る</li>
+</ul>
+
+<h2>3. シャドーITとの付き合い方</h2>
+<p>シャドーIT=情シスの管理外で使われるIT(個人契約のSaaS、私物PC等)。<strong class="mark">「禁止」だけでは地下に潜るだけ</strong>。現実的な対応は:</p>
+<ol class="plain">
+<li><strong>見つける</strong>: 経費精算・DNSログ・キャスト(CASB)などから利用実態を把握</li>
+<li><strong>理由を聞く</strong>: 使われるのは業務上の必要があるから。ニーズは正当なことが多い</li>
+<li><strong>公認化 or 代替提示</strong>: セキュリティ確認の上で会社契約に巻き取る/既存ツールでの代替を案内</li>
+<li><strong>ルール整備</strong>: 「新しいSaaSを使いたい時の申請フロー」を軽量に用意(重いと また潜る)</li>
+</ol>
+<div class="irohabox">シャドーITを見つけたときの第一声は「なんで勝手に!」じゃなくて「どんな業務で必要だったんですか?」。敵は現場じゃなくて、放置されたニーズですよ。</div>
+
+<div class="casebox"><strong>🎭 ケーススタディで腕試し</strong><br>「営業部が勝手にSaaS契約(シャドーIT発覚)」と「経費精算SaaSの3製品比較」の2シナリオに挑戦。</div>
+<a class="quizlink case" href="../../portal/case.html?c=case5-6-saas">🎭 ケーススタディ「SaaSの光と影」を始める</a>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>選定は機能・セキュリティ(SSO!)・費用・運用・撤退容易性の5軸</li>
+<li>台帳の急所は更新日と解約通知期限。四半期で利用実態と突合</li>
+<li>シャドーITは禁止でなく「見つけて、聞いて、公認化」で管理下に</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="5-5-aws.html">← 5-5 AWS基礎</a>
+  <a href="../../portal/quiz.html?q=part5-test">5-7 Part 5 修了テスト →</a>
+</footer>
+</div>
+</body>
+</html>
