@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8-5 ドキュメンテーションと構成管理 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 8 情シス実務スキル</div>
+  <h1>8-5 ドキュメンテーションと構成管理</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>「自分が明日入院しても回る」ドキュメント標準セットを整備できる</li>
+<li>手順書を「他人が実行できる」品質に書ける</li>
+<li>パスワード・鮮度・属人化の3大問題に対処できる</li>
+</ul></div>
+
+<h2>1. 情シスドキュメント標準セット(7点)</h2>
+<div class="tblwrap"><table>
+<tr><th>ドキュメント</th><th>内容</th><th>更新タイミング</th></tr>
+<tr><td>①ネットワーク構成図</td><td>物理(配線・機器)と論理(VLAN・IP)の2枚</td><td>構成変更時(変更管理とセット)</td></tr>
+<tr><td>②システム構成図</td><td>各システムの関係(認証・連携・データの流れ)</td><td>システム追加・廃止時</td></tr>
+<tr><td>③IPアドレス台帳</td><td>サブネット設計と払い出し状況(2-2章)</td><td>払い出し時</td></tr>
+<tr><td>④アカウント・権限台帳</td><td>特権アカウント、各システムの管理者一覧</td><td>棚卸し時(4-5章)</td></tr>
+<tr><td>⑤運用カレンダー・手順書</td><td>日次/月次/年次作業と手順(0-2章の年間行事)</td><td>手順変更時</td></tr>
+<tr><td>⑥障害時対応シート</td><td>連絡先(ベンダー・回線・保守番号)、初動フロー</td><td>契約更新時。<strong>印刷して壁にも</strong></td></tr>
+<tr><td>⑦資産・ライセンス台帳</td><td>7-3章のもの</td><td>資産移動時</td></tr>
+</table></div>
+<p>置き場所は「全部ここ」を1箇所に(Wiki等)。<strong class="mark">⑥だけは紙でも持つ</strong>——システム全滅時に見られない場所に置いた障害手順書はジョークにしかなりません。</p>
+
+<h2>2. 「他人が実行できる」手順書の書き方</h2>
+<ul class="plain">
+<li>1ステップ=1操作。実行コマンド/クリック対象と、<strong>期待される結果</strong>を必ずペアで書く(3章のラボ形式そのもの)</li>
+<li>前提(権限・所要時間・影響)と、<strong>失敗した時の戻し方</strong>を冒頭に</li>
+<li>禁止ワード: 「適宜」「いい感じに」「いつもの通り」——書いた本人しか分からない言葉</li>
+<li>品質テスト: <strong>その作業をやったことのない人に渡して、質問ゼロで完走できたら合格</strong></li>
+</ul>
+
+<h2>3. 3大問題への処方箋</h2>
+<div class="tblwrap"><table>
+<tr><th>問題</th><th>処方箋</th></tr>
+<tr><td>パスワード管理</td><td>平文Excel禁止。<strong>パスワードマネージャー(チーム用)</strong>で共有・履歴・権限を管理。緊急用の封印控え(金庫)も検討</td></tr>
+<tr><td>ドキュメントの鮮度</td><td>「変更したら文書も直す」を変更管理(7-1章)のチェック項目に入れる。年1回の一斉見直し日を設定</td></tr>
+<tr><td>属人化</td><td>月1回の「引き継ぎごっこ」: 手順書だけで他の人(または未来の自分)が作業してみる。詰まった箇所=文書の穴</td></tr>
+</table></div>
+
+<div class="trybox"><strong>💪 演習: 引き継ぎドキュメント作成(60分)</strong>
+<ol>
+<li>Part 3-11で書いた構築手順書を取り出す</li>
+<li>「運用手順書」に改訂: 日次確認(ログ・バックアップ成否)、月次作業(パッチ)、障害時の初動(3-12章の型)、連絡先を追記</li>
+<li>セルフレビュー: 禁止ワードが残っていないか / 期待結果がペアになっているか / 戻し方があるか</li>
+</ol></div>
+<div class="irohabox">ドキュメントは「未来の誰か(たいてい未来の自分)への手紙」。半年後のあなたは他人です。他人に優しく書きましょうね。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>標準7点セット+置き場所の一元化。障害シートは紙でも持つ</li>
+<li>手順書は「操作+期待結果」のペアと「戻し方」。他人テストで品質保証</li>
+<li>パスワードマネージャー・鮮度ルール・引き継ぎごっこで3大問題を防ぐ</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="8-4-project.html">← 8-4 プロジェクト管理</a>
+  <a href="8-6-communication.html">8-6 非IT部門に伝わる説明力 →</a>
+</footer>
+</div>
+</body>
+</html>

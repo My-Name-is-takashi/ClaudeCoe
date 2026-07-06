@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6-1 セキュリティの基礎と攻撃手法 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 6 情報セキュリティ</div>
+  <h1>6-1 セキュリティの基礎と攻撃手法</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>CIA(機密性・完全性・可用性)で対策を整理できる</li>
+<li>主要な攻撃手法の流れ(キルチェーン)を防御側視点で説明できる</li>
+<li>IPA「情報セキュリティ10大脅威」の使い方を知る</li>
+</ul>
+<small>📺 動画①「攻撃者は誰で、何が目的か」②「攻撃の教科書」を先にどうぞ。</small></div>
+
+<h2>1. CIA 〜守るべき3つの性質〜</h2>
+<div class="tblwrap"><table>
+<tr><th>性質</th><th>意味</th><th>壊れた例</th><th>主な対策</th></tr>
+<tr><td><strong>機密性</strong>(C)</td><td>見るべき人だけが見られる</td><td>顧客名簿の漏えい</td><td>権限管理・暗号化・MFA</td></tr>
+<tr><td><strong>完全性</strong>(I)</td><td>改ざんされていない</td><td>請求書の振込先書き換え</td><td>署名・ログ・変更管理</td></tr>
+<tr><td><strong>可用性</strong>(A)</td><td>使いたいときに使える</td><td>ランサムウェアで業務停止</td><td>バックアップ・冗長化・DDoS対策</td></tr>
+</table></div>
+<p>対策の議論が発散したら「これはCIAのどれを守る話?」と整理する——<strong class="mark">CIAは会話の共通言語</strong>です。あわせて「リスク=脅威 × 脆弱性 × 資産価値」の関係も覚えましょう(脅威は消せないが、脆弱性は減らせる)。</p>
+
+<h2>2. 攻撃者は誰で、何が目的か</h2>
+<ul class="plain">
+<li><strong>金銭目的の犯罪グループ(最多)</strong>: ランサムウェア、ビジネスメール詐欺(BEC)。「うちは狙われない」は誤解——<strong>攻撃は自動化されており、脆弱な所が機械的に狙われる</strong></li>
+<li><strong>国家系(標的型)</strong>: 技術情報・防衛関連の窃取。取引先経由(サプライチェーン)で中小も踏み台に</li>
+<li><strong>内部不正</strong>: 退職者による持ち出し等。技術対策+運用(4-5章の退職処理)で防ぐ</li>
+</ul>
+
+<h2>3. 攻撃の教科書 〜サイバーキルチェーン〜</h2>
+<div class="diagram">
+  <div class="row"><span class="box w">①偵察<br><small>公開情報収集</small></span><span class="arrow">→</span><span class="box w">②侵入<br><small>フィッシング/VPN機器の脆弱性</small></span><span class="arrow">→</span><span class="box w">③潜伏・拡大<br><small>権限昇格・横展開</small></span><span class="arrow">→</span><span class="box w">④目的実行<br><small>窃取・暗号化・恐喝</small></span></div>
+  <small>防御側の要点: どの段階でも「検知して断ち切れば」被害は縮む。1段目で全てを防ぐ必要はない。</small>
+</div>
+<div class="tblwrap"><table>
+<tr><th>手法</th><th>概要</th><th>講座での対策章</th></tr>
+<tr><td>フィッシング</td><td>偽メール・偽サイトで認証情報を窃取</td><td>6-5(訓練)、5-4(パスキー)</td></tr>
+<tr><td>ランサムウェア</td><td>データ暗号化+身代金要求(+暴露の二重恐喝)</td><td>6-6(対応)、7-5(バックアップ)</td></tr>
+<tr><td>BEC(ビジネスメール詐欺)</td><td>経営者や取引先になりすまし送金させる</td><td>6-5、8-6(社内教育)</td></tr>
+<tr><td>脆弱性攻撃</td><td>未パッチのVPN機器・サーバーを突く</td><td>6-4(パッチ運用)</td></tr>
+<tr><td>サプライチェーン攻撃</td><td>取引先・ソフト供給元経由で侵入</td><td>5-6(委託先評価)</td></tr>
+</table></div>
+
+<h2>4. IPA「情報セキュリティ10大脅威」の使い方</h2>
+<p>IPA(情報処理推進機構)が毎年発表するランキング。<strong class="mark">毎年1月頃に最新版を読み、自社対策の棚卸しをする</strong>のを年中行事にしましょう(組織向けの上位は例年、ランサム・サプライチェーン・標的型が常連)。経営報告の枕にも使える公的資料です。</p>
+<div class="irohabox">セキュリティの世界は「完璧な防御」ではなく「早く気づいて素早く断ち切る」が現代の考え方。怖がりすぎず、でも侮らず、いきましょう!</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>CIAは対策整理の共通言語。リスク=脅威×脆弱性×資産価値</li>
+<li>攻撃は自動化されている。「うちは狙われない」は成立しない</li>
+<li>キルチェーンのどこかで断ち切る。IPA 10大脅威で毎年棚卸し</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part6-ch01">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="../part5/5-6-saas-management.html">← Part 5</a>
+  <a href="6-2-endpoint.html">6-2 マルウェアとエンドポイント防御 →</a>
+</footer>
+</div>
+</body>
+</html>

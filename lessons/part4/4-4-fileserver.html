@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4-4 ファイルサーバーとアクセス権設計 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 4 Windows ServerとActive Directory</div>
+  <h1>4-4 ファイルサーバーとアクセス権設計</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>共有権限とNTFS権限の「合成ルール」を説明できる</li>
+<li>AGDLPで部署共有フォルダーの権限を設計・実装できる</li>
+<li>シャドウコピーで「昨日のファイルに戻して」に応えられる</li>
+</ul></div>
+
+<h2>1. 権限は二重扉 〜共有権限 × NTFS権限〜</h2>
+<div class="diagram">
+  <div class="row"><span class="box">ネットワーク越しのアクセス</span><span class="arrow">→</span><span class="box w">扉①共有権限</span><span class="arrow">→</span><span class="box w">扉②NTFS権限</span><span class="arrow">→</span><span class="box g">ファイル</span></div>
+  <small>両方の扉を通れる範囲=実際にできること(厳しい方が勝つ)。</small>
+</div>
+<p>実務の定石: <strong class="mark">共有権限は「Authenticated Users: フルコントロール」で広めに開け、細かい制御はNTFS権限で行う</strong>。二重管理をやめて迷子を防ぐ、広く使われる設計です。</p>
+<div class="tblwrap"><table>
+<tr><th>NTFS権限</th><th>できること</th></tr>
+<tr><td>読み取り</td><td>開く・一覧</td></tr>
+<tr><td>変更</td><td>読み+書き+削除(部署メンバーの標準)</td></tr>
+<tr><td>フルコントロール</td><td>変更+<strong>権限自体の変更</strong>(一般ユーザーには渡さない!)</td></tr>
+</table></div>
+<ul class="plain">
+<li>継承: 上位フォルダーの権限が下へ流れる。例外は「継承の無効化」で切る(乱用注意)</li>
+<li><strong>拒否(Deny)は最後の手段</strong>: 許可より常に勝つため、事故のもと。設計で解くのが正道</li>
+</ul>
+
+<h2>2. 設計例: ミライ商事の共有フォルダー</h2>
+<pre><code>\\dc01\share\
+├── 00_全社共有      DL-全社-読取 ← G-全社員(全員: 読み取り。書けるのは総務のみ)
+├── 10_営業部        DL-営業-変更 ← G-営業部
+├── 20_経理部        DL-経理-変更 ← G-経理部
+└── 90_役員          DL-役員-変更 ← G-役員(他部署は一覧にも出さない: ABEを有効化)</code></pre>
+<ul class="plain">
+<li>AGDLPどおり「フォルダーにはDLグループ、人はGグループへ」。異動対応はグループ差し替えだけ</li>
+<li><strong>ABE(アクセスベースの列挙)</strong>: 権限のないフォルダーはそもそも見えなくする機能。「役員フォルダーがあること自体」を隠せる</li>
+<li>やってはいけない: 個人名を直接ACLに追加 / Everyoneフルコントロール / 拒否の乱用</li>
+</ul>
+
+<h2>3. シャドウコピー 〜「昨日に戻して」の即答装置〜</h2>
+<p>ボリュームシャドウコピーを有効化(例: 7時と12時に取得)しておくと、ユーザー自身が「プロパティ→以前のバージョン」から復元できます。<strong class="mark">「消しちゃった」「上書きしちゃった」対応が数分で完了</strong>。ただしバックアップの代替ではありません(同じディスク上のため、ディスク故障には無力——Part 7-5へ続く)。</p>
+
+<div class="trybox"><strong>💪 ラボ: 共有フォルダー権限設計(120分)</strong>
+<ol>
+<li>DC(または別サーバーVM)に <code>D:\share</code> を作り、上記4フォルダー構成を作成</li>
+<li>G-営業部/G-経理部と、DL-営業-変更/DL-経理-変更を作成し、AGDLPどおり入れ子にする</li>
+<li>共有設定(Authenticated Users: フル)+NTFSでDLグループに「変更」を設定</li>
+<li>クライアントから営業ユーザーでログオン→営業フォルダーは書ける/経理フォルダーは開けないことを確認(エラーの見え方を記録)</li>
+<li>ABEを有効化し、権限のないフォルダーが一覧から消えることを確認</li>
+<li>シャドウコピー有効化→ファイルを消して「以前のバージョン」から復元してみる</li>
+</ol></div>
+<div class="irohabox">権限トラブルの調査は「その人はどのグループに居て、フォルダーにはどのグループが載っているか」の突き合わせがすべて。AGDLPが守られていれば5分で終わりますよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>共有×NTFSは厳しい方が勝つ。実務は「共有広め+NTFSで制御」</li>
+<li>AGDLP+ABEで「見せない・迷わせない」設計に。個人ACLと拒否は避ける</li>
+<li>シャドウコピーで復元セルフサービス化。ただしバックアップの代替ではない</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part4-ch04">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="4-3-gpo.html">← 4-3 GPO</a>
+  <a href="4-5-ad-operations.html">4-5 AD運用実務 →</a>
+</footer>
+</div>
+</body>
+</html>

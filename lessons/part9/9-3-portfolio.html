@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9-3 卒業制作 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 9 総合演習と卒業試験</div>
+  <h1>9-3 卒業制作:自宅ラボ構築レポート</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 卒業制作について</strong>
+<ul>
+<li>自分でテーマを選び、環境を構築し、レポートにまとめます</li>
+<li>転職・社内アピールの<strong>ポートフォリオとしてそのまま使える</strong>成果物にしましょう</li>
+</ul></div>
+
+<h2>1. テーマ例(自由選択・複数可)</h2>
+<div class="tblwrap"><table>
+<tr><th>テーマ</th><th>使う技術</th><th>難易度</th></tr>
+<tr><td>監視付きWebサーバー</td><td>Part 3 + 7-4(nginx+HTTPS+Uptime Kuma+バックアップ)</td><td>★★</td></tr>
+<tr><td>自宅NAS+リモートアクセス</td><td>Part 2 + 3 + 7-5(Samba/NAS、VPN、3-2-1バックアップ)</td><td>★★</td></tr>
+<tr><td>検証ADドメイン+ファイルサーバー</td><td>Part 4(AD、GPO、AGDLP権限設計)</td><td>★★★</td></tr>
+<tr><td>自宅ネットワークのVLAN分離</td><td>Part 2(家族用/仕事用/IoT用の分離設計)</td><td>★★★</td></tr>
+<tr><td>AWS上の監視付きWebサーバー</td><td>Part 5 + 3 + 7(VPC設計から。無料枠+予算アラート厳守)</td><td>★★★</td></tr>
+</table></div>
+
+<h2>2. レポートに含めるもの(この構成がそのまま評価基準)</h2>
+<ol class="plain">
+<li><strong>構成図</strong>: ネットワーク図とシステム構成図(8-5章の書き方で)</li>
+<li><strong>構築手順書</strong>: 第三者が再現できる粒度(コマンド+期待結果のペア)</li>
+<li><strong>運用設計</strong>: バックアップ(RPO/RTO)、監視項目、想定障害と対応手順</li>
+<li><strong>セキュリティ設計</strong>: 認証方式、権限、公開範囲、パッチ方針</li>
+<li><strong>振り返り</strong>: ハマった点と解決の過程 ← <strong class="mark">ここを最重視で評価。エラーとの格闘の記録こそ実力の証明</strong></li>
+</ol>
+
+<h2>3. 自己評価チェックリスト</h2>
+<div class="casebox">
+<ul>
+<li>□ 構成図だけ見て、第三者が全体像を説明できるか</li>
+<li>□ 手順書に「適宜」「いい感じに」が残っていないか</li>
+<li>□ 想定障害に「実際に壊して試した」記録があるか</li>
+<li>□ rootログイン・777・パスワード使い回しが存在しないか</li>
+<li>□ 振り返りに、エラーメッセージの原文と調査過程が書かれているか</li>
+</ul></div>
+
+<h2>4. 卒業</h2>
+<p>知識試験・実技試験・卒業制作の3点がそろったら——おめでとうございます。<strong>あなたは「一人前情シス(レベル4)」です。</strong>認定証を発行して、これまでの200時間を称えましょう。</p>
+<a class="quizlink" href="../../portal/cert.html">🎓 一人前情シス認定証を発行する</a>
+
+<div class="irohabox">ここまで本当におつかれさまでした。この講座で学んだ「型」は、これから現場で何百回も助けてくれます。そして数年後、あなたの後輩に同じ型を渡してあげてください。——ナビゲーターのいろはでした。いってらっしゃい!</div>
+
+<footer class="nav">
+  <a href="9-2-graduation-exam.html">← 9-2 卒業試験</a>
+  <a href="../../portal/index.html">学習ポータルへ</a>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5-1 クラウドの基礎 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 5 クラウドとSaaS管理</div>
+  <h1>5-1 クラウドの基礎(IaaS/PaaS/SaaS)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>IaaS/PaaS/SaaSの違いをピザの比喩で説明できる</li>
+<li>責任共有モデルで「自社がやるべきこと」を判断できる</li>
+<li>オンプレとクラウドの費用構造の違いを説明できる</li>
+</ul>
+<small>📺 動画「ピザで学ぶ IaaS/PaaS/SaaS」(10分)を先にどうぞ。</small></div>
+
+<h2>1. ピザで覚えるサービスモデル</h2>
+<div class="tblwrap"><table>
+<tr><th>モデル</th><th>ピザで言うと</th><th>自社がやること</th><th>例</th></tr>
+<tr><td>オンプレ</td><td>小麦から手作り</td><td>建物・電源からアプリまで全部</td><td>社内サーバー室</td></tr>
+<tr><td><strong>IaaS</strong></td><td>冷凍生地を買って自分で焼く</td><td>OSから上(構築・パッチ・運用)</td><td>AWS EC2、Azure VM</td></tr>
+<tr><td><strong>PaaS</strong></td><td>宅配ピザ(トッピングだけ選ぶ)</td><td>アプリとデータだけ</td><td>App Service、RDS</td></tr>
+<tr><td><strong>SaaS</strong></td><td>ピザ屋で食べる</td><td>使い方の管理(ID・権限・設定)</td><td>M365、Google Workspace、Slack</td></tr>
+</table></div>
+<p>下に行くほど「楽」になりますが、<strong class="mark">自社の責任がゼロになるモデルは存在しません</strong>。それを整理するのが次の「責任共有モデル」です。</p>
+
+<h2>2. 責任共有モデル 〜「クラウドなら安全」の誤解を斬る〜</h2>
+<div class="tblwrap"><table>
+<tr><th>レイヤー</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+<tr><td>建物・ハード・基盤</td><td>事業者</td><td>事業者</td><td>事業者</td></tr>
+<tr><td>OS・ミドルのパッチ</td><td><strong>自社</strong></td><td>事業者</td><td>事業者</td></tr>
+<tr><td>アプリの設定</td><td><strong>自社</strong></td><td><strong>自社</strong></td><td>事業者(機能)/<strong>自社(設定)</strong></td></tr>
+<tr><td><strong>ID・権限・共有設定・データ</strong></td><td><strong>自社</strong></td><td><strong>自社</strong></td><td><strong>自社</strong></td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ どのモデルでも「ID・権限・データ」は常に自社の責任</strong>。クラウドの情報漏えい事故の大半は、事業者の障害ではなく<strong>利用者側の設定ミス(公開範囲・権限過多)</strong>です。ここ、テストに出ますよ!</div>
+
+<h2>3. 費用構造と選定の考え方</h2>
+<ul class="plain">
+<li><strong>オンプレ=CAPEX</strong>(初期に大きく買って5年償却)/ <strong>クラウド=OPEX</strong>(使った分を毎月払う)</li>
+<li>クラウドが有利: 変動する負荷、素早い立ち上げ、災害対策(遠隔リージョン)</li>
+<li>オンプレが残る理由: 一定負荷の長期利用、回線・遅延要件、規制要件</li>
+<li><strong>リージョンとAZ</strong>: リージョン=地域(東京・大阪)、AZ=リージョン内の独立したデータセンター群。「AZをまたいで冗長化」が可用性の基本</li>
+<li><strong>SLAの読み方</strong>: 99.9%=月43分の停止は「仕様の範囲内」。返金条件も「請求額の◯%」程度。SLAは品質保証ではなく<strong>期待値の定義</strong></li>
+</ul>
+<div class="irohabox">経営層への説明は「所有から利用へ。ただし鍵の管理(ID・権限)はこれからも自分たちの仕事です」の一文が鉄板ですよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>IaaS/PaaS/SaaSは「どこまで任せるか」の違い。ピザで覚える</li>
+<li>ID・権限・データの責任は常に自社。事故の大半は設定ミス</li>
+<li>CAPEX→OPEXの転換。SLAは期待値の定義として読む</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part5-ch01">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="../part4/4-5-ad-operations.html">← Part 4</a>
+  <a href="5-2-m365.html">5-2 Microsoft 365管理 →</a>
+</footer>
+</div>
+</body>
+</html>

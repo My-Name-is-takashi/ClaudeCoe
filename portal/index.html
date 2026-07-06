@@ -34,28 +34,35 @@
   .bar-inner { height: 100%; background: linear-gradient(90deg, var(--accent), #8a5cf6);
                width: 0%; transition: width .5s; border-radius: 99px; }
   .pct { font-weight: 700; min-width: 5em; text-align: right; }
+  .dojo { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .dojo strong { font-size: .92rem; }
+  .dojo .drow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .dojo a { font-size: .8rem; background: var(--accent-soft); color: var(--accent); text-decoration: none;
+            padding: 5px 12px; border-radius: 99px; font-weight: 700; }
   details.part { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
                  margin-bottom: 12px; overflow: hidden; }
   summary { cursor: pointer; padding: 14px 18px; font-weight: 700; display: flex;
             align-items: center; gap: 10px; list-style: none; }
   summary::-webkit-details-marker { display: none; }
-  summary .part-pct { margin-left: auto; font-size: .85rem; color: var(--sub); font-weight: 400; }
+  summary .part-pct { margin-left: auto; font-size: .85rem; color: var(--sub); font-weight: 400; white-space: nowrap; }
   .lvtag { font-size: .72rem; background: var(--accent-soft); color: var(--accent);
            padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
   ul.chapters { list-style: none; border-top: 1px solid var(--line); }
   ul.chapters li { display: flex; align-items: center; gap: 10px; padding: 10px 18px;
                    border-bottom: 1px solid var(--line); font-size: .93rem; flex-wrap: wrap; }
   ul.chapters li:last-child { border-bottom: none; }
-  ul.chapters input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--ok); cursor: pointer; }
-  .media { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; }
-  .m { font-size: .68rem; padding: 1px 7px; border-radius: 99px; background: var(--accent-soft);
-       color: var(--accent); white-space: nowrap; }
-  .m.lab { background: var(--ok-soft); color: var(--ok); }
-  li.done .ch-title { color: var(--sub); text-decoration: line-through; }
-  .links { margin: 24px 0; text-align: center; font-size: .9rem; color: var(--sub); }
-  .links a { color: var(--accent); }
+  ul.chapters input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--ok); cursor: pointer; flex-shrink: 0; }
+  .ch-title a { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--sub); }
+  .ch-title a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .links2 { margin-left: auto; display: flex; gap: 5px; flex-wrap: wrap; }
+  .links2 a { font-size: .72rem; padding: 2px 9px; border-radius: 99px; text-decoration: none; font-weight: 700;
+              background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+  .links2 a.c { background: #f1e8fd; color: #8a5cf6; }
+  @media (prefers-color-scheme: dark) { .links2 a.c { background: #322a4a; color: #b9a5f5; } }
+  .links2 a.d { background: var(--ok-soft); color: var(--ok); }
+  li.done .ch-title, li.done .ch-title a { color: var(--sub); text-decoration: line-through; }
   footer { text-align: center; color: var(--sub); font-size: .8rem; padding: 24px; }
-  /* スマホ最適化 */
+  footer a { color: var(--accent); }
   @media (max-width: 600px) {
     header { padding: 24px 14px; }
     header h1 { font-size: 1.15rem; }
@@ -64,7 +71,7 @@
     .pct { min-width: auto; }
     summary { padding: 12px 12px; font-size: .92rem; }
     ul.chapters li { padding: 10px 12px; }
-    .media { margin-left: 28px; flex-basis: 100%; }
+    .links2 { margin-left: 28px; flex-basis: 100%; }
   }
 </style>
 </head>
@@ -80,114 +87,127 @@
       <span class="badge" id="badge">🌱</span>
       <div>
         <div class="level-name" id="levelName">レベル0 見習い</div>
-        <div style="font-size:.8rem;color:var(--sub)" id="doneCount">0 / 70 章 修了</div>
+        <div style="font-size:.8rem;color:var(--sub)" id="doneCount">0 章 修了</div>
       </div>
       <div class="bar-outer"><div class="bar-inner" id="bar"></div></div>
       <div class="pct" id="pct">0%</div>
     </div>
   </div>
 
-  <div id="parts"></div>
-
-  <div class="links">
-    📖 サンプル教材: <a href="../lessons/part3/3-05-vi.html">3-5 viエディタ完全入門</a> /
-    📝 サンプルクイズ: <a href="quiz.html">viエディタ 章末クイズ</a>
+  <div class="dojo">
+    <strong>⚡ ドリル道場(スキマ時間5分・スマホOK)</strong>
+    <div class="drow">
+      <a href="drill.html?d=vi">viキー道場</a>
+      <a href="drill.html?d=subnet">サブネット計算</a>
+      <a href="drill.html?d=port">ポート番号かるた</a>
+      <a href="drill.html?d=cmd">コマンド当て</a>
+      <a href="drill.html?d=log">ログ読解</a>
+      <a href="drill.html?d=shortcut">ショートカット即答</a>
+    </div>
   </div>
+
+  <div id="parts"></div>
 </div>
 
-<footer>進捗はこのブラウザ内(localStorage)に保存されます。</footer>
+<footer>
+  進捗はこのブラウザ内(localStorage)に保存されます。<br>
+  🎓 全課程を修了したら <a href="cert.html">一人前情シス認定証</a> を発行できます。
+</footer>
 
 <script>
+// 各章: [id, タイトル, lesson(相対パス|null), quizID|null, caseID|null, drillID|null]
+const L = "../lessons/";
 const CURRICULUM = [
-  { id:"p0", level:"レベル0", title:"Part 0 オリエンテーション:情シスという仕事", chapters:[
-    ["0-1","情シスとは何か 〜会社のITを支える仕事〜",["動画","クイズ"]],
-    ["0-2","情シスの1日・1年 〜リアルな業務カレンダー〜",["動画","HTML"]],
-    ["0-3","このコースの歩き方",["HTML"]],
-    ["0-4","情シスのキャリアと資格マップ",["HTML","クイズ"]],
+  { id:"p0", level:"レベル0", title:"Part 0 オリエンテーション:情シスという仕事", ch:[
+    ["0-1","情シスとは何か 〜会社のITを支える仕事〜", L+"part0/0-1-what-is-joshi.html","part0-ch01",null,null],
+    ["0-2","情シスの1日・1年 〜リアルな業務カレンダー〜", L+"part0/0-2-daily-yearly.html",null,null,null],
+    ["0-3","このコースの歩き方", L+"part0/0-3-how-to-learn.html",null,null,null],
+    ["0-4","情シスのキャリアと資格マップ", L+"part0/0-4-career-map.html","part0-ch04",null,null],
   ]},
-  { id:"p1", level:"レベル1", title:"Part 1 コンピュータとOSの基礎", chapters:[
-    ["1-1","コンピュータの仕組み(CPU・メモリ・ストレージ)",["動画","クイズ"]],
-    ["1-2","OSの役割 〜WindowsとmacOSとLinux〜",["動画","HTML","クイズ"]],
-    ["1-3","Windowsクライアント管理入門",["ラボ","クイズ"]],
-    ["1-4","PCキッティングとMDM入門",["動画","ラボ"]],
-    ["1-5","ハードウェアトラブルシュート",["ケース"]],
-    ["1-6","Part 1 修了テスト",["テスト"]],
+  { id:"p1", level:"レベル1", title:"Part 1 コンピュータとOSの基礎", ch:[
+    ["1-1","コンピュータの仕組み(CPU・メモリ・ストレージ)", L+"part1/1-1-computer-basics.html","part1-ch01",null,null],
+    ["1-2","OSの役割 〜WindowsとmacOSとLinux〜", L+"part1/1-2-os-basics.html","part1-ch02",null,null],
+    ["1-3","Windowsクライアント管理入門", L+"part1/1-3-windows-admin.html","part1-ch03",null,"shortcut"],
+    ["1-4","PCキッティングとMDM入門", L+"part1/1-4-kitting-mdm.html",null,null,null],
+    ["1-5","ハードウェアトラブルシュート", L+"part1/1-5-hw-troubleshoot.html",null,"case1-5-hw",null],
+    ["1-6","Part 1 修了テスト", null,"part1-test",null,null],
   ]},
-  { id:"p2", level:"レベル1", title:"Part 2 ネットワーク基礎と実践", chapters:[
-    ["2-1","ネットワークの全体像とOSI参照モデル",["動画","クイズ"]],
-    ["2-2","IPアドレスとサブネット",["動画","ドリル"]],
-    ["2-3","TCP/UDPとポート番号",["HTML","ドリル","クイズ"]],
-    ["2-4","DNSの仕組み",["動画","ラボ"]],
-    ["2-5","DHCP・NAT・ルーティング",["HTML","ラボ"]],
-    ["2-6","スイッチ・VLAN・無線LAN",["動画","HTML","クイズ"]],
-    ["2-7","VPNとリモートアクセス",["HTML","クイズ"]],
-    ["2-8","ネットワークトラブルシュート実践",["ラボ","ケース"]],
-    ["2-9","Part 2 修了テスト",["テスト"]],
+  { id:"p2", level:"レベル1", title:"Part 2 ネットワーク基礎と実践", ch:[
+    ["2-1","ネットワークの全体像とOSI参照モデル", L+"part2/2-1-network-overview.html","part2-ch01",null,null],
+    ["2-2","IPアドレスとサブネット", L+"part2/2-2-ip-subnet.html","part2-ch02",null,"subnet"],
+    ["2-3","TCP/UDPとポート番号", L+"part2/2-3-tcp-udp-port.html","part2-ch03",null,"port"],
+    ["2-4","DNSの仕組み", L+"part2/2-4-dns.html","part2-ch04",null,null],
+    ["2-5","DHCP・NAT・ルーティング", L+"part2/2-5-dhcp-nat-routing.html","part2-ch05",null,null],
+    ["2-6","スイッチ・VLAN・無線LAN", L+"part2/2-6-switch-vlan-wifi.html","part2-ch06",null,null],
+    ["2-7","VPNとリモートアクセス", L+"part2/2-7-vpn-remote.html","part2-ch07",null,null],
+    ["2-8","ネットワークトラブルシュート実践", L+"part2/2-8-troubleshoot.html",null,"case2-8-network",null],
+    ["2-9","Part 2 修了テスト", null,"part2-test",null,null],
   ]},
-  { id:"p3", level:"レベル2", title:"Part 3 Linuxサーバー入門〜実践 ★中核パート", chapters:[
-    ["3-1","Linuxとは・ディストリビューションの選び方",["動画","クイズ"]],
-    ["3-2","学習環境構築(VirtualBox+Ubuntu Server)",["ラボ"]],
-    ["3-3","基本コマンドI(ファイル操作・パイプ・リダイレクト)",["ラボ","ドリル"]],
-    ["3-4","基本コマンドII(検索・圧縮・プロセス)",["ラボ","ドリル"]],
-    ["3-5","viエディタ完全入門",["動画","ドリル","ラボ"]],
-    ["3-6","ユーザー・グループとパーミッション",["ラボ","クイズ"]],
-    ["3-7","パッケージ管理とsystemd",["ラボ","クイズ"]],
-    ["3-8","シェルスクリプト入門とcron",["ラボ"]],
-    ["3-9","SSHとファイル転送",["ラボ","クイズ"]],
-    ["3-10","nginx入門:インストールと設定の読み方",["動画","ラボ"]],
-    ["3-11","総合演習:Webサーバー環境構築(LEMP)",["ラボ"]],
-    ["3-12","ログの読み方とトラブルシュート",["ケース","ドリル"]],
-    ["3-13","Part 3 修了テスト(知識+実技)",["テスト"]],
+  { id:"p3", level:"レベル2", title:"Part 3 Linuxサーバー入門〜実践 ★中核パート", ch:[
+    ["3-1","Linuxとは・ディストリビューションの選び方", L+"part3/3-01-what-is-linux.html","part3-ch01",null,null],
+    ["3-2","学習環境構築(VirtualBox+Ubuntu Server)", L+"part3/3-02-build-lab.html",null,null,null],
+    ["3-3","基本コマンドI(ファイル操作・パイプ・リダイレクト)", L+"part3/3-03-commands1.html",null,null,"cmd"],
+    ["3-4","基本コマンドII(検索・圧縮・プロセス)", L+"part3/3-04-commands2.html","part3-ch04",null,null],
+    ["3-5","viエディタ完全入門", L+"part3/3-05-vi.html","part3-ch05-vi",null,"vi"],
+    ["3-6","ユーザー・グループとパーミッション", L+"part3/3-06-permission.html","part3-ch06",null,null],
+    ["3-7","パッケージ管理とsystemd", L+"part3/3-07-apt-systemd.html","part3-ch07",null,null],
+    ["3-8","シェルスクリプト入門とcron", L+"part3/3-08-shellscript-cron.html",null,null,null],
+    ["3-9","SSHとファイル転送", L+"part3/3-09-ssh.html","part3-ch09",null,null],
+    ["3-10","nginx入門:インストールと設定の読み方", L+"part3/3-10-nginx.html","part3-ch10",null,null],
+    ["3-11","総合演習:Webサーバー環境構築(LEMP)", L+"part3/3-11-lemp.html",null,null,null],
+    ["3-12","ログの読み方とトラブルシュート", L+"part3/3-12-logs.html",null,"case3-12-logs","log"],
+    ["3-13","Part 3 修了テスト(知識+実技)", null,"part3-test",null,null],
   ]},
-  { id:"p4", level:"レベル2", title:"Part 4 Windows ServerとActive Directory", chapters:[
-    ["4-1","Windows Serverの役割と管理ツール",["動画","HTML"]],
-    ["4-2","Active Directory基礎とドメイン構築",["動画","ラボ"]],
-    ["4-3","グループポリシー(GPO)",["ラボ","クイズ"]],
-    ["4-4","ファイルサーバーとアクセス権設計",["ラボ","クイズ"]],
-    ["4-5","AD運用実務(入退社・棚卸し)",["ケース"]],
-    ["4-6","Part 4 修了テスト",["テスト"]],
+  { id:"p4", level:"レベル2", title:"Part 4 Windows ServerとActive Directory", ch:[
+    ["4-1","Windows Serverの役割と管理ツール", L+"part4/4-1-windows-server.html","part4-ch01",null,null],
+    ["4-2","Active Directory基礎とドメイン構築", L+"part4/4-2-ad-basics.html","part4-ch02",null,null],
+    ["4-3","グループポリシー(GPO)", L+"part4/4-3-gpo.html","part4-ch03",null,null],
+    ["4-4","ファイルサーバーとアクセス権設計", L+"part4/4-4-fileserver.html","part4-ch04",null,null],
+    ["4-5","AD運用実務(入退社・棚卸し)", L+"part4/4-5-ad-operations.html",null,"case4-5-adops",null],
+    ["4-6","Part 4 修了テスト", null,"part4-test",null,null],
   ]},
-  { id:"p5", level:"レベル3", title:"Part 5 クラウドとSaaS管理", chapters:[
-    ["5-1","クラウドの基礎(IaaS/PaaS/SaaS)",["動画","クイズ"]],
-    ["5-2","Microsoft 365管理",["動画","ラボ"]],
-    ["5-3","Google Workspace管理",["ラボ","HTML"]],
-    ["5-4","ID管理とSSO(SAML/OIDC/MFA)",["動画","HTML","クイズ"]],
-    ["5-5","AWS基礎(VPC/EC2/S3/IAM)",["動画","ラボ"]],
-    ["5-6","SaaSの選定と管理",["ケース"]],
-    ["5-7","Part 5 修了テスト",["テスト"]],
+  { id:"p5", level:"レベル3", title:"Part 5 クラウドとSaaS管理", ch:[
+    ["5-1","クラウドの基礎(IaaS/PaaS/SaaS)", L+"part5/5-1-cloud-basics.html","part5-ch01",null,null],
+    ["5-2","Microsoft 365管理", L+"part5/5-2-m365.html","part5-ch02",null,null],
+    ["5-3","Google Workspace管理", L+"part5/5-3-google-workspace.html",null,null,null],
+    ["5-4","ID管理とSSO(SAML/OIDC/MFA)", L+"part5/5-4-sso-mfa.html","part5-ch04",null,null],
+    ["5-5","AWS基礎(VPC/EC2/S3/IAM)", L+"part5/5-5-aws.html","part5-ch05",null,null],
+    ["5-6","SaaSの選定と管理", L+"part5/5-6-saas-management.html",null,"case5-6-saas",null],
+    ["5-7","Part 5 修了テスト", null,"part5-test",null,null],
   ]},
-  { id:"p6", level:"レベル3", title:"Part 6 情報セキュリティ", chapters:[
-    ["6-1","セキュリティの基礎と攻撃手法",["動画","クイズ"]],
-    ["6-2","マルウェアとエンドポイント防御",["動画","HTML"]],
-    ["6-3","ネットワークセキュリティとゼロトラスト",["HTML","クイズ"]],
-    ["6-4","脆弱性管理とパッチ運用",["ラボ"]],
-    ["6-5","標的型攻撃メール対応訓練",["演習"]],
-    ["6-6","インシデント対応",["ケース"]],
-    ["6-7","法令・規格とセキュリティポリシー",["HTML","クイズ"]],
-    ["6-8","Part 6 修了テスト",["テスト"]],
+  { id:"p6", level:"レベル3", title:"Part 6 情報セキュリティ", ch:[
+    ["6-1","セキュリティの基礎と攻撃手法", L+"part6/6-1-security-basics.html","part6-ch01",null,null],
+    ["6-2","マルウェアとエンドポイント防御", L+"part6/6-2-endpoint.html",null,null,null],
+    ["6-3","ネットワークセキュリティとゼロトラスト", L+"part6/6-3-network-zerotrust.html","part6-ch03",null,null],
+    ["6-4","脆弱性管理とパッチ運用", L+"part6/6-4-vuln-patch.html",null,null,null],
+    ["6-5","標的型攻撃メール対応訓練(シミュレーター)", L+"part6/6-5-phishing-sim.html",null,null,null],
+    ["6-6","インシデント対応", L+"part6/6-6-incident.html",null,"case6-6-ransom",null],
+    ["6-7","法令・規格と認証(ISMS・Pマーク)", L+"part6/6-7-law-isms.html","part6-ch07",null,null],
+    ["6-7b","ISMS文書の書き方(実践)", L+"part6/6-7b-isms-writing.html","part6-ch07b",null,null],
+    ["6-8","Part 6 修了テスト", null,"part6-test",null,null],
   ]},
-  { id:"p7", level:"レベル4", title:"Part 7 IT運用とヘルプデスク", chapters:[
-    ["7-1","ITIL入門(サービスとしてのIT)",["動画","クイズ"]],
-    ["7-2","ヘルプデスク実践",["ケース"]],
-    ["7-3","IT資産管理とライセンス管理",["HTML","演習"]],
-    ["7-4","監視とアラート",["ラボ"]],
-    ["7-5","バックアップとBCP/DR",["HTML","演習"]],
-    ["7-6","障害対応総合訓練",["演習"]],
-    ["7-7","Part 7 修了テスト",["テスト"]],
+  { id:"p7", level:"レベル4", title:"Part 7 IT運用とヘルプデスク", ch:[
+    ["7-1","ITIL入門(サービスとしてのIT)", L+"part7/7-1-itil.html","part7-ch01",null,null],
+    ["7-2","ヘルプデスク実践", L+"part7/7-2-helpdesk.html",null,"case7-2-helpdesk",null],
+    ["7-3","IT資産管理とライセンス管理", L+"part7/7-3-asset-license.html","part7-ch03",null,null],
+    ["7-4","監視とアラート", L+"part7/7-4-monitoring.html",null,null,null],
+    ["7-5","バックアップとBCP/DR", L+"part7/7-5-backup-bcp.html","part7-ch05",null,null],
+    ["7-6","障害対応総合訓練", L+"part7/7-6-incident-drill.html",null,"case7-6-outage",null],
+    ["7-7","Part 7 修了テスト", null,"part7-test",null,null],
   ]},
-  { id:"p8", level:"レベル4", title:"Part 8 情シス実務スキル", chapters:[
-    ["8-1","ベンダーマネジメント",["HTML","演習"]],
-    ["8-2","IT予算と稟議",["HTML","演習"]],
-    ["8-3","社内規程とIT統制",["HTML","クイズ"]],
-    ["8-4","システム導入プロジェクト管理",["ケース"]],
-    ["8-5","ドキュメンテーションと構成管理",["演習"]],
-    ["8-6","非IT部門に伝わる説明力",["動画","演習"]],
-    ["8-7","Part 8 修了テスト",["テスト"]],
+  { id:"p8", level:"レベル4", title:"Part 8 情シス実務スキル", ch:[
+    ["8-1","ベンダーマネジメント", L+"part8/8-1-vendor.html",null,null,null],
+    ["8-2","IT予算と稟議", L+"part8/8-2-budget.html",null,null,null],
+    ["8-3","社内規程とIT統制", L+"part8/8-3-rules-control.html","part8-ch03",null,null],
+    ["8-4","システム導入プロジェクト管理", L+"part8/8-4-project.html",null,"case8-4-project",null],
+    ["8-5","ドキュメンテーションと構成管理", L+"part8/8-5-documentation.html",null,null,null],
+    ["8-6","非IT部門に伝わる説明力", L+"part8/8-6-communication.html",null,null,null],
+    ["8-7","Part 8 修了テスト", null,"part8-test",null,null],
   ]},
-  { id:"p9", level:"卒業", title:"Part 9 総合演習と卒業試験", chapters:[
-    ["9-1","総合シナリオ演習「ある日の情シス、全部盛り」",["演習"]],
-    ["9-2","卒業試験(知識100問+実技)",["テスト"]],
-    ["9-3","卒業制作:自宅ラボ構築レポート",["演習"]],
+  { id:"p9", level:"卒業", title:"Part 9 総合演習と卒業試験", ch:[
+    ["9-1","総合シナリオ演習「ある日の情シス、全部盛り」", L+"part9/9-1-final-exercise.html",null,"case9-1-final",null],
+    ["9-2","卒業試験(知識30問+実技)", L+"part9/9-2-graduation-exam.html","part9-grad",null,null],
+    ["9-3","卒業制作:自宅ラボ構築レポート", L+"part9/9-3-portfolio.html",null,null,null],
   ]},
 ];
 
@@ -202,7 +222,7 @@ const LEVELS = [
 
 const KEY = "joshi-progress";
 const state = JSON.parse(localStorage.getItem(KEY) || "{}");
-const total = CURRICULUM.reduce((n,p)=>n+p.chapters.length,0);
+const total = CURRICULUM.reduce((n,p)=>n+p.ch.length,0);
 
 function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 
@@ -210,20 +230,27 @@ function render(){
   const root = document.getElementById("parts");
   root.innerHTML = "";
   CURRICULUM.forEach(part=>{
-    const done = part.chapters.filter(c=>state[c[0]]).length;
+    const done = part.ch.filter(c=>state[c[0]]).length;
     const d = document.createElement("details");
     d.className = "part";
-    if (done < part.chapters.length && done > 0) d.open = true;
+    if (done < part.ch.length && done > 0) d.open = true;
     d.innerHTML = `<summary><span class="lvtag">${part.level}</span>${part.title}
-      <span class="part-pct">${done}/${part.chapters.length}</span></summary>`;
+      <span class="part-pct">${done}/${part.ch.length}</span></summary>`;
     const ul = document.createElement("ul");
     ul.className = "chapters";
-    part.chapters.forEach(([id,title,media])=>{
+    part.ch.forEach(([id,title,lesson,quiz,cs,drill])=>{
       const li = document.createElement("li");
       if (state[id]) li.className = "done";
+      const titleHtml = lesson
+        ? `<a href="${lesson}"><strong>${id}</strong> ${title}</a>`
+        : `<strong>${id}</strong> ${title}`;
+      let links = "";
+      if (quiz)  links += `<a href="quiz.html?q=${quiz}">📝 ${id.includes("テスト")||title.includes("テスト")||title.includes("試験")?"テスト":"クイズ"}</a>`;
+      if (cs)    links += `<a class="c" href="case.html?c=${cs}">🎭 ケース</a>`;
+      if (drill) links += `<a class="d" href="drill.html?d=${drill}">⚡ ドリル</a>`;
       li.innerHTML = `<input type="checkbox" id="c${id}" ${state[id]?"checked":""}>
-        <label for="c${id}" class="ch-title" style="cursor:pointer"><strong>${id}</strong> ${title}</label>
-        <span class="media">${media.map(m=>`<span class="m ${m==="ラボ"?"lab":""}">${m}</span>`).join("")}</span>`;
+        <span class="ch-title">${titleHtml}</span>
+        <span class="links2">${links}</span>`;
       li.querySelector("input").addEventListener("change", e=>{
         state[id] = e.target.checked; if(!e.target.checked) delete state[id];
         save(); render();

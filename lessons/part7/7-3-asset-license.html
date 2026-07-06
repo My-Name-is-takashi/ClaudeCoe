@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7-3 IT資産管理とライセンス管理 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 7 IT運用とヘルプデスク</div>
+  <h1>7-3 IT資産管理とライセンス管理</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>ハード・ソフト・ライセンスの台帳を設計できる</li>
+<li>棚卸しプロセスを回せる</li>
+<li>廃棄時のデータ消去を正しく行える</li>
+</ul></div>
+
+<h2>1. 台帳の設計 〜3つの台帳と1つの原則〜</h2>
+<div class="tblwrap"><table>
+<tr><th>台帳</th><th>必須列</th><th>更新タイミング</th></tr>
+<tr><td>ハードウェア台帳</td><td>管理番号 / 型番・シリアル / 利用者 / 設置場所 / 購入日・保証期限 / <strong>EOL</strong> / 状態(利用中・保管・廃棄)</td><td>キッティング時・入退社・移動時(1-4章)</td></tr>
+<tr><td>ソフトウェア台帳</td><td>製品名・バージョン / インストール先 / EOL</td><td>導入・更新時(資産管理ツールで自動収集が理想)</td></tr>
+<tr><td>ライセンス台帳</td><td>製品 / ライセンス種別 / <strong>保有数 vs 利用数</strong> / 契約更新日 / 証書の保管場所</td><td>購入・割当・回収時(5-6章のSaaS台帳と統合可)</td></tr>
+</table></div>
+<p>原則はただ一つ: <strong class="mark">「現物・台帳・実際の利用者が常に一致している」</strong>。ズレは事件(紛失・シャドーIT・ライセンス違反)の兆候です。</p>
+
+<h2>2. ライセンスの型と監査リスク</h2>
+<ul class="plain">
+<li><strong>デバイス/ユーザー/同時使用/コア課金/サブスク</strong>——製品ごとに数え方が違う。「保有数<利用数」が違反状態</li>
+<li>ベンダーからの<strong>ライセンス監査</strong>(真正性確認)は実際に来ます。違反時は正規料金+ペナルティの購入で、数百万円規模になることも</li>
+<li>逆に「保有数>利用数」は無駄なコスト。<strong>棚卸しはリスクと費用の両方を削る</strong>一石二鳥の仕事です</li>
+</ul>
+
+<h2>3. 棚卸しの回し方(半期に1回)</h2>
+<pre><code>① 資産管理ツール/AD/MDMから「機械が知っている一覧」を出す
+② 台帳と突合 → 差分リストを作る(台帳にあるのに見えない端末=最優先調査)
+③ 現物確認(利用者にセルフチェック依頼+抜き取り実査)
+④ 差分の原因を潰す(返却漏れ・記載漏れ・紛失)→ 台帳更新
+⑤ 結果を記録(ISMS審査・内部統制の証跡になる: 6-7章)</code></pre>
+
+<h2>4. 廃棄 〜データ消去までが資産管理〜</h2>
+<div class="warnbox"><strong>⚠️ 「初期化したから大丈夫」ではない</strong>: 通常のフォーマットではデータは復元可能です。廃棄時は<strong>①暗号化消去(BitLocker等の鍵破棄)②消去ソフトによる上書き ③物理破壊</strong>のいずれかを行い、業者委託時は<strong>データ消去証明書</strong>を必ず受領・保管します。HDD横流しによる情報流出は実際に起きた重大事件です。</div>
+
+<div class="trybox"><strong>💪 演習: 台帳の欠陥探し(30分)</strong>
+<p>次のミライ商事の台帳抜粋から、問題点を3つ以上指摘してください。</p>
+<pre><code>管理番号 | 機種        | 利用者 | 購入日     | 状態
+NB-0088 | ThinkPad X1 | 佐藤  | 2019/04/01 | 利用中   ← 佐藤さんは6月に退職済み
+NB-0089 | ThinkPad X1 | 田中  | 2019/04/01 | 利用中   ← OSはWindows 10のまま
+(空欄)  | MacBook Pro | 山本  | 不明       | 利用中
+NB-0090 | ThinkPad X1 | ―    | 2019/04/01 | 保管中   ← 先月から所在確認できず</code></pre>
+<details><summary>📄 模範解答</summary>
+<ul class="plain">
+<li>NB-0088: 退職者に貸与中のまま=回収漏れ(情報漏えいリスク・即回収)</li>
+<li>NB-0089: Windows 10はEOL済み=パッチ無しで稼働中(6-4章のEOL管理違反)</li>
+<li>山本さんのMac: 管理番号なし・購入日不明=台帳外資産(シャドーIT疑い。経緯確認と登録)</li>
+<li>NB-0090: 「保管中」なのに所在不明=紛失の疑い。データ暗号化の有無を確認し、規程に沿って報告</li>
+<li>全体: 2019年購入で6年超=更新計画(8-2章)の対象</li>
+</ul></details></div>
+<div class="irohabox">台帳仕事は地味ですが、「あのPC誰が使ってる?」に3秒で答えられる情シスは、監査でも障害でも人事でも頼られます。地味こそ武器です。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>台帳は3つ(ハード・ソフト・ライセンス)+EOL列。現物と一致してこそ台帳</li>
+<li>ライセンスは「保有vs利用」の差分管理。監査は実際に来る</li>
+<li>廃棄はデータ消去+証明書まで。フォーマットは消去ではない</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part7-ch03">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="7-2-helpdesk.html">← 7-2 ヘルプデスク実践</a>
+  <a href="7-4-monitoring.html">7-4 監視とアラート →</a>
+</footer>
+</div>
+</body>
+</html>

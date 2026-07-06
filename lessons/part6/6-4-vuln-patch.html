@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6-4 脆弱性管理とパッチ運用 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 6 情報セキュリティ</div>
+  <h1>6-4 脆弱性管理とパッチ運用</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>CVE/CVSSを読めるようになる</li>
+<li>「即パッチできない現実」と折り合いをつけた優先順位付けができる</li>
+<li>EOL(サポート終了)管理の重要性を理解する</li>
+</ul></div>
+
+<h2>1. 脆弱性情報の読み方</h2>
+<div class="tblwrap"><table>
+<tr><th>用語</th><th>意味</th></tr>
+<tr><td><strong>CVE</strong></td><td>脆弱性の世界共通の背番号(例: CVE-2026-12345)</td></tr>
+<tr><td><strong>CVSS</strong></td><td>深刻度スコア(0〜10)。9.0以上=Critical、7.0以上=High</td></tr>
+<tr><td>JVN / NVD</td><td>日本/米国の脆弱性データベース。ベンダーのセキュリティアドバイザリと併読</td></tr>
+<tr><td>PoC / 悪用確認(KEV)</td><td>攻撃コードの公開有無・実際に悪用されているか。<strong>優先度を決める最重要情報</strong></td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ CVSSの点数だけで並べない</strong>: 実務の優先度は「①実際に悪用されているか(KEV) ②インターネットに面しているか ③自社のその機能を使っているか」で決まります。CVSS 9.8でも内部限定・該当機能未使用なら後回しにでき、CVSS 7.2でも公開VPN装置なら即日対応です。</div>
+
+<h2>2. 優先順位付けの型(トリアージ)</h2>
+<pre><code>優先度S(即日〜数日): 悪用確認あり × インターネット公開資産(VPN装置・公開サーバー)
+優先度A(2週間以内): 悪用可能性高 × 重要システム / 全社PCのブラウザ・OS
+優先度B(月次パッチで): その他のサーバー・業務アプリ
+優先度C(計画対応): 内部限定・緩和策適用済み・影響小</code></pre>
+<ul class="plain">
+<li>即パッチできない時の<strong>緩和策</strong>: 該当機能の無効化、アクセス元制限、WAF/IPSでの防御、監視強化</li>
+<li>サーバーのパッチは<strong>検証→本番の順+計画メンテ枠</strong>で(3-7章の apt / 1-3章のWindows Update)</li>
+</ul>
+
+<h2>3. EOL管理 〜サポート切れは「無限の脆弱性」〜</h2>
+<p>EOL(End of Life)を過ぎたOS・機器には<strong class="mark">パッチが二度と出ません</strong>。「動いているから使い続ける」は、鍵が壊れた家に住み続けるのと同じ。資産台帳(7-3章)にEOL列を持たせ、<strong>2年前から更新予算を計画</strong>(8-2章)するのが一人前の運用です。</p>
+
+<div class="trybox"><strong>💪 ラボ: 脆弱性トリアージ演習(90分)</strong>
+<p>ミライ商事の環境(公開: VPN装置・Webサイト / 社内: AD・ファイルサーバー・全社PC)を前提に、次の架空スキャン結果に優先度S/A/B/Cを付け、理由を書いてください。</p>
+<ol>
+<li>VPN装置のRCE脆弱性(CVSS 9.8・悪用確認あり)</li>
+<li>社内ファイルサーバーのSMB脆弱性(CVSS 8.1・PoCなし)</li>
+<li>全社PCのブラウザ脆弱性(CVSS 8.8・悪用確認あり)</li>
+<li>社内プリンター管理画面の脆弱性(CVSS 7.5・内部限定)</li>
+<li>公開WebサーバーのnginxのDoS脆弱性(CVSS 5.3)</li>
+<li>経理端末のみ使用の会計ソフト脆弱性(CVSS 9.1・PoCなし・ベンダーパッチ未提供)</li>
+</ol>
+<details><summary>📄 模範解答(クリックで表示)</summary>
+<ul class="plain">
+<li>1=S(公開×悪用あり。即日。適用まではアクセス元制限)/ 3=S〜A(悪用あり×全社。自動更新の確認と強制)</li>
+<li>2=A(内部だが横展開の主経路。月内)/ 6=A(パッチ未提供→ネットワーク分離・監視強化の緩和策+ベンダー督促)</li>
+<li>4=B〜C(内部限定。管理VLANで隔離済みならC)/ 5=B(DoSのみ・影響限定。定期メンテで)</li>
+</ul></details></div>
+<div class="irohabox">脆弱性対応は「全部すぐやる」と宣言すると必ず破綻します。「Sは即日、Aは2週間」のようにSLAを決めて淡々と回すのが、続けられる運用のコツです。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>CVEは背番号、CVSSは深刻度。優先度は「悪用×露出×該当」で決める</li>
+<li>即パッチ不能なら緩和策(制限・無効化・監視)で時間を稼ぐ</li>
+<li>EOL管理は脆弱性管理の土台。台帳+2年前からの更新計画</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="6-3-network-zerotrust.html">← 6-3 ネットワークセキュリティ</a>
+  <a href="6-5-phishing-sim.html">6-5 標的型メール対応訓練 →</a>
+</footer>
+</div>
+</body>
+</html>

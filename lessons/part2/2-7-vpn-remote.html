@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-7 VPNとリモートアクセス | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 2 ネットワーク基礎と実践</div>
+  <h1>2-7 VPNとリモートアクセス</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>拠点間VPNとリモートアクセスVPNの違いを説明できる</li>
+<li>フルトンネルとスプリットトンネルの違いと選び方がわかる</li>
+<li>VPN起因の定番トラブルに当たりをつけられる</li>
+</ul></div>
+
+<h2>1. VPN=公道の上に作る「専用トンネル」</h2>
+<p>VPN(Virtual Private Network)は、インターネットという公道の上に<strong class="mark">暗号化されたトンネル</strong>を掘り、あたかも専用線のように安全に通信する技術です。</p>
+<div class="tblwrap"><table>
+<tr><th>種類</th><th>つなぐもの</th><th>ミライ商事での用途</th></tr>
+<tr><td><strong>拠点間VPN</strong>(サイト間)</td><td>オフィス ⇔ オフィス(ルーター同士が常時接続)</td><td>東京⇔大阪⇔福岡を結び、全社で同じ社内網を使う</td></tr>
+<tr><td><strong>リモートアクセスVPN</strong></td><td>個人のPC ⇔ 会社(必要なときだけ接続)</td><td>在宅勤務者が社内システムへアクセス</td></tr>
+</table></div>
+<ul class="plain">
+<li><strong>IPsec-VPN</strong>: ネットワーク層で暗号化。拠点間の定番</li>
+<li><strong>SSL-VPN</strong>: TLSベース。クライアントの導入が軽く、リモートアクセスの定番</li>
+</ul>
+
+<h2>2. フルトンネル vs スプリットトンネル</h2>
+<div class="tblwrap"><table>
+<tr><th></th><th>フルトンネル</th><th>スプリットトンネル</th></tr>
+<tr><td>通信の流れ</td><td><strong>全通信</strong>を会社経由にする</td><td>社内宛だけVPN、その他(YouTube等)は直接インターネットへ</td></tr>
+<tr><td>長所</td><td>統制・監視がしやすい</td><td>会社回線が混まない、Web会議が快適</td></tr>
+<tr><td>短所</td><td>会社のVPN装置と回線がボトルネックに</td><td>PC側の統制が別途必要(EDR等)</td></tr>
+</table></div>
+<p>「在宅勤務が増えたらVPNが激重になった」はフルトンネル設計の典型的な悲鳴。<strong class="mark">どの通信を会社経由にすべきか</strong>という設計問題として捉えましょう。</p>
+
+<h2>3. VPN起因のよくある問い合わせと切り分け</h2>
+<div class="tblwrap"><table>
+<tr><th>症状</th><th>当たりの付けどころ</th></tr>
+<tr><td>「VPNはつながるが社内サーバーに届かない」</td><td>ルーティング/ACL。VPNのIPレンジからの通信が許可されているか</td></tr>
+<tr><td>「社内サイトの名前が引けない」</td><td>DNS。VPN接続時に社内DNSが配られているか(2-4章の知識!)</td></tr>
+<tr><td>「夕方になると遅い」</td><td>VPN装置のセッション数・回線帯域の枯渇(フルトンネル?)</td></tr>
+<tr><td>「カフェのWi-Fiからだけつながらない」</td><td>施設側FWがVPNポートを塞いでいる</td></tr>
+</table></div>
+
+<h2>4. その先へ:ZTNAという潮流</h2>
+<p>「社内ネットワークに入れたら全部見える」という従来型VPNの弱点を見直し、<strong>アプリ単位で本人と端末を毎回検証してつなぐ</strong>のがZTNA(ゼロトラスト・ネットワークアクセス)。Part 6-3で本格的に扱いますが、「VPNの次の形」として名前を覚えておきましょう。</p>
+<div class="irohabox">在宅勤務の「つながらない」は、VPN・DNS・自宅Wi-Fiの三択から始めると早いです。まず「社内の名前が引けるか」を聞くのがわたしの定番です。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>拠点間=常時・ルーター同士 / リモートアクセス=必要時・個人PC</li>
+<li>フル/スプリットは統制と快適さのトレードオフ</li>
+<li>「VPNはつながるのに◯◯できない」はルーティングかDNSから疑う</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part2-ch07">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="2-6-switch-vlan-wifi.html">← 2-6 スイッチ・VLAN・無線LAN</a>
+  <a href="2-8-troubleshoot.html">2-8 トラブルシュート実践 →</a>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1-4 PCキッティングとMDM入門 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 1 コンピュータとOSの基礎</div>
+  <h1>1-4 PCキッティングとMDM入門</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>キッティングの標準工程を、チェックリスト付きで実施できる</li>
+<li>MDM(Intune等)による自動化・ゼロタッチ展開の概念を説明できる</li>
+</ul>
+<small>📺 動画「キッティング完全実演」(15分)とあわせてどうぞ。</small></div>
+
+<h2>1. キッティングとは 〜情シスの登竜門〜</h2>
+<p>キッティングは、<strong class="mark">新品PCを「会社で使える状態」に仕上げて引き渡すまでの一連の作業</strong>です。新人情シスが最初に任される仕事の定番であり、ここでの丁寧さが会社のITの品質を決めます。</p>
+
+<h2>2. 標準工程チェックリスト(ミライ商事版)</h2>
+<div class="tblwrap"><table>
+<tr><th>工程</th><th>作業</th><th>チェックポイント</th></tr>
+<tr><td>① 開梱・検品</td><td>外観確認、付属品確認、型番/シリアル記録</td><td>シリアルは<strong>この時点で</strong>資産台帳へ(箱を捨てる前!)</td></tr>
+<tr><td>② 初期設定</td><td>OSセットアップ、ローカル管理者作成、ホスト名設定</td><td>ホスト名は命名規則どおり(例: <code>MIRAI-NB-0123</code>)</td></tr>
+<tr><td>③ 参加・登録</td><td>ドメイン参加 or Entra参加、MDM登録</td><td>ポリシー(暗号化・画面ロック)が当たったか確認</td></tr>
+<tr><td>④ ソフト導入</td><td>標準ソフト(Office、ブラウザ、EDR、資産管理エージェント)</td><td><strong>EDR/ウイルス対策の導入漏れは重大事故</strong></td></tr>
+<tr><td>⑤ 更新・暗号化</td><td>Windows Update最新化、BitLocker有効化</td><td>回復キーの保管場所を確認(AD/Entra/台帳)</td></tr>
+<tr><td>⑥ 検収・記録</td><td>チェックリスト全項目確認、台帳更新、ラベル貼付</td><td>「誰に・いつ・何を」渡したかを記録</td></tr>
+<tr><td>⑦ 引き渡し</td><td>初期パスワード通知(安全な経路で)、初回サインイン支援</td><td>パスワードをメール平文で送らない</td></tr>
+</table></div>
+<div class="irohabox">キッティングの上手い下手は「⑥記録」に出ます。半年後に「あのPC誰が使ってる?」と聞かれて3秒で答えられたら一人前です。</div>
+
+<h2>3. 台数が増えたら:クローニングとプロビジョニング</h2>
+<ul class="plain">
+<li><strong>手作業</strong>: 〜5台ならチェックリスト方式で十分</li>
+<li><strong>マスターイメージ(クローニング)</strong>: 完成品のディスクイメージを複製して展開する伝統的手法</li>
+<li><strong>プロビジョニング(現代の主流)</strong>: PCは無地のまま配り、<strong class="mark">初回起動時にMDMが自動で設定・ソフト導入</strong>する方式(Windows Autopilot / Apple自動デバイス登録)</li>
+</ul>
+<div class="diagram">
+  <div class="row"><span class="box">メーカー出荷</span><span class="arrow">→</span><span class="box">社員宅へ直送</span><span class="arrow">→</span><span class="box g">初回起動でMDMが自動セットアップ</span></div>
+  <small>ゼロタッチ展開: 情シスが箱を開けずにキッティングが完了する。リモートワーク時代の標準形。</small>
+</div>
+
+<h2>4. MDMでできること(Intune/Jamfの共通概念)</h2>
+<div class="tblwrap"><table>
+<tr><th>機能</th><th>例</th></tr>
+<tr><td>構成プロファイル</td><td>Wi-Fi設定・画面ロック・暗号化を全端末に強制</td></tr>
+<tr><td>アプリ配布</td><td>標準ソフトの自動インストール・更新</td></tr>
+<tr><td>コンプライアンス</td><td>「暗号化していない端末は社内データにアクセス不可」等の条件付け</td></tr>
+<tr><td>リモートワイプ</td><td>紛失・盗難時に遠隔で初期化(Part 6でも登場)</td></tr>
+</table></div>
+
+<div class="trybox"><strong>💪 やってみよう: キッティング手順書づくり(60分)</strong>
+<ol>
+<li>上の①〜⑦の表を土台に、「自分の会社(または架空のミライ商事)用の手順書」を文書として書き起こす</li>
+<li>各工程に「所要時間」「担当」「確認欄(チェックボックス)」を付ける</li>
+<li>書き終えたら、家族や友人に読んでもらい「この手順書だけで作業できそうか」を聞いてみる(=手順書品質の試金石)</li>
+</ol></div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>キッティングは7工程。<strong>記録(台帳)とセキュリティソフト導入</strong>が品質の分かれ目</li>
+<li>台数が増えたらMDM+プロビジョニングで「箱を開けないキッティング」へ</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="1-3-windows-admin.html">← 1-3 Windowsクライアント管理</a>
+  <a href="1-5-hw-troubleshoot.html">1-5 ハードウェアトラブルシュート →</a>
+</footer>
+</div>
+</body>
+</html>

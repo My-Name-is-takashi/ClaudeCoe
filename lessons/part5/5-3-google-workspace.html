@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5-3 Google Workspace管理 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 5 クラウドとSaaS管理</div>
+  <h1>5-3 Google Workspace管理</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>Google管理コンソールで組織部門・グループ・共有設定を管理できる</li>
+<li>M365との対応関係を「翻訳表」で押さえ、両刀使いになる</li>
+</ul></div>
+
+<h2>1. 管理の軸は「組織部門(OU)」</h2>
+<p>Google Workspaceの設定は<strong class="mark">組織部門(OU)単位で継承</strong>されます。ADのOU+GPO(Part 4)と同じ発想:「ポリシーを変えたい単位で部門を切る」が設計のコツです。</p>
+<pre><code>miraishoji.example.co.jp
+├── /社員            ← 標準ポリシー
+│   ├── /営業部
+│   └── /経理部      ← 外部共有をより厳しく
+├── /役員            ← 端末管理を強化
+└── /共有アカウント   ← 2段階認証プロセス必須+ログイン制限</code></pre>
+
+<h2>2. M365 ⇄ Google Workspace 翻訳表</h2>
+<div class="tblwrap"><table>
+<tr><th>やりたいこと</th><th>Microsoft 365</th><th>Google Workspace</th></tr>
+<tr><td>ユーザー・ライセンス管理</td><td>M365管理センター</td><td>管理コンソール(admin.google.com)</td></tr>
+<tr><td>認証・SSO・MFA</td><td>Entra ID</td><td>管理コンソール「セキュリティ」(2段階認証プロセス)</td></tr>
+<tr><td>メール</td><td>Exchange Online</td><td>Gmail(ルーティング・コンプライアンス設定)</td></tr>
+<tr><td>ファイル共有</td><td>SharePoint / OneDrive</td><td>共有ドライブ / マイドライブ</td></tr>
+<tr><td>会議・チャット</td><td>Teams</td><td>Meet / Chat</td></tr>
+<tr><td>ポリシー適用単位</td><td>グループ/条件付きアクセス</td><td><strong>組織部門(継承)</strong>+グループ</td></tr>
+<tr><td>監査ログ</td><td>Purview 監査</td><td>レポート→監査と調査</td></tr>
+<tr><td>退職者データ移管</td><td>共有メールボックス化等</td><td>データ移行ツール/Google Vault</td></tr>
+</table></div>
+
+<h2>3. 実務の要注意ポイント</h2>
+<ul class="plain">
+<li><strong>マイドライブ問題</strong>: 個人のマイドライブに部署の重要ファイルが溜まると、退職時に迷子になる。<strong class="mark">「チームの資産は共有ドライブへ」</strong>を規程と教育で徹底</li>
+<li><strong>外部共有の既定値</strong>: 「リンクを知っている全員」が許可になっていないか最優先で点検(情報漏えいの定番ルート)</li>
+<li><strong>グループ(メーリングリスト)</strong>: 外部からの投稿可否、メンバー以外の閲覧可否の設定漏れが多い</li>
+<li><strong>退職処理</strong>: ライセンス剥奪の前にデータ移管(Vault/移行ツール)。順序を誤るとデータが消える</li>
+</ul>
+
+<div class="trybox"><strong>💪 ラボ: Google Workspace管理演習(120分・無料試用)</strong>
+<ol>
+<li>14日間の無料試用でテナントを作成(検証用ドメインを使用)</li>
+<li>組織部門を「/社員/営業部」「/社員/経理部」で作成し、ユーザーを配置</li>
+<li>経理部だけ「ドライブの外部共有オフ」を設定し、継承の上書きを確認</li>
+<li>共有ドライブを作成し、マイドライブとの権限モデルの違いを確認</li>
+<li>「レポート→監査と調査」でファイル共有操作のログを検索</li>
+<li>2段階認証プロセスを自分のアカウントで強制し、ログイン体験の変化を確認</li>
+</ol></div>
+<div class="irohabox">M365とGoogle、両方触れる情シスは市場価値が高いんです。「翻訳表」の考え方さえあれば、2つ目のツールは半分の時間で覚えられますよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>Googleの管理は組織部門の継承が軸(AD OU+GPOと同じ発想)</li>
+<li>チーム資産は共有ドライブへ。外部共有の既定値を最優先点検</li>
+<li>退職処理は「データ移管→ライセンス回収」の順序厳守</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="5-2-m365.html">← 5-2 Microsoft 365管理</a>
+  <a href="5-4-sso-mfa.html">5-4 ID管理とSSO →</a>
+</footer>
+</div>
+</body>
+</html>

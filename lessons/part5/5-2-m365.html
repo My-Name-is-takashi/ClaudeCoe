@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5-2 Microsoft 365管理 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 5 クラウドとSaaS管理</div>
+  <h1>5-2 Microsoft 365管理</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>M365管理センターでユーザー・ライセンスの日常管理ができる</li>
+<li>Entra ID(旧Azure AD)とオンプレADの関係を説明できる</li>
+<li>Exchange/SharePoint/Teamsの管理ポイントを押さえる</li>
+</ul>
+<small>📺 動画「M365管理センターツアー」(15分)。ラボはM365開発者プログラム/試用テナントで実施します。</small></div>
+
+<h2>1. 管理センターの地図</h2>
+<div class="tblwrap"><table>
+<tr><th>管理センター</th><th>担当</th><th>情シスの日常業務</th></tr>
+<tr><td>Microsoft 365 管理センター</td><td>ユーザー・ライセンス・請求の玄関口</td><td>入退社対応、ライセンス割当</td></tr>
+<tr><td>Entra ID(旧Azure AD)</td><td>認証・グループ・条件付きアクセス</td><td>SSO設定、MFA、サインインログ調査</td></tr>
+<tr><td>Exchange 管理センター</td><td>メール</td><td>共有メールボックス、転送、迷惑メール対策</td></tr>
+<tr><td>SharePoint / OneDrive</td><td>ファイル共有</td><td>外部共有ポリシー、サイト管理</td></tr>
+<tr><td>Teams 管理センター</td><td>チャット・会議</td><td>チーム作成ポリシー、外部アクセス</td></tr>
+<tr><td>Defender / Purview</td><td>セキュリティ・情報保護</td><td>脅威対策、監査ログ検索(超重要)</td></tr>
+</table></div>
+
+<h2>2. Entra IDとオンプレADの関係</h2>
+<div class="diagram">
+  <div class="row"><span class="box">オンプレAD<br><small>mirai.local(Part 4)</small></span><span class="arrow">⇄ Entra Connectで同期 ⇄</span><span class="box g">Entra ID<br><small>クラウドの認証基盤</small></span></div>
+  <small>ハイブリッド構成: 社内はAD、クラウド(M365等)はEntra ID。同じID・パスワードで両方使える。</small>
+</div>
+<ul class="plain">
+<li>Entra IDは「クラウド版の社員名簿+鍵束」。M365のログインはすべてここが処理</li>
+<li>ハイブリッドでは<strong class="mark">「どちらが正(マスター)か」を意識</strong>——同期元(通常オンプレAD)で編集しないと元に戻ってしまう</li>
+<li>新しい会社ではオンプレADなしの「Entra IDオンリー」構成も増加中</li>
+</ul>
+
+<h2>3. ライセンスの基礎知識</h2>
+<div class="tblwrap"><table>
+<tr><th>プラン</th><th>ざっくり</th><th>月額感(1ユーザー)</th></tr>
+<tr><td>Business Basic</td><td>Web版Office+メール+Teams</td><td>数百円台</td></tr>
+<tr><td>Business Standard</td><td>+デスクトップ版Office</td><td>1,000円台後半</td></tr>
+<tr><td>Business Premium</td><td>+Intune・セキュリティ強化(300名まで)</td><td>2,000円台後半</td></tr>
+<tr><td>E3 / E5</td><td>大企業向け。E5はセキュリティ・分析全部盛り</td><td>4,000円〜8,000円台</td></tr>
+</table></div>
+<p>選定の軸: <strong>Intune(MDM)や条件付きアクセスが要るならPremium以上</strong>。「全員E5」は過剰投資になりがちで、役割に応じた混在割当が現実解です。</p>
+
+<h2>4. 現場で多い管理タスク</h2>
+<ul class="plain">
+<li><strong>共有メールボックス</strong>: info@ など。追加ライセンス不要(50GBまで)で作れる——問い合わせ窓口の定番</li>
+<li><strong>退職者のメール</strong>: 共有メールボックス化してライセンス回収、が定石(4-5章のチェックリストと連動)</li>
+<li><strong>外部共有</strong>: SharePoint/OneDriveの外部共有は「既定で誰でもリンク可」になっていないか必ず点検</li>
+<li><strong>監査ログ</strong>: 「誰がこのファイルを消した?」はPurviewの監査ログ検索で追える。有効化されているか最初に確認</li>
+</ul>
+
+<div class="trybox"><strong>💪 ラボ: M365管理演習(150分・試用テナント)</strong>
+<ol>
+<li>M365開発者プログラムまたは試用版でテナントを作成(会社のテナントでは絶対に演習しない)</li>
+<li>ユーザー3名を作成し、ライセンスを割当て。1名は「ライセンスなし」で挙動の違いを確認</li>
+<li>共有メールボックス <code>info@</code> を作成し、メンバーからの送受信を確認</li>
+<li>SharePointの外部共有設定を「既存ゲストのみ」に変更してみる</li>
+<li>Entra IDでサインインログを開き、自分のログイン履歴(場所・端末)を読む</li>
+<li>監査ログ検索を有効化し、ファイル削除操作を検索してみる</li>
+</ol></div>
+<div class="irohabox">M365の管理画面は頻繁に模様替えします。「画面の場所」ではなく「どの管理センターの担当か」で覚えるのが長持ちのコツですよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>入口はM365管理センター、認証の心臓はEntra ID</li>
+<li>ハイブリッドは「マスターはどちらか」を常に意識</li>
+<li>共有メールボックス・外部共有設定・監査ログが実務の3大頻出</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part5-ch02">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="5-1-cloud-basics.html">← 5-1 クラウドの基礎</a>
+  <a href="5-3-google-workspace.html">5-3 Google Workspace管理 →</a>
+</footer>
+</div>
+</body>
+</html>

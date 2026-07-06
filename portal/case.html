@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ケーススタディ | 情シス養成講座</title>
+<link rel="stylesheet" href="../lessons/assets/lesson.css">
+<style>
+  .scene { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; }
+  .scene .text { white-space:pre-wrap; margin-bottom:18px; }
+  .opt { display:block; width:100%; text-align:left; padding:13px 15px; margin-bottom:10px;
+         border:2px solid var(--line); border-radius:10px; background:var(--card); color:var(--text);
+         cursor:pointer; font-size:.95rem; line-height:1.6; }
+  .opt:hover { border-color:var(--accent); }
+  .fb { margin-top:6px; padding:14px; border-radius:10px; font-size:.93rem; white-space:pre-wrap; }
+  .fb.best { background:var(--ok-soft); border-left:4px solid var(--ok); }
+  .fb.soso { background:var(--warn-soft); border-left:4px solid var(--warn); }
+  .fb.bad  { background:var(--ng-soft); border-left:4px solid var(--ng); }
+  button.primary { background:var(--accent); color:#fff; border:none; border-radius:10px;
+                   padding:12px 26px; font-size:1rem; font-weight:700; cursor:pointer; margin-top:16px; }
+  .hud { font-size:.82rem; color:var(--sub); margin-bottom:12px; }
+  .result { text-align:center; padding:24px 8px; }
+  .result .rank { font-size:2.8rem; font-weight:800; }
+  .review { text-align:left; margin-top:18px; font-size:.9rem; }
+  @media (max-width:600px){ button.primary { width:100%; } }
+</style>
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">ケーススタディ 〜あなたならどうする?〜</div>
+  <h1 id="title">読み込み中…</h1>
+</header>
+<div class="wrap">
+  <div class="scene" id="stage"></div>
+  <p style="margin-top:16px;font-size:.85rem"><a href="index.html">← 学習ポータルへ戻る</a></p>
+</div>
+
+<script>
+// cases/<ID>.js を読み込む。データ形式:
+// window.CASE_DATA = { title, intro, start, nodes: { key: {
+//   text, choices:[{label, to, score(0-2), fb}], end?: true, endNote? } } }
+// score: 2=ベスト 1=次善 0=悪手
+let D, node, score = 0, maxScore = 0, steps = 0;
+const log = [];
+const cid = (new URLSearchParams(location.search).get("c") || "")
+              .replace(/[^a-zA-Z0-9_-]/g, "");
+const s = document.createElement("script");
+s.src = "../cases/" + cid + ".js";
+s.onload = () => {
+  D = window.CASE_DATA;
+  document.getElementById("title").textContent = D.title;
+  render(D.start, D.intro);
+};
+s.onerror = () => document.getElementById("stage").textContent = "シナリオが見つかりません: " + cid;
+document.head.appendChild(s);
+
+function esc(t){ const d=document.createElement("div"); d.textContent=t; return d.innerHTML; }
+function fmt(t){ return esc(t).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>"); }
+
+function render(key, intro){
+  node = D.nodes[key];
+  if (!node) { finish(); return; }
+  const st = document.getElementById("stage");
+  let html = `<div class="hud">場面 ${steps+1}${intro?"(導入)":""}</div>`;
+  if (intro) html += `<div class="text" style="color:var(--sub)">${fmt(intro)}</div>`;
+  html += `<div class="text">${fmt(node.text)}</div>`;
+  if (node.end || !node.choices) { finish(node); return; }
+  node.choices.forEach((c,i)=>{ html += `<button class="opt" data-i="${i}">${"ABCD"[i]}. ${fmt(c.label)}</button>`; });
+  html += `<div id="fbArea"></div>`;
+  st.innerHTML = html;
+  st.querySelectorAll(".opt").forEach(b=>b.addEventListener("click", ()=>choose(+b.dataset.i)));
+}
+
+function choose(i){
+  const c = node.choices[i];
+  steps++; score += c.score; maxScore += 2;
+  log.push({q: node.text.split("\n")[0], pick: c.label, score: c.score, fb: c.fb});
+  const cls = c.score===2?"best":c.score===1?"soso":"bad";
+  const head = c.score===2?"◎ ベストな判断!":c.score===1?"○ 悪くない判断":"△ その選択は危険…";
+  document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+  document.getElementById("fbArea").innerHTML =
+    `<div class="fb ${cls}"><strong>${head}</strong>\n${fmt(c.fb)}</div>
+     <button class="primary" id="nextBtn">つづける ▶</button>`;
+  document.getElementById("nextBtn").addEventListener("click", ()=>render(c.to));
+  document.getElementById("nextBtn").focus();
+}
+
+function finish(endNode){
+  const pct = maxScore ? Math.round(score/maxScore*100) : 0;
+  const rank = pct>=85?["S","#2fa572","一人前の判断力です!"]:
+               pct>=65?["A","#4f6df5","合格ライン。振り返りで仕上げましょう"]:
+               pct>=45?["B","#b3760a","基本は掴めています。解説を読み直しましょう"]:
+                       ["C","#d64550","もう一度挑戦してみましょう。失敗して学ぶのがケーススタディです"];
+  let html = `<div class="result">`;
+  if (endNode && endNode.text) html += `<div class="text" style="text-align:left">${fmt(endNode.text)}</div>`;
+  html += `<div class="rank" style="color:${rank[1]}">評価 ${rank[0]}</div>
+    <p>判断スコア ${score} / ${maxScore}(${pct}%)— ${rank[2]}</p>
+    <button class="primary" onclick="location.reload()">最初からやり直す</button>
+    <div class="review"><strong>📋 あなたの判断の記録:</strong><ul class="plain">` +
+    log.map(l=>`<li>${l.score===2?"◎":l.score===1?"○":"△"} ${fmt(l.pick)}</li>`).join("") +
+    `</ul></div></div>`;
+  document.getElementById("stage").innerHTML = html;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5-4 ID管理とSSO(SAML/OIDC/MFA) | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 5 クラウドとSaaS管理</div>
+  <h1>5-4 ID管理とSSO(SAML/OIDC/MFA)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>SSOの価値を非IT役員に説明できる</li>
+<li>SAMLの登場人物(IdP/SP)と流れを図で説明できる</li>
+<li>MFAの方式別強度と「MFA疲労攻撃」を知る</li>
+</ul>
+<small>📺 動画「パスワード100個問題とSSO」(12分)を先にどうぞ。</small></div>
+
+<h2>1. パスワード100個問題</h2>
+<p>SaaSが増えると、社員1人あたりのID/パスワードは数十個に。結果は<strong>使い回し・付箋・忘却地獄</strong>。SSO(シングルサインオン)は<strong class="mark">「会社のID基盤(IdP)に1回ログインすれば、連携する全SaaSに入れる」</strong>仕組みで、利便性とセキュリティを同時に上げる稀有な施策です。</p>
+<ul class="plain">
+<li>役員向け説明の鉄板: 「入口を1つにして、そこに最強の鍵(MFA)を付けます。退職時はその1つを止めれば全部止まります」</li>
+</ul>
+
+<h2>2. SAMLの登場人物と流れ</h2>
+<div class="diagram">
+  <div class="row"><span class="box">① 社員がSaaSへアクセス</span><span class="arrow">→</span><span class="box w">SP(SaaS側)<br><small>「IdPで認証してきて」</small></span></div>
+  <div class="row"><span class="arrow">↓ リダイレクト</span></div>
+  <div class="row"><span class="box g">IdP(Entra ID等)<br><small>② ログイン+MFA</small></span><span class="arrow">→</span><span class="box">③ 署名付きの証明書(アサーション)を発行</span><span class="arrow">→</span><span class="box w">④ SPが検証してログイン成立</span></div>
+  <small>IdP=身元保証人、SP=サービス提供者。SPはパスワードを一切預からない。</small>
+</div>
+<div class="tblwrap"><table>
+<tr><th>用語</th><th>意味</th></tr>
+<tr><td>IdP(Identity Provider)</td><td>認証する側。Entra ID、Okta、Google等</td></tr>
+<tr><td>SP(Service Provider)</td><td>SaaS側。SAMLの設定画面には必ず「IdPのURL・証明書」を入れる欄がある</td></tr>
+<tr><td>SAMLアサーション</td><td>「この人は本人です」というIdPの署名付き証明書</td></tr>
+<tr><td>OIDC(OpenID Connect)</td><td>SAMLの現代版(OAuth 2.0ベース)。新しいSaaSはこちらが主流。役割は同じ</td></tr>
+<tr><td>SCIM</td><td>アカウントの自動作成・削除(プロビジョニング)の規格。入退社連動の自動化に使う</td></tr>
+</table></div>
+<p>切り分けの勘所: <strong class="mark">「ログイン画面に到達できない/戻ってこない」はSP側設定、「IdPでログインできない」はIdP側</strong>。エラーURLがどちらのドメインかを見るだけで当たりがつきます。</p>
+
+<h2>3. MFA(多要素認証)の方式と強度</h2>
+<div class="tblwrap"><table>
+<tr><th>方式</th><th>強度</th><th>備考</th></tr>
+<tr><td>SMSコード</td><td>△</td><td>ないよりまし。SIMスワップ等のリスク</td></tr>
+<tr><td>認証アプリ(TOTP/プッシュ)</td><td>○</td><td>現在の標準。ただしプッシュ連打の「MFA疲労攻撃」に注意</td></tr>
+<tr><td>FIDO2/パスキー(生体・セキュリティキー)</td><td>◎</td><td>フィッシング耐性あり。今後の本命</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ MFA疲労攻撃</strong>: 盗んだパスワードでログインを試み、プッシュ通知を深夜に連打して「間違えて承認」を狙う攻撃。対策は番号一致方式(Number Matching)への切り替えと、「身に覚えのない通知は拒否して報告」の周知です。</div>
+
+<h2>4. 導入の現実的な順序</h2>
+<ol class="plain">
+<li>IdPを決める(M365があるならEntra IDが自然)</li>
+<li>全員にMFA(まず管理者、次に全社員)</li>
+<li>主要SaaSからSAML/OIDC連携(パスワードログインは無効化まで)</li>
+<li>SCIMで入退社の自動化(4-5章・5-6章の台帳と連動)</li>
+</ol>
+<div class="irohabox">SSO導入後の退職処理は「IdPで1アカウント止めるだけ」。4-5章で苦労したSaaS消し忘れ問題の、これが根本解決策なんです。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>SSO=入口を1つにして最強の鍵を付ける。利便性と安全の同時達成</li>
+<li>SAMLはIdP(保証人)とSP(サービス)。エラーはどちらのドメインかで切り分け</li>
+<li>MFAはアプリ以上、本命はパスキー。疲労攻撃には番号一致で対抗</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part5-ch04">📝 章末クイズに挑戦する(8問)</a>
+<footer class="nav">
+  <a href="5-3-google-workspace.html">← 5-3 Google Workspace</a>
+  <a href="5-5-aws.html">5-5 AWS基礎 →</a>
+</footer>
+</div>
+</body>
+</html>

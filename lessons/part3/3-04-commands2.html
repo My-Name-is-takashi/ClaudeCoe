@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-4 基本コマンドII | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-4 基本コマンドII(検索・圧縮・プロセス)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li><code>grep</code> と <code>find</code> で「探す」を制する(業務最頻出)</li>
+<li><code>tar</code> でアーカイブを扱える</li>
+<li><code>ps</code>・<code>top</code>・<code>kill</code> でプロセスを制御できる</li>
+</ul></div>
+
+<h2>1. grep 〜中身から探す〜</h2>
+<pre><code>grep error /var/log/syslog          <span class="cm"># errorを含む行を表示</span>
+grep -i error syslog                <span class="cm"># -i 大文字小文字を無視</span>
+grep -n "192.168.10.5" *.conf       <span class="cm"># -n 行番号つき。設定から特定IPを探す定番</span>
+grep -r "server_name" /etc/nginx/   <span class="cm"># -r ディレクトリごと再帰検索</span>
+grep -v "^#" nginx.conf             <span class="cm"># -v 「含まない行」= コメントを除いて読む神業</span>
+ps aux | grep nginx                 <span class="cm"># パイプ合わせ技: プロセスの中から探す</span></code></pre>
+<p>正規表現は初歩の4つだけまず覚えます: <code>^</code>(行頭)/ <code>$</code>(行末)/ <code>.</code>(任意の1文字)/ <code>*</code>(直前の繰り返し)。<code>grep "^Port" sshd_config</code> のように「行頭がPortの行」を狙い撃ちできます。</p>
+
+<h2>2. find 〜名前・日付・サイズで探す〜</h2>
+<pre><code>find /etc -name "*.conf"            <span class="cm"># 名前で探す</span>
+find /var/log -mtime -7             <span class="cm"># 7日以内に更新されたファイル</span>
+find / -size +100M 2>/dev/null      <span class="cm"># 100MB超の大物(ディスクフル調査の主砲)</span>
+find ~/dojo -name "*.txt" -delete   <span class="cm"># 見つけて削除(先に -delete なしで確認!)</span></code></pre>
+<p><strong class="mark">grep=中身で探す、find=属性で探す</strong>。この分業を覚えれば「あのファイルどこ?」に困りません。</p>
+
+<h2>3. tar 〜固める・展開する〜</h2>
+<pre><code>tar czf logs-20260706.tar.gz /var/log/nginx/   <span class="cm"># c=作成 z=gzip f=ファイル名</span>
+tar tzf logs-20260706.tar.gz                   <span class="cm"># t=中身を見る(展開前の確認作法)</span>
+tar xzf logs-20260706.tar.gz -C /tmp/restore/  <span class="cm"># x=展開 -C=展開先指定</span></code></pre>
+<p>「czf(作る)・tzf(覗く)・xzf(開ける)」の3点セットで暗記。バックアップ(3-8章)の土台です。</p>
+
+<h2>4. プロセスとリソース</h2>
+<pre><code>ps aux                    <span class="cm"># 全プロセス一覧(USER/PID/%CPU/%MEMを見る)</span>
+top                       <span class="cm"># リアルタイム監視(q で終了、M でメモリ順)</span>
+kill 1234                 <span class="cm"># PID 1234へ終了要求(TERM=お願い)</span>
+kill -9 1234              <span class="cm"># 強制終了(KILL=問答無用。最後の手段)</span>
+df -h                     <span class="cm"># ディスク使用量(100%はないか?)</span>
+du -sh /var/log/*         <span class="cm"># どのディレクトリが太っているか</span>
+free -h                   <span class="cm"># メモリの空き</span></code></pre>
+<div class="warnbox"><strong>⚠️ kill -9 をいきなり撃たない</strong>: TERM(既定)はプロセスに後片付けの猶予を与えます。-9は後片付けなしの即死で、データ破損の恐れ。まず <code>kill</code>、効かないときだけ <code>-9</code>。</div>
+
+<div class="trybox"><strong>💪 ラボ: 実務シナリオノック(後半・90分)</strong>
+<ol>
+<li>「設定ファイル群から特定IPを探せ」: <code>grep -rn "127.0.0.1" /etc/ 2>/dev/null | head</code> を実行し、出力の意味を説明する</li>
+<li>「先週分のログを固めて退避せよ」: <code>/var/log</code> で7日以内更新の .log を find で列挙 → tar czf で <code>~/backup-$(date +%Y%m%d).tar.gz</code> に固める → tzf で中身確認</li>
+<li>「暴走プロセスを止めろ」: 別ターミナルで <code>yes > /dev/null &</code> を実行 → top でCPU100%の犯人を見つけ、PIDを調べて kill → topで消えたことを確認</li>
+<li>「ディスクの太った場所を探せ」: <code>du -sh /var/* 2>/dev/null | sort -h | tail -5</code> でワースト5を出す</li>
+</ol></div>
+
+<div class="irohabox">今日の4つ(grep・find・tar・ps/kill)は、障害対応の現場で毎回登場するレギュラーメンバー。3-12章のログ調査で「あ、これ3-4でやったやつ!」ってなりますよ。</div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part3-ch04">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="3-03-commands1.html">← 3-3 基本コマンドI</a>
+  <a href="3-05-vi.html">3-5 viエディタ完全入門 →</a>
+</footer>
+</div>
+</body>
+</html>

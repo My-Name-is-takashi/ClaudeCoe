@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6-3 ネットワークセキュリティとゼロトラスト | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 6 情報セキュリティ</div>
+  <h1>6-3 ネットワークセキュリティとゼロトラスト</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>境界型防御の構成要素(FW/UTM/IDS/IPS/プロキシ)を配置図で説明できる</li>
+<li>FWルールを読める(暗黙のdeny)</li>
+<li>ゼロトラストの考え方と現実的な移行順序を説明できる</li>
+</ul></div>
+
+<h2>1. 境界型防御 〜城壁と関所のモデル〜</h2>
+<div class="tblwrap"><table>
+<tr><th>装置</th><th>役割</th><th>例えるなら</th></tr>
+<tr><td>FW(ファイアウォール)</td><td>IP・ポート単位で通信を許可/拒否</td><td>関所(通行手形の確認)</td></tr>
+<tr><td>UTM</td><td>FW+AV+IPS+Webフィルター等の全部入り(中小の定番)</td><td>多機能な関所</td></tr>
+<tr><td>IDS/IPS</td><td>不正な通信パターンを検知(IDS)/遮断(IPS)</td><td>見張り台/自動迎撃</td></tr>
+<tr><td>プロキシ/Webフィルター</td><td>社内→外のWebを代理・検査、危険サイト遮断</td><td>外出許可の窓口</td></tr>
+<tr><td>DMZ</td><td>外部公開サーバーを置く緩衝地帯</td><td>城壁の外の出島</td></tr>
+</table></div>
+
+<h2>2. FWルールの読み方 〜暗黙のdeny〜</h2>
+<pre><code># | 送信元          | 宛先            | ポート     | 動作
+1 | 社内LAN         | ANY(外部)      | 443,80    | 許可   <span class="cm"># Web閲覧</span>
+2 | 社内LAN         | DMZ:203.0.113.10| 443       | 許可   <span class="cm"># 公開サイトへ</span>
+3 | ANY(外部)      | DMZ:203.0.113.10| 443       | 許可   <span class="cm"># 外から公開サイトへ</span>
+4 | DMZ             | 社内LAN         | ANY       | 拒否   <span class="cm"># DMZが乗っ取られても中に入れない</span>
+※ 最後に書かれていない通信はすべて拒否(<strong>暗黙のdeny</strong>)</code></pre>
+<ul class="plain">
+<li>ルールは<strong class="mark">上から順に評価され、最初に一致した行で決まる</strong></li>
+<li>「とりあえずANY-ANY許可」で当てた穴は、必ず棚卸しで発見・封鎖する(FWルールも資産。台帳化+年次レビュー)</li>
+</ul>
+
+<h2>3. ゼロトラスト 〜「社内=安全」の終わり〜</h2>
+<p>クラウド・在宅勤務・スマホの時代、「城壁の内側は信頼する」前提が崩れました。ゼロトラストは<strong class="mark">「場所を信頼しない。アクセスのたびに、人と端末と状況を検証する」</strong>という設計思想です。</p>
+<div class="tblwrap"><table>
+<tr><th>境界型</th><th>ゼロトラスト</th></tr>
+<tr><td>社内にいれば信頼</td><td>どこにいても毎回検証</td></tr>
+<tr><td>VPNで「中に入れる」</td><td>ZTNAで「そのアプリだけつなぐ」(2-7章)</td></tr>
+<tr><td>守る対象=ネットワーク境界</td><td>守る対象=ID・端末・データ</td></tr>
+</table></div>
+<p><strong>現実的な移行順序</strong>(一夜にしては成らず):
+①ID基盤+MFA+SSO(5-4章)→ ②端末の健全性管理(MDM/EDR: 1-4章・6-2章)→ ③条件付きアクセス(「会社管理外の端末からは接続不可」等)→ ④VPNのZTNA置き換え。<strong class="mark">Part 5までの学習が、実はゼロトラストへの布石だった</strong>のです。</p>
+<div class="irohabox">「ゼロトラスト製品を買えば完成」ではありません。ID・端末・データの管理という地味な土台(この講座でやってきたこと!)の上にしか建たないんです。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>境界型はFW/UTM/DMZの配置で守る。ルールは上から評価+暗黙のdeny</li>
+<li>ゼロトラスト=場所でなく、人・端末・状況を毎回検証</li>
+<li>移行はID→端末→条件付きアクセス→ZTNAの順。土台が9割</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part6-ch03">📝 章末クイズに挑戦する(8問)</a>
+<footer class="nav">
+  <a href="6-2-endpoint.html">← 6-2 エンドポイント防御</a>
+  <a href="6-4-vuln-patch.html">6-4 脆弱性管理とパッチ運用 →</a>
+</footer>
+</div>
+</body>
+</html>

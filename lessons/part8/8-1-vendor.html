@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8-1 ベンダーマネジメント | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 8 情シス実務スキル</div>
+  <h1>8-1 ベンダーマネジメント</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>相見積もりを「条件を揃えて」比較できる</li>
+<li>見積書・保守契約のチェックポイントを押さえる</li>
+<li>ベンダーと対等で健全な関係を築ける</li>
+</ul></div>
+
+<h2>1. 見積もりの取り方 〜条件を揃えるのが9割〜</h2>
+<ul class="plain">
+<li><strong>RFI</strong>(情報提供依頼)=「何ができるか教えて」/ <strong>RFP</strong>(提案依頼)=「この要件への提案と見積もりをください」</li>
+<li>相見積もりは<strong class="mark">同じ要件書を渡して同じ前提で</strong>。台数・期間・保守範囲・納期が揃っていない見積もりは比較になりません</li>
+<li>「一式」表記には内訳を要求する——後の「それは含まれていません」を防ぐ唯一の方法</li>
+</ul>
+<div class="tblwrap"><table>
+<tr><th>見積書のチェック項目</th><th>見るポイント</th></tr>
+<tr><td>範囲</td><td>機器・ライセンス・構築作業・<strong>データ移行・教育・ドキュメント</strong>は含まれるか</td></tr>
+<tr><td>期間・期限</td><td>見積有効期限、納期、検収条件</td></tr>
+<tr><td>保守</td><td>初年度無償?次年度以降の額(<strong>本体の15〜20%/年が相場感</strong>)</td></tr>
+<tr><td>前提条件</td><td>「お客様作業」に何が入っているか(意外と多い)</td></tr>
+</table></div>
+
+<h2>2. 保守契約とSLAの読み方</h2>
+<div class="tblwrap"><table>
+<tr><th>用語</th><th>確認すべきこと</th></tr>
+<tr><td>対応時間</td><td>平日9-17? 24365? <strong>自社の業務時間と合っているか</strong></td></tr>
+<tr><td>オンサイト/センドバック</td><td>来てくれるのか、送って直すのか(復旧時間が桁で変わる)</td></tr>
+<tr><td>駆けつけ時間</td><td>「連絡から4時間以内に着手」等。7-6章の障害で効いた条項</td></tr>
+<tr><td>範囲の境界</td><td>ハードは対象でも「設定変更は別料金」等。<strong>境界の明文化</strong>が揉め事を防ぐ</td></tr>
+</table></div>
+
+<h2>3. 交渉と関係づくり</h2>
+<ul class="plain">
+<li><strong>値引きより条件交渉</strong>: 「保守初年度を含めて」「教育を1回追加で」の方が通りやすく、実利も大きい</li>
+<li>相見積もりの存在は正直に伝えてよい(健全な競争)。ただし他社の見積額を見せるのはマナー違反</li>
+<li><strong>ベンダーは敵ではなくパートナー</strong>: 無理な値切りは品質と優先度で返ってくる。良い関係=障害時に本気で動いてくれる保険</li>
+<li>ベンダーロックイン対策: ドキュメント(設計書・設定情報)の納品を契約に含め、<strong>自社に「引っ越せる自由」を残す</strong></li>
+</ul>
+<div class="trybox"><strong>💪 演習: 見積比較ワーク(45分)</strong>
+<p>無線AP更改(20台)の3社見積もり: A社380万(保守込み・3年)/ B社295万(保守別・年28万)/ C社340万(保守込みだが「設定作業はお客様作業」)。3年総額に正規化し、条件差を洗い出し、各社への確認質問リストを作ってください。</p>
+<details><summary>📄 考え方の例</summary>
+<ul class="plain">
+<li>3年総額: A=380万 / B=295+28×3=379万 / C=340万+自社作業の人件費(または追加見積)</li>
+<li>ほぼ同額のAとBは条件面(駆けつけ・センドバック・更新時の扱い)で比較</li>
+<li>Cへの質問: 「設定作業を御社実施にした場合の追加額は?」——安く見える見積もりの正体を暴く</li>
+</ul></details></div>
+<div class="irohabox">「安い見積もりには理由がある」。総額と境界線を揃えてはじめて、本当の比較が始まります。ここが情シスの目利きの見せ場ですよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>相見積もりは同一要件書+総額正規化で比較。「一式」には内訳を</li>
+<li>保守は対応時間・駆けつけ・範囲の境界を契約書で確認</li>
+<li>値引きより条件。ドキュメント納品で引っ越せる自由を確保</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="../part7/7-6-incident-drill.html">← Part 7</a>
+  <a href="8-2-budget.html">8-2 IT予算と稟議 →</a>
+</footer>
+</div>
+</body>
+</html>

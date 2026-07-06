@@ -1,0 +1,58 @@
+// 3-7 パッケージ管理とsystemd 章末クイズ
+window.QUIZ_DATA = {
+  id: "part3-ch07",
+  title: "3-7 パッケージ管理とsystemd 章末クイズ",
+  passLine: 70,
+  questions: [
+    { type: "single", level: 1,
+      q: "`apt update` と `apt upgrade` の違いとして正しいものはどれですか?",
+      choices: [
+        "updateはパッケージ一覧(カタログ)の更新、upgradeはソフト本体の更新",
+        "updateが本体、upgradeがカタログ",
+        "同じ動作の別名",
+        "updateはWindows専用"],
+      answer: [0],
+      explain: "「カタログを最新化してから本体を上げる」ので、実務では `sudo apt update && sudo apt upgrade` をセットで打ちます。" },
+    { type: "single", level: 2,
+      q: "`systemctl start nginx` だけ実行し、`enable` を忘れるとどうなりますか?",
+      choices: [
+        "今は動くが、OS再起動後に自動起動しない",
+        "何も動かない",
+        "再起動後だけ動く",
+        "永久に動き続ける"],
+      answer: [0],
+      explain: "start=今すぐ、enable=次回起動から。「メンテ再起動後にサービスが上がってこない」障害の定番原因です。" },
+    { type: "single", level: 2,
+      q: "本番稼働中のnginxに設定変更を反映するとき、restartよりreloadが好まれる理由は?",
+      choices: [
+        "接続を切らずに設定だけ読み直せるから",
+        "reloadの方が権限が不要だから",
+        "restartは設定を読まないから",
+        "reloadは自動でバックアップを取るから"],
+      answer: [0],
+      explain: "restartは一瞬サービスが止まります。無停止のreloadで済むならそちらが第一選択です。" },
+    { type: "single", level: 2,
+      q: "サービスが起動失敗(failed)したときの調査手順として最適なのはどれですか?",
+      choices: [
+        "`systemctl status サービス` → `journalctl -xeu サービス` の順で詳細を見る",
+        "すぐOSを再インストールする",
+        "とにかく10回restartを繰り返す",
+        "電源を入れ直す"],
+      answer: [0],
+      explain: "statusで概要(終了コード・時刻)、journalctlで詳細(原因)。この2連コンボが調査の型です。" },
+    { type: "single", level: 1,
+      q: "nginxのログを「リアルタイムで追いかける」journalctlのコマンドはどれですか?",
+      choices: ["`journalctl -u nginx -f`", "`journalctl -u nginx --old`", "`journalctl stop nginx`", "`journalctl -rm nginx`"],
+      answer: [0],
+      explain: "-fはfollow(tail -f相当)。障害の再現試験をしながらログを流し見る定番です。" },
+    { type: "single", level: 3,
+      q: "aptのようなパッケージ管理を使う利点として適切でないものはどれですか?",
+      choices: [
+        "どんなソフトでも無審査で入るので何でも自由に使える",
+        "依存関係を自動で解決してくれる",
+        "署名検証つきで配布元の信頼性が担保される",
+        "一括アップデートでセキュリティ運用が楽になる"],
+      answer: [0],
+      explain: "リポジトリは審査・署名された配布元です。「何でも無審査」はむしろ野良ダウンロードの危険性の説明です。" },
+  ]
+};

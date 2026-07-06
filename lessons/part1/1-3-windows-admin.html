@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1-3 Windowsクライアント管理入門 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 1 コンピュータとOSの基礎</div>
+  <h1>1-3 Windowsクライアント管理入門(ラボ)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 このラボのゴール(所要 約90分)</strong>
+<ul>
+<li>ユーザーアカウント・UAC・Windows Update・イベントログを実際に操作する</li>
+<li>管理ツールを「実行コマンド」で呼び出せるようになる</li>
+</ul>
+<small>前提: Windows 10/11 のPC(会社PCではなく私物や検証機で!)。管理者権限が必要です。</small></div>
+
+<div class="warnbox"><strong>⚠️ ラボの鉄則</strong>: 会社の本番PCでは絶対に実施しないこと。自分のPCで行う場合も、手順にある変更は最後に元へ戻します。</div>
+
+<h2>STEP 1: 管理ツールを呼び出す(10分)</h2>
+<pre><code><span class="cm"># Win+R(ファイル名を指定して実行)から。情シスの「合言葉」たちです</span>
+winver      <span class="cm">→ Windowsのバージョン確認</span>
+msinfo32    <span class="cm">→ システム情報(型番・BIOS・メモリ)</span>
+eventvwr    <span class="cm">→ イベントビューアー</span>
+control     <span class="cm">→ コントロールパネル</span>
+compmgmt.msc<span class="cm">→ コンピューターの管理(ユーザー・ディスク・サービス)</span>
+taskschd.msc<span class="cm">→ タスクスケジューラ</span></code></pre>
+<p>✅ <strong>確認</strong>: 6つすべて開けたらSTEP 1完了。この呼び出し方は電話サポートでも「Win+Rで◯◯と打ってください」とそのまま使えます。</p>
+
+<h2>STEP 2: ローカルユーザーと権限(20分)</h2>
+<ol class="plain">
+<li><code>compmgmt.msc</code> →「ローカルユーザーとグループ」→「ユーザー」</li>
+<li>右クリック→「新しいユーザー」: 名前 <code>labuser</code>、パスワードを設定して作成</li>
+<li>作成した labuser をダブルクリック→「所属するグループ」を確認(既定は <strong>Users</strong>=標準ユーザー)</li>
+<li>いったんサインアウトし、labuser でサインイン→ソフトのインストールを試みると<strong>管理者パスワードを要求される</strong>ことを確認(これが UAC)</li>
+<li>元のユーザーに戻る</li>
+</ol>
+<div class="casebox"><strong>💡 なぜ大事?</strong> 会社では「一般社員=標準ユーザー、情シス=管理者」が大原則。マルウェアに感染しても、標準ユーザーなら被害を大幅に抑えられます(Part 6 で再登場)。</div>
+
+<h2>STEP 3: Windows Update の制御(15分)</h2>
+<ol class="plain">
+<li>「設定」→「Windows Update」→「更新の履歴」で最近当たった更新を確認</li>
+<li>「詳細オプション」→「更新の一時停止」を1週間に設定してみる → すぐ解除する</li>
+<li>用語確認: 毎月第2火曜(米国時間)の定例更新=<strong class="mark">パッチチューズデー</strong>。翌水曜は問い合わせが増えがち</li>
+</ol>
+
+<h2>STEP 4: イベントビューアーでログを読む(25分)</h2>
+<ol class="plain">
+<li><code>eventvwr</code> →「Windowsログ」→「システム」</li>
+<li>「レベル」列で並べ替え、<strong>エラー</strong>と<strong>警告</strong>をいくつか開いて説明文を読む</li>
+<li>「現在のログをフィルター」で「レベル: エラー」「期間: 過去7日」に絞り込む</li>
+<li>ソース <code>Kernel-Power ID:41</code> があれば、それは「正常終了せず電源断」の痕跡(突然のシャットダウン調査の定番)</li>
+</ol>
+<p>✅ <strong>確認</strong>: 「過去7日のエラーだけを一覧にする」操作が一人でできればSTEP 4完了。</p>
+
+<h2>STEP 5: タスクスケジューラ(15分)</h2>
+<ol class="plain">
+<li><code>taskschd.msc</code> →「タスクスケジューラライブラリ」を眺め、既存タスクがたくさん動いていることを確認</li>
+<li>「基本タスクの作成」→ 名前 <code>lab-notepad</code> → 毎日 → 時刻は5分後 → プログラム <code>notepad.exe</code> → 完了</li>
+<li>5分待ってメモ帳が自動起動することを確認 → <strong>タスクを削除して後片付け</strong></li>
+</ol>
+
+<h2>うまくいかないとき</h2>
+<ul class="plain">
+<li>「ローカルユーザーとグループ」が無い → Home エディションです。「設定」→「アカウント」→「他のユーザー」で代用できます(1-2章のエディション差の実体験!)</li>
+<li>UACのダイアログが出ない → UAC設定が最低になっていないか <code>control</code>→ユーザーアカウントで確認</li>
+</ul>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>管理ツールは実行コマンド(winver/msinfo32/eventvwr…)で瞬時に呼べる</li>
+<li>標準ユーザー+UACが社内セキュリティの土台</li>
+<li>イベントログは「過去7日のエラーに絞る」から始めるのが読み方の型</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part1-ch03">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="1-2-os-basics.html">← 1-2 OSの役割</a>
+  <a href="1-4-kitting-mdm.html">1-4 キッティングとMDM →</a>
+</footer>
+</div>
+</body>
+</html>

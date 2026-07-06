@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1-1 コンピュータの仕組み | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 1 コンピュータとOSの基礎</div>
+  <h1>1-1 コンピュータの仕組み(CPU・メモリ・ストレージ)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>CPU・メモリ・ストレージの役割を「机と本棚」の比喩で説明できる</li>
+<li>PCカタログのスペック表を読んで、用途に合うPCを選定できる</li>
+</ul>
+<small>📺 動画①「パソコンの中身、ぜんぶ見せます」②「スペック表の読み方」とあわせてどうぞ。</small></div>
+
+<h2>1. 3大部品は「頭脳・机・本棚」</h2>
+<div class="tblwrap"><table>
+<tr><th>部品</th><th>比喩</th><th>役割</th><th>足りないと…</th></tr>
+<tr><td><strong>CPU</strong></td><td>頭脳</td><td>計算・処理をする</td><td>すべての動作が遅い(処理待ち)</td></tr>
+<tr><td><strong>メモリ(RAM)</strong></td><td>机の広さ</td><td>作業中のデータを広げる場所。電源OFFで消える</td><td>アプリを複数開くと極端に遅くなる</td></tr>
+<tr><td><strong>ストレージ(SSD/HDD)</strong></td><td>本棚</td><td>ファイルやOSを保存する場所。電源OFFでも残る</td><td>「空き容量不足」で保存・更新ができない</td></tr>
+</table></div>
+<p><strong class="mark">「遅い」の相談は、まずこの3つのどれが詰まっているかを見る</strong>——これが情シスの基本動作です(タスクマネージャーの見方は1-3章で)。</p>
+
+<h2>2. スペック表の読み方</h2>
+<pre><code>例: 社用PCカタログ
+CPU: Core i5-1335U(10コア)     <span class="cm">← 世代とコア数を見る。iの後の数字はグレード(3<5<7)</span>
+メモリ: 16GB                    <span class="cm">← 事務なら8GB、標準は16GB。あとから増設できない機種も多い</span>
+ストレージ: SSD 256GB NVMe      <span class="cm">← いまはSSD一択。HDDより桁違いに速い</span>
+ディスプレイ: 14型 FHD(1920x1080)
+インターフェース: USB-C(PD対応)x2, HDMI, USB-A x2  <span class="cm">← 会議室・充電の運用に直結</span></code></pre>
+<div class="tblwrap"><table>
+<tr><th>用途</th><th>目安構成</th><th>ポイント</th></tr>
+<tr><td>事務(メール・Office)</td><td>Core i3〜i5 / 8〜16GB / SSD 256GB</td><td>軽さ・バッテリー・価格重視</td></tr>
+<tr><td>開発・データ処理</td><td>Core i7 / 32GB / SSD 512GB〜</td><td>メモリを最優先で盛る</td></tr>
+<tr><td>デザイン・動画</td><td>Core i7+GPU / 32GB / SSD 1TB</td><td>GPUと色精度の高い画面</td></tr>
+</table></div>
+
+<h2>3. SSDとHDD、そして周辺の規格</h2>
+<ul class="plain">
+<li><strong>SSD</strong>: 高速・静音・衝撃に強い。ノートPCは実質SSD一択</li>
+<li><strong>HDD</strong>: 容量単価が安い。バックアップ・大容量保管用として現役</li>
+<li><strong>USB規格</strong>: 形(Type-A/Type-C)と速度(USB 3.x)は別の話。「Type-Cなのに遅い」は普通にある</li>
+<li><strong>映像出力</strong>: HDMI / DisplayPort / USB-C(Alt Mode)。会議室トラブルの主戦場</li>
+</ul>
+<div class="irohabox">「メモリとストレージの区別」は、社員さんへの説明でも毎週使います。“机”と“本棚”の例え、そのまま使ってOKですよ。</div>
+
+<div class="trybox"><strong>💪 やってみよう(10分)</strong>
+<ol>
+<li>自分のPCのスペックを調べる(Windows: <code>Win+R</code> → <code>msinfo32</code> / Mac: 「このMacについて」)</li>
+<li>CPU・メモリ・ストレージを上の表と見比べ、「事務用として合格か」を判定してみる</li>
+</ol></div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>CPU=頭脳、メモリ=机、ストレージ=本棚。「遅い」はこの3つから疑う</li>
+<li>スペック表は「用途に足りるか」で読む。標準構成表を持つと選定が速い</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part1-ch01">📝 章末クイズに挑戦する(8問)</a>
+<footer class="nav">
+  <a href="../part0/0-4-career-map.html">← Part 0</a>
+  <a href="1-2-os-basics.html">1-2 OSの役割 →</a>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-7 パッケージ管理とsystemd | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-7 パッケージ管理とsystemd</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li><code>apt</code> でパッケージの検索・導入・更新・削除ができる</li>
+<li><code>systemctl</code> でサービスの起動・停止・自動起動を制御できる</li>
+<li><code>journalctl</code> でサービスのログを追える</li>
+</ul></div>
+
+<h2>1. apt 〜ソフトの「公式アプリストア」〜</h2>
+<pre><code>sudo apt update            <span class="cm"># カタログ(パッケージ一覧)を最新化 ※まだ何も入らない</span>
+sudo apt upgrade           <span class="cm"># 入っているソフトを一括更新(セキュリティ運用の基本)</span>
+apt search nginx           <span class="cm"># 探す</span>
+apt show nginx             <span class="cm"># 詳細(バージョン・説明)を見る</span>
+sudo apt install nginx     <span class="cm"># インストール(依存関係も自動解決)</span>
+sudo apt remove nginx      <span class="cm"># 削除(設定は残す)。完全削除は purge</span></code></pre>
+<div class="warnbox"><strong>⚠️ update と upgrade の違い</strong>: update=カタログの更新、upgrade=ソフト本体の更新。「update したのに直らない」はこの取り違えが原因のことも。セットで <code>sudo apt update && sudo apt upgrade</code> と覚えましょう。</div>
+<p>リポジトリ(配布元)から署名検証つきで取得する仕組みなので、<strong class="mark">野良サイトからのダウンロードより安全</strong>。これが「Linuxにウイルス対策ソフトの概念が薄い」一因です(無敵という意味ではありません!)。</p>
+
+<h2>2. systemd 〜サービスの元締め〜</h2>
+<pre><code>systemctl status nginx     <span class="cm"># 状態確認(active (running)? failed?)</span>
+sudo systemctl start nginx    <span class="cm"># 起動</span>
+sudo systemctl stop nginx     <span class="cm"># 停止</span>
+sudo systemctl restart nginx  <span class="cm"># 再起動(接続は一瞬切れる)</span>
+sudo systemctl reload nginx   <span class="cm"># 設定再読込(無停止。対応サービスのみ)</span>
+sudo systemctl enable nginx   <span class="cm"># OS起動時の自動起動をON</span>
+sudo systemctl disable nginx  <span class="cm"># 自動起動OFF</span></code></pre>
+<div class="tblwrap"><table>
+<tr><th>混同しがちペア</th><th>違い</th></tr>
+<tr><td><code>start</code> と <code>enable</code></td><td>start=「今」動かす / enable=「次回起動時から」自動で動く。<strong>両方やって初めて「今も再起動後も動く」</strong></td></tr>
+<tr><td><code>restart</code> と <code>reload</code></td><td>restart=全部入れ直し(瞬断あり)/ reload=設定だけ読み直し(無停止)。本番ではまずreloadを検討</td></tr>
+</table></div>
+
+<h2>3. journalctl 〜サービスの日記帳〜</h2>
+<pre><code>journalctl -u nginx            <span class="cm"># nginxのログだけ表示</span>
+journalctl -u nginx -f         <span class="cm"># リアルタイム追尾(tail -f 相当)</span>
+journalctl -u nginx --since "1 hour ago"
+journalctl -xe                 <span class="cm"># 直近のログ+解説つき(起動失敗調査の定番)</span></code></pre>
+<p><strong class="mark">起動失敗の調査手順は「status → journalctl -xe」の2連コンボ</strong>。statusで概要(いつ・何番の終了コードで死んだか)、journalctlで詳細(なぜ)を見ます。</p>
+
+<div class="trybox"><strong>💪 ラボ: サービス管理演習(75分)</strong>
+<ol>
+<li>スナップショット取得 → <code>sudo apt update && sudo apt install nginx</code></li>
+<li><code>systemctl status nginx</code> で active (running) を確認 → <code>curl http://localhost</code> でWelcomeページのHTMLが返ることを確認</li>
+<li><code>sudo systemctl stop nginx</code> → curlが失敗することを確認 → start で復活</li>
+<li><code>systemctl is-enabled nginx</code> で自動起動を確認 → <code>sudo reboot</code> → 再接続して「再起動後も動いている」ことを確認</li>
+<li><code>journalctl -u nginx</code> で起動・停止の履歴が時系列で残っていることを確認</li>
+<li>おまけ: <code>/etc/nginx/nginx.conf</code> の1行目にわざと <code>hoge</code> と書いて <code>sudo systemctl restart nginx</code> → 失敗を <code>status</code> と <code>journalctl -xe</code> で調査 → viで直して復旧(3-5章の実戦!)</li>
+</ol></div>
+<div class="irohabox">手順6の「わざと壊して直す」、ちょっとドキドキしましたか?本番で初体験するより、ラボで100回転んでおくほうが、ずっと安上がりです!</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>apt: update(カタログ)→ upgrade(本体)。導入はinstall一発</li>
+<li>systemctl: start/enable は別物。本番の設定反映はまず reload</li>
+<li>起動失敗は「status → journalctl -xe」の2連コンボで調べる</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part3-ch07">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="3-06-permission.html">← 3-6 パーミッション</a>
+  <a href="3-08-shellscript-cron.html">3-8 シェルスクリプトとcron →</a>
+</footer>
+</div>
+</body>
+</html>

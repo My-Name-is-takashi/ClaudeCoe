@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-1 ネットワークの全体像とOSI参照モデル | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 2 ネットワーク基礎と実践</div>
+  <h1>2-1 ネットワークの全体像とOSI参照モデル</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>オフィスのネットワーク構成(ONU・ルーター・スイッチ・AP・FW)を絵に描ける</li>
+<li>OSI 7階層とTCP/IP 4階層を対応づけて説明できる</li>
+</ul>
+<small>📺 動画①「メールが届くまでの大冒険」②「オフィスのネットワークを describe する」とあわせてどうぞ。</small></div>
+
+<h2>1. オフィスネットワークの登場人物</h2>
+<div class="diagram">
+  <div class="row"><span class="box w">インターネット</span></div>
+  <div class="row"><span class="arrow">|</span></div>
+  <div class="row"><span class="box">ONU<br><small>光回線の終端</small></span><span class="arrow">—</span><span class="box g">FW/UTM<br><small>関所</small></span><span class="arrow">—</span><span class="box">ルーター<br><small>拠点の出入口</small></span></div>
+  <div class="row"><span class="arrow">|</span></div>
+  <div class="row"><span class="box">L2スイッチ<br><small>フロアの分岐</small></span><span class="arrow">—</span><span class="box">無線AP<br><small>Wi-Fi</small></span></div>
+  <div class="row"><span class="arrow">|</span></div>
+  <div class="row"><span class="box">PC・プリンター・サーバー</span></div>
+  <small>ミライ商事 東京本社の基本構成。障害時は「どの階層の機器までは生きているか」を上から/下から辿る。</small>
+</div>
+<div class="tblwrap"><table>
+<tr><th>機器</th><th>役割</th><th>例えるなら</th></tr>
+<tr><td>ONU</td><td>光信号⇔電気信号の変換(回線の終端)</td><td>玄関ドア</td></tr>
+<tr><td>ルーター</td><td>異なるネットワーク間の転送(社内⇔インターネット)</td><td>郵便局</td></tr>
+<tr><td>FW/UTM</td><td>通信の検問(許可/拒否)</td><td>関所</td></tr>
+<tr><td>L2スイッチ</td><td>同一ネットワーク内の交通整理(MACアドレス)</td><td>フロアの案内係</td></tr>
+<tr><td>無線AP</td><td>Wi-Fi電波の出入口(電波⇔有線の変換)</td><td>ワイヤレスの窓口</td></tr>
+</table></div>
+
+<h2>2. OSI参照モデル 〜通信を7つの層で考える〜</h2>
+<p>通信は「役割の階層」に分けて考えると、障害の切り分けが一気に楽になります。<strong class="mark">下の層が死んでいたら、上の層は絶対に動かない</strong>——これが切り分けの大原則です。</p>
+<div class="tblwrap"><table>
+<tr><th>層</th><th>名前</th><th>担当</th><th>身近な例/道具</th></tr>
+<tr><td>7</td><td>アプリケーション</td><td>アプリ同士の会話規約</td><td>HTTP、DNS、SMTP</td></tr>
+<tr><td>6</td><td>プレゼンテーション</td><td>データ形式・暗号化</td><td>文字コード、TLS</td></tr>
+<tr><td>5</td><td>セッション</td><td>会話の開始と終了</td><td>ログインセッション</td></tr>
+<tr><td>4</td><td>トランスポート</td><td>確実に届ける/ポート番号</td><td>TCP/UDP(2-3章)</td></tr>
+<tr><td>3</td><td>ネットワーク</td><td>住所(IP)と経路</td><td>IPアドレス、ルーター、ping</td></tr>
+<tr><td>2</td><td>データリンク</td><td>隣の機器まで届ける</td><td>MACアドレス、スイッチ</td></tr>
+<tr><td>1</td><td>物理</td><td>電気・光・電波</td><td>LANケーブル、光回線、電波</td></tr>
+</table></div>
+<p>実務ではTCP/IP 4階層(アプリケーション=5〜7層/トランスポート=4層/インターネット=3層/リンク=1〜2層)で会話することが多いです。<strong>「L2で落ちてる」「L3までは通る」という言い方に慣れましょう</strong>。</p>
+
+<h2>3. カプセル化 〜手紙を封筒に入れる〜</h2>
+<p>データは送信時、上の層から順に「封筒」に入れられていきます。メール本文 → TCPの封筒(ポート番号)→ IPの封筒(宛先IP)→ Ethernetの封筒(隣の機器のMAC)。受信側は逆順に開封します。<strong class="mark">ルーターはIPの封筒を見て転送し、スイッチはEthernetの封筒を見て転送する</strong>——機器の役割の違いは「どの封筒を読むか」の違いです。</p>
+
+<div class="irohabox">「つながらない」と言われたら、頭の中にこの7階層を思い浮かべて、下から順に「ケーブルは?(L1)→ スイッチは?(L2)→ pingは?(L3)…」。これが2-8章でやる切り分けの型です。</div>
+
+<div class="trybox"><strong>💪 やってみよう(10分)</strong>
+<ol>
+<li>自宅のネットワークを紙に描いてみる(回線終端装置→ルーター→Wi-Fi→端末)</li>
+<li>それぞれの機器がOSIのどの層で仕事をしているか書き添える</li>
+</ol></div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>オフィスの構成は「ONU→FW→ルーター→スイッチ→AP→端末」が基本形</li>
+<li>OSIは切り分けの地図。<strong>下の層から順に疑う</strong></li>
+<li>ルーターはIP(L3)、スイッチはMAC(L2)を見て転送する</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part2-ch01">📝 章末クイズに挑戦する(8問)</a>
+<footer class="nav">
+  <a href="../part1/1-5-hw-troubleshoot.html">← Part 1</a>
+  <a href="2-2-ip-subnet.html">2-2 IPアドレスとサブネット →</a>
+</footer>
+</div>
+</body>
+</html>

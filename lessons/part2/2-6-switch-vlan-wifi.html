@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-6 スイッチ・VLAN・無線LAN | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 2 ネットワーク基礎と実践</div>
+  <h1>2-6 スイッチ・VLAN・無線LAN</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>L2/L3スイッチの違いとMACアドレス学習を説明できる</li>
+<li>VLANでネットワークを分割する目的と設定の読み方がわかる</li>
+<li>無線LANの規格・認証・設計の基本を押さえる</li>
+</ul>
+<small>📺 動画「VLANでオフィスを仕切る」(12分)とあわせてどうぞ。</small></div>
+
+<h2>1. スイッチの仕事 〜MACアドレスで交通整理〜</h2>
+<ul class="plain">
+<li>スイッチは「どのポートの先にどのMACアドレスがいるか」を<strong>学習</strong>し、宛先のポートだけにフレームを送る</li>
+<li><strong>L2スイッチ</strong>: MACアドレス(L2)だけで転送。同一ネットワーク内の交通整理役</li>
+<li><strong>L3スイッチ</strong>: ルーター機能も持つスイッチ。<strong class="mark">VLAN同士の橋渡し(VLAN間ルーティング)</strong>は普通これが担う</li>
+<li><strong>PoE</strong>: LANケーブルで電力も送る機能。無線APや監視カメラの設置で必須知識</li>
+</ul>
+
+<h2>2. VLAN 〜1台のスイッチの中に「仮想の仕切り」〜</h2>
+<p>VLANは、物理的には1つのネットワークを<strong class="mark">論理的に複数へ分割</strong>する技術です。目的は主に3つ: <strong>①セキュリティ(部門分離・ゲスト分離) ②ブロードキャストの抑制 ③管理のしやすさ</strong>。</p>
+<div class="diagram">
+  <div class="row"><span class="box">VLAN10 社員PC<br><small>192.168.10.0/24</small></span>
+  <span class="box g">VLAN20 サーバー<br><small>192.168.20.0/24</small></span>
+  <span class="box w">VLAN90 ゲストWi-Fi<br><small>192.168.90.0/24 → 社内へは通さない</small></span></div>
+  <small>ミライ商事のVLAN設計。ゲストはインターネットにしか出られない。</small>
+</div>
+<div class="tblwrap"><table>
+<tr><th>用語</th><th>意味</th></tr>
+<tr><td>アクセスポート</td><td>1つのVLANだけが流れるポート。PC・プリンターをつなぐ</td></tr>
+<tr><td>トランクポート(タグVLAN)</td><td>複数のVLANをタグ付きで相乗りさせるポート。<strong>スイッチ間・AP向け</strong>の幹線</td></tr>
+<tr><td>ネイティブVLAN</td><td>トランク上でタグなしのフレームが属するVLAN</td></tr>
+</table></div>
+<pre><code><span class="cm"># スイッチ設定の読み方(よくある表記の例)</span>
+interface GigabitEthernet0/1
+ switchport mode access
+ switchport access vlan 10        <span class="cm"># ← このポートはVLAN10専用(社員PC用)</span>
+interface GigabitEthernet0/24
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,90   <span class="cm"># ← 幹線。3つのVLANが相乗り</span></code></pre>
+<div class="warnbox"><strong>⚠️ 現場あるある</strong>: 「差し替えたらつながらない」の一定数は<strong>アクセスポートのVLAN違い</strong>。空きポートに挿す前に「そのポートは何VLANか」を確認する癖をつけましょう。</div>
+
+<h2>3. 無線LANの基礎</h2>
+<div class="tblwrap"><table>
+<tr><th>項目</th><th>要点</th></tr>
+<tr><td>規格</td><td>Wi-Fi 5(11ac)→ 6/6E(11ax)→ 7(11be)。周波数は2.4GHz(遠くまで届くが混雑)と5GHz/6GHz(速いが障害物に弱い)</td></tr>
+<tr><td>暗号化</td><td>WPA2以上が必須、新規はWPA3推奨。WEPは即時撲滅対象</td></tr>
+<tr><td>認証</td><td>家庭=事前共有キー(PSK)。企業=<strong>802.1X(WPA2/3-Enterprise)</strong>で個人ごとに認証(退職者をすぐ無効化できる)</td></tr>
+<tr><td>SSID設計</td><td>社員用(社内VLANへ)+ゲスト用(分離VLANへ)の2本立てが基本形</td></tr>
+<tr><td>設置設計</td><td>APの位置=電波調査(サイトサーベイ)。チャネル重複と電子レンジ(2.4GHz)干渉に注意</td></tr>
+</table></div>
+<div class="irohabox">「Wi-Fiが遅い」相談の犯人は、だいたい ①2.4GHzの混雑 ②AP1台に人が集中 ③電波の死角、の3兄弟。周波数とAP配置を見るだけで当たりがつきますよ。</div>
+
+<div class="trybox"><strong>💪 やってみよう(10分)</strong>
+<ol>
+<li>スマホのWi-Fi設定で、自宅のSSIDが2.4GHzと5GHzのどちらにつながっているか確認する</li>
+<li>会社(または自宅)に必要なVLANを3つ設計し、それぞれのサブネットを割り当ててみる(2-2章の復習)</li>
+</ol></div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>スイッチはMAC学習で交通整理。VLAN間はL3スイッチが橋渡し</li>
+<li>VLANは「仮想の仕切り」。アクセス/トランクの区別を読めるように</li>
+<li>企業Wi-FiはWPA2/3-Enterprise+ゲスト分離が基本形</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part2-ch06">📝 章末クイズに挑戦する(8問)</a>
+<footer class="nav">
+  <a href="2-5-dhcp-nat-routing.html">← 2-5 DHCP・NAT・ルーティング</a>
+  <a href="2-7-vpn-remote.html">2-7 VPNとリモートアクセス →</a>
+</footer>
+</div>
+</body>
+</html>

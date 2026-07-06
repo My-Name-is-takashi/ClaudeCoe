@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6-7 法令・規格と認証(ISMS/Pマーク) | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 6 情報セキュリティ ★認証系重点章</div>
+  <h1>6-7 法令・規格と認証(ISMS・Pマーク)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>情シスが関わる主要法令の実務ポイントを押さえる</li>
+<li><strong>ISMS(ISO/IEC 27001)とPマークの違い・取得プロセス・年間運用</strong>を説明できる</li>
+<li>審査(監査)対応で情シスがやることを具体的に知る</li>
+</ul></div>
+
+<h2>1. 情シスが関わる法令マップ</h2>
+<div class="tblwrap"><table>
+<tr><th>法令</th><th>情シスへの影響</th></tr>
+<tr><td><strong>個人情報保護法</strong></td><td>安全管理措置(アクセス制御・ログ・委託先監督)、漏えい時の委員会報告+本人通知義務(6-6章)</td></tr>
+<tr><td>不正アクセス禁止法</td><td>他人のID使用・無断アクセスは犯罪。<strong>退職者アカウント放置は「招待状」</strong>(4-5章)</td></tr>
+<tr><td>電子帳簿保存法</td><td>電子取引データの保存要件(改ざん防止・検索性)。経理システム選定で情シスに相談が来る</td></tr>
+<tr><td>労働関連(労基法等)</td><td>勤怠システムの客観的記録、PCログによる労働時間把握</td></tr>
+<tr><td>著作権法</td><td>ソフトウェアの不正コピー禁止(7-3章のライセンス管理)</td></tr>
+</table></div>
+
+<h2>2. 認証の全体マップ 〜どれが何の証明?〜</h2>
+<div class="tblwrap"><table>
+<tr><th>認証</th><th>正式には</th><th>何の証明?</th><th>取る動機の典型</th></tr>
+<tr><td><strong>ISMS</strong></td><td>ISO/IEC 27001</td><td><strong>情報セキュリティ管理の仕組み</strong>が国際規格どおり回っていること(対象範囲を選べる)</td><td>大手取引・入札の要件、B2Bの信頼</td></tr>
+<tr><td><strong>Pマーク</strong></td><td>プライバシーマーク(JIS Q 15001)</td><td><strong>個人情報の適切な取り扱い</strong>(全社が対象)</td><td>B2C・個人情報を大量に扱う事業</td></tr>
+<tr><td>ISMSクラウドセキュリティ認証</td><td>ISO/IEC 27017</td><td>ISMSにクラウド固有の管理策を追加</td><td>クラウドサービス提供・利用企業</td></tr>
+<tr><td>SOC 2</td><td>—</td><td>受託サービスの内部統制(監査人の報告書)</td><td>SaaS事業者が顧客に示す(5-6章の委託先評価で「見る側」になる)</td></tr>
+</table></div>
+<p>選び方の目安: <strong class="mark">B2Bでセキュリティ全般を示すならISMS、個人情報中心のB2CならPマーク</strong>。両方持つ会社も多く、ミライ商事はISMSを取得済みという設定で以降を学びます。</p>
+
+<h2>3. ISMSのからくり 〜PDCAを審査される〜</h2>
+<p>ISMSは「立派な設備」の審査ではなく、<strong>リスクを自分で特定し、対策を決め、回し、見直す仕組み(PDCA)</strong>の審査です。</p>
+<pre><code>P(計画): 情報資産台帳 → リスクアセスメント → 適用宣言書(93管理策から選択)
+D(実行): 規程どおりの運用、教育、記録(ログ・台帳・議事録)
+C(評価): 内部監査、マネジメントレビュー(経営層による見直し)
+A(改善): 是正処置(指摘→原因→対策→有効性確認)</code></pre>
+<div class="tblwrap"><table>
+<tr><th>取得スケジュール(典型)</th><th>内容</th></tr>
+<tr><td>0〜3ヶ月</td><td>適用範囲決定、資産洗い出し、リスクアセスメント、規程整備</td></tr>
+<tr><td>3〜6ヶ月</td><td>運用開始(記録を貯める)、全社教育、内部監査+マネジメントレビュー</td></tr>
+<tr><td>6〜8ヶ月</td><td>審査(第1段階: 文書審査 → 第2段階: 運用審査)→ 認証取得</td></tr>
+<tr><td>以後</td><td><strong>毎年サーベイランス(維持審査)、3年ごとに更新審査</strong></td></tr>
+</table></div>
+
+<h2>4. 情シスの実務 〜ISMS年間カレンダー〜</h2>
+<div class="tblwrap"><table>
+<tr><th>時期</th><th>情シスのISMS業務</th><th>講座の対応章</th></tr>
+<tr><td>通年</td><td>アクセス権管理の記録、ログ保全、構成変更の記録</td><td>4-5, 3-12</td></tr>
+<tr><td>半期</td><td>アカウント・資産の棚卸し(休眠・退職者・特権)</td><td>4-5, 7-3</td></tr>
+<tr><td>年1回</td><td>リスクアセスメント見直し、全社セキュリティ教育、標的型メール訓練</td><td>6-1, 6-5</td></tr>
+<tr><td>年1回</td><td>内部監査対応 → 是正処置</td><td>本章</td></tr>
+<tr><td>審査前</td><td>記録の整備確認(「やっている」を「証拠で示せる」に)</td><td>8-5</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ 審査で聞かれる定番と、正しい構え</strong>
+<ul>
+<li>「退職者のアカウントはいつ無効化されますか?<strong>直近の退職者の記録を見せてください</strong>」← 口頭説明でなく記録で答える</li>
+<li>「このサーバー室に入れるのは誰ですか?入退室記録は?」</li>
+<li>「バックアップの復元テストはいつ実施しましたか?」(7-5章の伏線)</li>
+<li>NG対応: 審査直前だけ記録を作る(日付で見抜かれます)。<strong class="mark">日常業務の型(この講座の各章)を回していれば、審査対応は「記録を見せるだけ」</strong>になります。</li>
+</ul></div>
+
+<h2>5. 「規程はあるが守られない」問題への処方箋</h2>
+<ul class="plain">
+<li>規程は3階層で書く: <strong>基本方針(社長名・不変)→ 対策基準(何を守るか)→ 実施手順(どうやるか・頻繁に更新)</strong></li>
+<li>守れないルールは直す: 現場が守れない規程は「例外申請」を整備するか、規程側を現実に合わせて改訂(形骸化が最大の敵)</li>
+<li>教育は「事例で」: 規程の読み上げでなく、6-5章のような体験型訓練が定着します</li>
+</ul>
+<div class="irohabox">ISMSは「書類仕事」と嫌われがちですが、正体は「この講座でやってきた良い習慣に、証拠を残すこと」。日常が正しければ、審査は怖くないんですよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>ISMS=セキュリティ管理の仕組みの国際認証、Pマーク=個人情報の全社認証</li>
+<li>ISMSはPDCAの審査。取得後も毎年維持審査、3年で更新</li>
+<li>審査対応の本質は「日常の記録」。棚卸し・ログ・復元テストを平時から</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part6-ch07">📝 章末クイズに挑戦する(8問)</a>
+<a class="quizlink case" href="6-7b-isms-writing.html">✍️ 実践編へ: ISMS文書の書き方(サンプル条文・リスク表・監査チェックリスト)</a>
+<footer class="nav">
+  <a href="6-6-incident.html">← 6-6 インシデント対応</a>
+  <a href="6-7b-isms-writing.html">6-7b ISMS文書の書き方 →</a>
+</footer>
+</div>
+</body>
+</html>

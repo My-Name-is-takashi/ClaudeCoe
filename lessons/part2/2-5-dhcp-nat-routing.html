@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-5 DHCP・NAT・ルーティング | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 2 ネットワーク基礎と実践</div>
+  <h1>2-5 DHCP・NAT・ルーティング</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>DHCPの4ステップ(DORA)とリース運用を説明できる</li>
+<li>NAT/NAPTの仕組みとポートフォワードを説明できる</li>
+<li>デフォルトゲートウェイと経路の考え方を体感する</li>
+</ul></div>
+
+<h2>1. DHCP 〜IPアドレスの自動配布係〜</h2>
+<pre><code><span class="cm"># DORA: PCがネットワークに参加するときの4ステップ</span>
+① Discover  PC「誰かIPください!」(ブロードキャスト)
+② Offer     DHCPサーバー「192.168.10.55 はどう?」
+③ Request   PC「それください!」
+④ Ack       サーバー「どうぞ。リース期間は8時間ね」</code></pre>
+<ul class="plain">
+<li><strong>リース期間</strong>: 貸出期限。切れる前に自動更新される</li>
+<li><strong>枯渇障害</strong>: 配れるIPが尽きると新しい端末がつながらない。「午後から来た人だけWi-Fiに入れない」の定番原因</li>
+<li><strong>予約(固定割当て)</strong>: プリンターやサーバーはMACアドレスに紐づけて毎回同じIPを配る、または静的設定にする</li>
+</ul>
+
+<h2>2. NAT/NAPT 〜社内の顔とインターネットの顔〜</h2>
+<p>社内のプライベートIPのままではインターネットと通信できません。ルーターが<strong class="mark">送信元を会社のグローバルIPに書き換えて代表発信</strong>します。これがNAT。さらにポート番号も使って「社内の誰の通信か」を管理し、1つのグローバルIPを全員で共有するのがNAPT(IPマスカレード)です。</p>
+<div class="tblwrap"><table>
+<tr><th>社内(変換前)</th><th>→</th><th>インターネット側(変換後)</th></tr>
+<tr><td>192.168.10.5:50001</td><td>→</td><td>203.0.113.1:60001</td></tr>
+<tr><td>192.168.10.8:50002</td><td>→</td><td>203.0.113.1:60002</td></tr>
+</table></div>
+<p><strong>ポートフォワード</strong>はこの逆向きの穴あけ。「グローバルIPの443番に来た通信は社内の192.168.20.10へ渡す」のように、外部公開に使います(安易な公開はPart 6で学ぶリスクと表裏一体)。</p>
+
+<h2>3. ルーティング 〜「知らない宛先はぜんぶ親分へ」〜</h2>
+<ul class="plain">
+<li>PCは通信のたびに考える: <strong>宛先は同じ町内(サブネット)?</strong></li>
+<li>同じ町内 → スイッチ経由で直接届ける(ARPでMACを調べて)</li>
+<li>違う町 → <strong class="mark">デフォルトゲートウェイ(ルーター)に丸投げ</strong></li>
+<li>ルーターはルーティングテーブル(行き先表)を見て次のルーターへ… の連鎖で世界中に届く</li>
+</ul>
+<pre><code><span class="cm"># 拠点間のスタティックルートの例(ミライ商事)</span>
+宛先 192.168.30.0/24(大阪) → ネクストホップ 10.0.0.2(VPNルーター)
+宛先 0.0.0.0/0(その他ぜんぶ) → 203.0.113.254(インターネット出口)
+<span class="cm"># 0.0.0.0/0 が「デフォルトルート」。上から具体的な経路が優先される</span></code></pre>
+
+<h2>4. ラボ: 自分の端末の通信経路を調べる(45分)</h2>
+<pre><code><span class="cm"># ① 自分の設定を確認(Windows)</span>
+ipconfig /all
+<span class="cm">   → IPv4アドレス / サブネットマスク / デフォルトゲートウェイ / DHCPサーバー / DNSサーバー を書き出す</span>
+
+<span class="cm"># ② ゲートウェイのMACアドレスをARPテーブルで確認</span>
+arp -a | findstr <ゲートウェイのIP>
+
+<span class="cm"># ③ 外部までの経路を見る(各行が経由ルーター)</span>
+tracert -d 8.8.8.8
+<span class="cm">   → 1行目が自宅/社内ルーター、2行目以降がプロバイダ網</span>
+
+<span class="cm"># ④ DHCPのリースを更新してみる</span>
+ipconfig /release && ipconfig /renew   <span class="cm"># 一瞬ネットが切れます(自宅で!)</span></code></pre>
+<p>✅ 確認: 「自分のPCがインターネットに出るまでの登場人物(IP・GW・DNS・NAT)」を紙1枚に描ければクリア。</p>
+
+<div class="irohabox">「IPは来てる?」「GWにpingは通る?」「DNSは引ける?」——この3点セットが言えるようになったら、Part 2の折り返し地点は突破です!</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>DHCPはDORAの4ステップ。枯渇とリースは障害対応の頻出ネタ</li>
+<li>NAPTで社内全員が1つのグローバルIPを共有。逆向きの穴がポートフォワード</li>
+<li>知らない宛先はデフォルトゲートウェイへ。経路は tracert で見える</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part2-ch05">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="2-4-dns.html">← 2-4 DNSの仕組み</a>
+  <a href="2-6-switch-vlan-wifi.html">2-6 スイッチ・VLAN・無線LAN →</a>
+</footer>
+</div>
+</body>
+</html>

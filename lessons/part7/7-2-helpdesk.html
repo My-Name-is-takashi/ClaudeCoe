@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7-2 ヘルプデスク実践 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 7 IT運用とヘルプデスク</div>
+  <h1>7-2 ヘルプデスク実践</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>優先度マトリクス(影響度×緊急度)で受付順を決められる</li>
+<li>曖昧な訴えを事実に翻訳するヒアリングができる</li>
+<li>ナレッジベースを育てて「同じ質問」を減らせる</li>
+</ul></div>
+
+<h2>1. 優先度マトリクス 〜声の大きさで決めない〜</h2>
+<div class="tblwrap"><table>
+<tr><th></th><th>緊急度: 高(業務が今止まる)</th><th>緊急度: 低(回避策あり/期限先)</th></tr>
+<tr><td><strong>影響: 広い</strong>(全社・部門)</td><td><strong>P1 最優先</strong>(例: 全社ネット断)</td><td>P2(例: 来週の全社行事のIT準備)</td></tr>
+<tr><td><strong>影響: 狭い</strong>(個人)</td><td>P2〜3(例: 役員が今からの会議で投影不可)</td><td>P3〜4(例: 新しいマウスが欲しい)</td></tr>
+</table></div>
+<p>ポイント: <strong class="mark">「役員だから」ではなく「会議が今始まるから」緊急度が上がる</strong>——基準を人でなく業務影響に置くと、説明可能な優先順位になります。</p>
+
+<h2>2. ヒアリングの技術 〜「ネットが変」を事実に翻訳〜</h2>
+<div class="tblwrap"><table>
+<tr><th>聞くこと</th><th>質問例</th></tr>
+<tr><td>症状の具体化</td><td>「何をしようとして、どんな画面/メッセージが出ますか?(可能ならスクショを)」</td></tr>
+<tr><td>時期</td><td>「いつからですか? 昨日は正常でしたか?」</td></tr>
+<tr><td>範囲</td><td>「周りの方も同じですか? あなただけですか?」</td></tr>
+<tr><td>直前の変更</td><td>「その前に何か変わったこと(更新・インストール・席替え)は?」</td></tr>
+<tr><td>再現性</td><td>「毎回ですか? ときどきですか?」</td></tr>
+</table></div>
+<ul class="plain">
+<li>禁句: 「普通はそうなりません」「さっき説明しましたよね」——<strong>相手は困っている素人</strong>。技術の翻訳者であることが情シスの職能です</li>
+<li>エラーメッセージは<strong>原文のまま</strong>もらう(意訳された「エラーが出た」は情報量ゼロ)</li>
+</ul>
+
+<h2>3. 回答テンプレート(感じの良い定型文)</h2>
+<pre><code>【受付】お問い合わせありがとうございます。受付番号は #1234 です。
+       本件は本日15時までに一次回答いたします。
+【進捗】原因調査中です。◯◯までは確認できており、明日午前に続報をお送りします。
+       (※進捗ゼロでも期限までに必ず一報を入れる——放置感が信頼を削る最大要因)
+【クローズ】解消を確認しました。再発時はこの番号への返信でご連絡ください。
+【できない時】ご要望の◯◯は、セキュリティ規程により対応できません。
+       代わりに△△の方法で同じ目的を実現できますので、手順をご案内します。</code></pre>
+<p><strong class="mark">「ダメです」で終わらせず、代替案とセットで返す</strong>のがプロの断り方です(8-6章に続く)。</p>
+
+<h2>4. ナレッジベースを育てる</h2>
+<ul class="plain">
+<li>同じ質問が3回来たら、FAQ記事化(タイトルは<strong>ユーザーの言葉</strong>で:「×VPN認証エラー」→「○在宅勤務で社内システムにつながらない時」)</li>
+<li>クローズしたチケットの「対応」欄が、そのままナレッジの下書きになる(チケット駆動の配当)</li>
+<li>KPI例: 一次解決率、平均対応時間、FAQによる自己解決率——「忙しい」を数字で語れるようにする</li>
+</ul>
+
+<div class="casebox"><strong>🎭 ケーススタディで腕試し</strong><br>午前中に7件の問い合わせが同時に来る「繁忙日シミュレーション」。優先度マトリクスを武器に乗り切ってください。</div>
+<a class="quizlink case" href="../../portal/case.html?c=case7-2-helpdesk">🎭 ケーススタディ「ヘルプデスク繁忙日」を始める</a>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>優先度は「人」でなく「業務影響×緊急度」で決めて説明可能に</li>
+<li>ヒアリングは症状・時期・範囲・変更・再現性の5点セット</li>
+<li>進捗ゼロでも期限に一報。断る時は代替案とセット。3回来たらFAQ化</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="7-1-itil.html">← 7-1 ITIL入門</a>
+  <a href="7-3-asset-license.html">7-3 IT資産管理 →</a>
+</footer>
+</div>
+</body>
+</html>

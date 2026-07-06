@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-10 nginx入門:設定の読み方 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践 ★重点章</div>
+  <h1>3-10 nginx入門:インストールと設定の読み方</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li><code>nginx.conf</code> の構造(ディレクティブ・ブロック・include)を読解できる</li>
+<li><code>server</code> / <code>location</code> のマッチングを理解し、バーチャルホストを設定できる</li>
+<li>リバースプロキシとHTTPS化の設定を読み書きできる</li>
+<li>安全な変更手順「<code>nginx -t</code> → reload」を習慣化する</li>
+</ul>
+<small>📺 動画①「nginxってなに?」②「nginx.conf 読解ツアー」とあわせてどうぞ。</small></div>
+
+<h2>1. nginxの2つの顔</h2>
+<div class="tblwrap"><table>
+<tr><th>役割</th><th>何をする?</th><th>ミライ商事での例</th></tr>
+<tr><td><strong>Webサーバー</strong></td><td>HTMLや画像などの静的ファイルを配る</td><td>社内ポータルのページ配信</td></tr>
+<tr><td><strong>リバースプロキシ</strong></td><td>「受付窓口」として手前に立ち、背後のアプリへ転送する</td><td>勤怠アプリ(内部の8080番)を443番で受けて転送</td></tr>
+</table></div>
+<p>リバースプロキシを挟む理由: <strong class="mark">①HTTPS化を一手に引き受ける ②複数アプリを1つの入口に集約 ③アプリを直接インターネットに晒さない</strong>。現代のサーバー構成の定番形です。</p>
+
+<h2>2. 設定ファイルの地図</h2>
+<pre><code>/etc/nginx/
+├── nginx.conf              <span class="cm"># 大元。全体設定と include の起点</span>
+├── conf.d/*.conf           <span class="cm"># 追加設定の置き場(includeされる)</span>
+├── sites-available/        <span class="cm"># サイト定義の「倉庫」(Ubuntu流)</span>
+│   └── default
+└── sites-enabled/          <span class="cm"># 「有効化」されたサイト(availableへのシンボリックリンク)</span>
+    └── default -> ../sites-available/default</code></pre>
+<p>Ubuntu流の運用: 設定は sites-available に書き、<code>ln -s</code> でsites-enabled に置いた分だけ有効。<strong>無効化はリンクを消すだけ</strong>なので、切り戻しが安全にできます。</p>
+
+<h2>3. nginx.conf の文法は「2つだけ」</h2>
+<pre><code><span class="cm"># ① ディレクティブ: 「名前 値;」— セミコロン必須!</span>
+worker_processes auto;
+
+<span class="cm"># ② ブロック: 「名前 { … }」— 中に設定を入れ子にできる</span>
+http {
+    server {                          <span class="cm"># server = 1つのサイト(バーチャルホスト)</span>
+        listen 80;                    <span class="cm"># 待ち受けポート</span>
+        server_name portal.mirai.example.co.jp;   <span class="cm"># どのホスト名宛を受けるか</span>
+        root /var/www/portal;         <span class="cm"># ドキュメントルート</span>
+        index index.html;
+
+        location / {                  <span class="cm"># location = URLパスごとの設定</span>
+            try_files $uri $uri/ =404;
+        }
+        location /api/ {              <span class="cm"># /api/ 宛だけ別の動きをさせる</span>
+            proxy_pass http://127.0.0.1:8080;
+        }
+    }
+}</code></pre>
+<p>読み方のコツ: <strong class="mark">外側から「http → server(どのサイト?)→ location(どのURL?)」と絞り込む</strong>。逆に言えば、どんな複雑な設定もこの3段の入れ子です。</p>
+
+<h2>4. locationマッチの優先順位(頻出!)</h2>
+<div class="tblwrap"><table>
+<tr><th>書き方</th><th>意味</th><th>優先度</th></tr>
+<tr><td><code>location = /login</code></td><td>完全一致</td><td>1位(即決)</td></tr>
+<tr><td><code>location ^~ /static/</code></td><td>前方一致(正規表現より優先の宣言)</td><td>2位</td></tr>
+<tr><td><code>location ~ \.php$</code></td><td>正規表現(~* は大文字小文字無視)</td><td>3位(定義順)</td></tr>
+<tr><td><code>location /</code></td><td>前方一致(最長一致で選ばれる)</td><td>4位(受け皿)</td></tr>
+</table></div>
+<p>例: <code>/static/app.php</code> へのアクセスは——<code>^~ /static/</code> があればそちらに決まり、正規表現 <code>\.php$</code> は評価されません。<strong>「このURLはどのlocationに当たる?」を読めることが、nginx読解力の核心</strong>です。</p>
+
+<h2>5. リバースプロキシの定番セット</h2>
+<pre><code>location / {
+    proxy_pass http://127.0.0.1:8080;      <span class="cm"># 背後のアプリへ転送</span>
+    proxy_set_header Host $host;            <span class="cm"># 元のホスト名をアプリに伝える</span>
+    proxy_set_header X-Real-IP $remote_addr;         <span class="cm"># 本当の客のIPを伝える</span>
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;      <span class="cm"># http/httpsの別を伝える</span>
+}</code></pre>
+<div class="warnbox"><strong>⚠️ 末尾スラッシュの罠</strong>: <code>proxy_pass http://127.0.0.1:8080/;</code>(スラッシュあり)と <code>…:8080</code>(なし)では転送されるパスが変わります。「あり」はlocation部分を差し替え、「なし」はそのまま渡す。プロキシが404になったらまずここを疑いましょう。</div>
+
+<h2>6. HTTPS化と安全な変更手順</h2>
+<pre><code>server {
+    listen 443 ssl;
+    server_name portal.mirai.example.co.jp;
+    ssl_certificate     /etc/nginx/ssl/portal.crt;   <span class="cm"># 証明書</span>
+    ssl_certificate_key /etc/nginx/ssl/portal.key;   <span class="cm"># 秘密鍵(600!)</span>
+    ...
+}
+server {
+    listen 80;
+    server_name portal.mirai.example.co.jp;
+    return 301 https://$host$request_uri;   <span class="cm"># httpは httpsへ恒久リダイレクト</span>
+}</code></pre>
+<pre><code><span class="cm"># 変更のたびに必ずこの3点セット(息をするように)</span>
+sudo nginx -t                    <span class="cm"># ① 構文チェック(syntax is ok / test is successful)</span>
+sudo systemctl reload nginx      <span class="cm"># ② 無停止で反映</span>
+curl -I http://localhost         <span class="cm"># ③ 動作確認(ステータスコードを見る)</span></code></pre>
+
+<div class="trybox"><strong>💪 ラボ: nginx設定演習(150分)</strong>
+<ol>
+<li>スナップショット取得 → nginx導入済みの mirai-lab01 で <code>/etc/nginx/</code> の構造を <code>ls -R</code> と <code>cat</code> で一巡する</li>
+<li><code>grep -v "^\s*#" /etc/nginx/nginx.conf | grep -v "^$"</code> でコメントを除いた「本体」を読む(3-4章の技!)</li>
+<li>静的サイト追加: <code>/var/www/portal/index.html</code> を作り、sites-available に <code>portal</code> 定義を書き、シンボリックリンクで有効化 → <code>curl -H "Host: portal.mirai.example.co.jp" http://localhost</code> で確認</li>
+<li>locationマッチ実験: <code>= /exact</code>、<code>^~ /static/</code>、<code>~ \.txt$</code>、<code>/</code> の4つを定義し、それぞれ別の文字列を返すようにして、どのURLがどこに当たるかを予想→curlで答え合わせ</li>
+<li>リバースプロキシ: <code>python3 -m http.server 8080</code> を起動し、<code>/app/</code> 宛を8080へproxy_pass。末尾スラッシュあり/なしの挙動差を体験</li>
+<li>自己署名証明書でHTTPS化(<code>openssl req -x509 -newkey rsa:2048 -nodes ...</code>)+80→443リダイレクト</li>
+<li>全ステップで「nginx -t → reload → curl」の3点セットを実施</li>
+</ol></div>
+<div class="irohabox">nginxの設定が読めるようになると、Webの障害対応で「どこまでは正常か」を一人で切り分けられるようになります。3-12章のログ調査とあわせて、Part 3のクライマックスですよ!</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>文法は「ディレクティブ;」と「ブロック{}」の2つ。http→server→locationの3段絞り込み</li>
+<li>locationは = → ^~ → 正規表現 → 前方一致の順で決まる</li>
+<li>proxy_passは末尾スラッシュに注意。変更は「-t → reload → curl」の3点セット</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part3-ch10">📝 章末クイズに挑戦する(8問)</a>
+<footer class="nav">
+  <a href="3-09-ssh.html">← 3-9 SSHとファイル転送</a>
+  <a href="3-11-lemp.html">3-11 総合演習: LEMP構築 →</a>
+</footer>
+</div>
+</body>
+</html>

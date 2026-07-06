@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7-6 障害対応総合訓練 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 7 IT運用とヘルプデスク</div>
+  <h1>7-6 障害対応総合訓練</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この訓練のゴール</strong>
+<ul>
+<li>障害発生から復旧報告までの一連の指揮を、時間圧の中で体験する</li>
+<li>「直す」と「伝える」の分離、社内アナウンスの書き方を身につける</li>
+</ul></div>
+
+<h2>1. 障害対応の型(タイムライン)</h2>
+<pre><code>T+0   検知(監視 or 通報)→ 一報の起票
+T+10  影響範囲の把握 → 優先度判定(P1?)→ 体制招集(指揮/作業/広報)
+T+15  <strong>第一報の社内アナウンス</strong>(原因不明でも出す!)
+T+n   切り分け→暫定復旧(ワークアラウンド優先)→ 続報(30〜60分ごと)
+復旧   復旧宣言(確認手順つき)→ 監視強化
+翌日〜 障害報告書 → ポストモーテム(6-6章と同じBlameless)</code></pre>
+<div class="warnbox"><strong>⚠️ 第一報は「原因が分からないうちに」出す</strong>: 「◯時◯分より社内ポータルに接続しづらい事象が発生しています。現在調査中です。次報は30分後」——これだけで問い合わせの洪水が止まり、作業に集中できます。完璧な情報を待って沈黙するのが最悪手。</div>
+
+<h2>2. 社内アナウンスの型</h2>
+<pre><code>【障害情報 第1報】社内ポータルにつながりにくい事象(調査中)
+発生時刻: 9:12頃〜
+影響範囲: 全社/社内ポータルの閲覧・申請機能
+現在の状況: 原因を調査中です
+回避策: 至急の申請は紙の様式(総務に備置)をご利用ください
+次回のお知らせ: 10:00までに続報します
+問い合わせ: 情シス 内線2200(※本件の個別問い合わせはご遠慮ください)</code></pre>
+<p>ポイント: <strong class="mark">影響範囲・回避策・次報時刻</strong>の3点があれば、利用者は落ち着いて待てます。</p>
+
+<h2>3. 役割の分離 〜「直す人」と「伝える人」〜</h2>
+<ul class="plain">
+<li>作業者が電話対応を兼ねると、復旧が止まる。<strong>2人いれば必ず分業</strong>(一人情シスなら、上長や総務に広報を委任する取り決めを平時に)</li>
+<li>指揮役は手を動かさない: 状況集約・優先判断・エスカレーション・記録が仕事</li>
+</ul>
+
+<div class="casebox"><strong>🎭 総合訓練シナリオ「ミライ商事 障害対策室」</strong><br>
+月曜9時、ファイルサーバーにアクセス不可。あなたの判断次第で、被害範囲と復旧時間、そして社内の信頼が変わります。これまでの全章の集大成です。</div>
+<a class="quizlink case" href="../../portal/case.html?c=case7-6-outage">🎭 総合訓練「障害対策室」を始める</a>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>第一報は原因不明でも15分以内。影響・回避策・次報時刻の3点セット</li>
+<li>直す人と伝える人を分ける。指揮役は手を動かさない</li>
+<li>復旧して終わりではなく、報告書とポストモーテムまでが障害対応</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="7-5-backup-bcp.html">← 7-5 バックアップとBCP</a>
+  <a href="../../portal/quiz.html?q=part7-test">7-7 Part 7 修了テスト →</a>
+</footer>
+</div>
+</body>
+</html>
