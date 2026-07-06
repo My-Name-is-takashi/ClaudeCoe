@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-5 viエディタ完全入門 | 情シス養成講座</title>
+<style>
+  :root {
+    --bg:#f6f7fb; --card:#fff; --text:#1f2430; --sub:#626b7f;
+    --accent:#4f6df5; --accent-soft:#e8ecfe; --line:#e3e6ee;
+    --ok:#2fa572; --ok-soft:#e2f5ec; --warn:#b3760a; --warn-soft:#fdf3dd;
+    --code-bg:#252a38; --code-fg:#e8eaf0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14171f; --card:#1d212c; --text:#e8eaf0; --sub:#99a1b3;
+      --accent:#7b93ff; --accent-soft:#2a3350; --line:#2c3140;
+      --ok:#4cc98f; --ok-soft:#1e3a2e; --warn:#e8b04b; --warn-soft:#3a3120;
+      --code-bg:#10131a; --code-fg:#dfe3ee; }
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+         background:var(--bg); color:var(--text); line-height:1.9; }
+  header { background:linear-gradient(120deg,var(--accent),#8a5cf6); color:#fff; padding:28px 20px; }
+  header .crumb { font-size:.8rem; opacity:.85; }
+  header h1 { font-size:1.5rem; margin-top:4px; }
+  .wrap { max-width:820px; margin:0 auto; padding:24px 20px 60px; }
+  h2 { font-size:1.25rem; margin:44px 0 14px; padding-left:12px; border-left:5px solid var(--accent); }
+  h3 { font-size:1.05rem; margin:26px 0 10px; color:var(--accent); }
+  p { margin-bottom:14px; }
+  strong.mark { background:linear-gradient(transparent 65%, #ffe484 65%); padding:0 2px; }
+  @media (prefers-color-scheme: dark){ strong.mark { background:linear-gradient(transparent 65%, #6b5b1e 65%); } }
+  .goalbox, .trybox, .warnbox, .irohabox { border-radius:12px; padding:16px 18px; margin:18px 0; }
+  .goalbox { background:var(--accent-soft); border-left:5px solid var(--accent); }
+  .trybox  { background:var(--ok-soft); border-left:5px solid var(--ok); }
+  .warnbox { background:var(--warn-soft); border-left:5px solid var(--warn); }
+  .irohabox { background:var(--card); border:1px dashed var(--accent); font-size:.93rem; }
+  .irohabox::before { content:"💬 いろは先輩のひとこと"; display:block; font-weight:700; color:var(--accent); font-size:.85rem; margin-bottom:4px; }
+  .goalbox ul, .trybox ol { margin-left:1.4em; }
+  code { background:var(--accent-soft); padding:1px 6px; border-radius:5px;
+         font-family:ui-monospace,Consolas,monospace; font-size:.9em; }
+  pre { background:var(--code-bg); color:var(--code-fg); padding:16px; border-radius:10px;
+        overflow-x:auto; margin:14px 0; font-size:.86rem; line-height:1.7; }
+  pre code { background:none; padding:0; color:inherit; }
+  pre .cm { color:#8f9bb8; }
+  .tblwrap { overflow-x:auto; margin:14px 0; }
+  table { border-collapse:collapse; width:100%; font-size:.9rem; background:var(--card); }
+  th, td { border:1px solid var(--line); padding:8px 12px; text-align:left; }
+  th { background:var(--accent-soft); }
+  td code { white-space:nowrap; }
+  /* モード遷移図 */
+  .modemap { display:grid; grid-template-columns:1fr auto 1fr; gap:8px 4px; align-items:center;
+             background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin:16px 0; }
+  .mode { border-radius:10px; padding:12px; text-align:center; font-weight:700; }
+  .mode small { display:block; font-weight:400; font-size:.75rem; color:var(--sub); }
+  .mode.normal { background:var(--accent-soft); border:2px solid var(--accent); grid-column:2; }
+  .mode.insert { background:var(--ok-soft); border:2px solid var(--ok); grid-column:1; }
+  .mode.cmd { background:var(--warn-soft); border:2px solid var(--warn); grid-column:3; }
+  .arrows { grid-column:1/4; display:flex; justify-content:space-around; font-size:.8rem; color:var(--sub); text-align:center; }
+  footer.nav { display:flex; justify-content:space-between; margin-top:50px; font-size:.9rem; }
+  a { color:var(--accent); }
+  .quizlink { display:block; text-align:center; background:var(--accent); color:#fff; text-decoration:none;
+              font-weight:700; padding:14px; border-radius:12px; margin-top:30px; }
+  /* スマホ最適化: モード遷移図を縦積みに、余白を詰める */
+  @media (max-width: 600px) {
+    header { padding: 22px 14px; }
+    header h1 { font-size: 1.25rem; }
+    .wrap { padding: 16px 14px 48px; }
+    h2 { font-size: 1.1rem; margin-top: 36px; }
+    pre { font-size: .78rem; padding: 12px; }
+    .modemap { grid-template-columns: 1fr; padding: 14px; }
+    .mode.normal, .mode.insert, .mode.cmd { grid-column: 1; }
+    .arrows { grid-column: 1; flex-direction: column; gap: 6px; }
+    footer.nav { flex-wrap: wrap; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="crumb">Part 3 Linuxサーバー入門〜実践</div>
+  <h1>3-5 viエディタ完全入門</h1>
+</header>
+
+<div class="wrap">
+
+<div class="goalbox">
+  <strong>🎯 この章で学ぶこと</strong>
+  <ul>
+    <li>viの<strong>モードの概念</strong>を理解し、「閉じ込められて出られない」状態を卒業する</li>
+    <li>移動・編集・検索置換を<strong>実務速度</strong>で行えるようになる</li>
+    <li>サーバー設定ファイルを<strong>安全に編集する作法</strong>(バックアップ→編集→検証)を身につける</li>
+  </ul>
+  <small>📺 先に動画①「viはなぜ難しい?」(12分)を視聴してから読むと理解が2倍速です。</small>
+</div>
+
+<h2>1. なぜ今さらvi?</h2>
+<p>サーバーの設定ファイルを編集するとき、GUIのエディタは使えません。SSHでつないだ黒い画面の中で編集する必要があるからです。そして、<strong class="mark">viはどんなLinuxサーバーにも必ず入っています</strong>。障害対応で初めて触るサーバーでも、viさえ使えれば設定を直せる——だから情シスの必修スキルなのです。</p>
+<div class="irohabox">最初はみんな「vi、閉じ込められた!助けて!」ってなります。わたしもなりました。でもモードの仕組みが分かれば、3日で怖くなくなりますよ!</div>
+
+<h2>2. viの心臓部:モードを理解する</h2>
+<p>viが難しく感じる原因はただひとつ、<strong class="mark">「モード」があること</strong>です。普通のエディタは「開いたら即、文字が打てる」のに対し、viは<strong>命令を出すモード</strong>と<strong>文字を打つモード</strong>が分かれています。</p>
+
+<div class="modemap">
+  <div class="mode insert">挿入モード<small>文字を入力する</small></div>
+  <div class="mode normal">ノーマルモード<small>起動直後はココ/移動・削除・コピー</small></div>
+  <div class="mode cmd">コマンドラインモード<small>保存・終了・置換</small></div>
+  <div class="arrows">
+    <span>← <code>i</code> <code>a</code> <code>o</code> で入る<br><code>Esc</code> で戻る →</span>
+    <span>← <code>:</code> <code>/</code> で入る<br><code>Esc</code> で戻る →</span>
+  </div>
+</div>
+
+<p>覚えることは実は2つだけです。</p>
+<ol style="margin:0 0 14px 1.6em;">
+  <li><strong>迷子になったら、まず <code>Esc</code></strong>(何度押してもOK。必ずノーマルモードに戻れる)</li>
+  <li><strong>全部やめて逃げたいときは <code>Esc</code> → <code>:q!</code></strong>(保存せずに終了)</li>
+</ol>
+<div class="warnbox"><strong>⚠️ ここ、テストに出ますよ!</strong><br>
+<code>:q!</code> は「保存せずに強制終了」。編集が消えてもいいときの緊急脱出です。保存して終了は <code>:wq</code>。この2つを取り違えると、30分の編集作業が消えます。</div>
+
+<h2>3. 最初に覚える15個のキー</h2>
+<p>viのコマンドは何百とありますが、<strong class="mark">実務の9割はこの15個</strong>で回ります。ドリル「viキー道場」でこの表を反射で打てるようにしましょう。</p>
+
+<div class="tblwrap">
+<table>
+  <tr><th>やりたいこと</th><th>キー</th><th>補足</th></tr>
+  <tr><td>文字を入力し始める</td><td><code>i</code></td><td>カーソル位置の手前から挿入(insert)</td></tr>
+  <tr><td>行の下に新しい行を作って入力</td><td><code>o</code></td><td>設定を1行追加するときに最頻出(open)</td></tr>
+  <tr><td>入力をやめる(命令モードへ)</td><td><code>Esc</code></td><td>迷ったらコレ</td></tr>
+  <tr><td>保存して終了</td><td><code>:wq</code></td><td>write & quit</td></tr>
+  <tr><td>保存せず終了(緊急脱出)</td><td><code>:q!</code></td><td>! は「強制」の意味</td></tr>
+  <tr><td>カーソル移動</td><td><code>h j k l</code></td><td>←↓↑→(矢印キーでも可)</td></tr>
+  <tr><td>ファイルの先頭 / 最終行へ</td><td><code>gg</code> / <code>G</code></td><td>ログの末尾確認は <code>G</code> が大活躍</td></tr>
+  <tr><td>行の先頭 / 末尾へ</td><td><code>0</code> / <code>$</code></td><td>行内ジャンプ</td></tr>
+  <tr><td>1文字消す / 1行消す</td><td><code>x</code> / <code>dd</code></td><td><code>dd</code>は「カット」でもある</td></tr>
+  <tr><td>行をコピー / 貼り付け</td><td><code>yy</code> / <code>p</code></td><td>yank & paste</td></tr>
+  <tr><td>取り消し(アンドゥ)</td><td><code>u</code></td><td>やり直しは <code>Ctrl+r</code></td></tr>
+  <tr><td>下方向に検索</td><td><code>/文字列</code></td><td>次の一致へは <code>n</code></td></tr>
+  <tr><td>全体置換</td><td><code>:%s/旧/新/g</code></td><td>詳細は次の節</td></tr>
+  <tr><td>指定行へジャンプ</td><td><code>:行番号</code></td><td>「設定ファイルの42行目にエラー」に即対応</td></tr>
+  <tr><td>行番号を表示</td><td><code>:set number</code></td><td><code>~/.vimrc</code> に書けば常時有効</td></tr>
+</table>
+</div>
+
+<div class="trybox">
+  <strong>💪 やってみよう①(5分)</strong>
+  <ol>
+    <li>練習ファイルを作る: <code>cp /etc/hosts ~/hosts.practice</code></li>
+    <li><code>vi ~/hosts.practice</code> で開く</li>
+    <li><code>G</code> で最終行へ → <code>o</code> で行を追加 → <code>192.168.10.5  testserver</code> と入力</li>
+    <li><code>Esc</code> → <code>:wq</code> で保存終了 → <code>cat ~/hosts.practice</code> で確認</li>
+  </ol>
+</div>
+
+<h2>4. 実務の主役:検索と置換</h2>
+<p>設定ファイルの編集で最も使うのが検索と置換です。たとえばサーバーのIPアドレスが変わったとき:</p>
+<pre><code><span class="cm"># ノーマルモードで入力(コロンから始まる)</span>
+:%s/192.168.1.10/192.168.1.20/g
+<span class="cm">#  │  │           │            └ g: 行内のすべての出現を対象</span>
+<span class="cm">#  │  │           └ 新しい文字列</span>
+<span class="cm">#  │  └ 古い文字列</span>
+<span class="cm">#  └ %: ファイル全体の行を対象</span></code></pre>
+<p>置換前に <code>/192.168.1.10</code> で検索して <code>n</code> で件数感覚を掴んでから置換すると、事故が減ります。<strong class="mark">「検索で確認 → 置換で実行」</strong>が安全な型です。</p>
+
+<h2>5. サーバー設定ファイルを安全に編集する作法</h2>
+<p>viが使えることと、<strong>本番サーバーの設定を安全に編集できること</strong>は別のスキルです。情シスの現場では必ずこの手順を踏みます。</p>
+<pre><code><span class="cm"># ① 編集前に必ずバックアップ(日付入り)</span>
+sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak.20260706
+
+<span class="cm"># ② sudoを付けてviで編集</span>
+sudo vi /etc/nginx/nginx.conf
+
+<span class="cm"># ③ 構文チェック(nginxの場合)— reloadの前に必ず!</span>
+sudo nginx -t
+
+<span class="cm"># ④ 問題なければ反映</span>
+sudo systemctl reload nginx
+
+<span class="cm"># ⑤ 動作確認(戻せる状態のまま検証)</span>
+curl -I http://localhost</code></pre>
+<div class="warnbox"><strong>⚠️ sudoを付け忘れてviで開いてしまったら?</strong><br>
+保存時に「readonly」エラーが出ても慌てないでください。<code>:w /tmp/nginx.conf.tmp</code> で一時退避すれば編集内容は失われません。退避後に <code>sudo cp</code> で反映しましょう。<code>:q!</code> でやり直すと編集が全部消えます。</div>
+
+<div class="trybox">
+  <strong>💪 やってみよう②(10分)</strong>
+  <ol>
+    <li>3-2章で作ったVMにSSH接続する</li>
+    <li><code>sudo cp /etc/ssh/sshd_config ~/sshd_config.practice</code> で練習用コピーを作る</li>
+    <li><code>vi ~/sshd_config.practice</code> で開き、<code>/PermitRootLogin</code> で検索</li>
+    <li>その行を <code>yy</code> → <code>p</code> で複製し、複製した行を <code>PermitRootLogin no</code> に書き換える</li>
+    <li><code>u</code> を2回押してすべて取り消し、<code>Ctrl+r</code> で1つだけやり直してみる</li>
+    <li><code>:q!</code> で保存せずに終了する(練習ファイルなので気軽に!)</li>
+  </ol>
+</div>
+
+<h2>6. まとめ</h2>
+<div class="goalbox">
+  <ul>
+    <li>viは<strong>ノーマル・挿入・コマンドライン</strong>の3モード。迷ったら <code>Esc</code>、脱出は <code>:q!</code></li>
+    <li>実務の9割は<strong>15個のキー</strong>で回る。ドリルで反射になるまで練習する</li>
+    <li>本番編集は<strong>「バックアップ → 編集 → 構文チェック → reload → 動作確認」</strong>の型を必ず守る</li>
+  </ul>
+</div>
+<div class="irohabox">次の章末クイズには、実際の現場で「あるある」なトラブル問題も入れてあります。全問正解できたら、viはもう卒業です。今日もおつかれさまでした!</div>
+
+<a class="quizlink" href="../../portal/quiz.html">📝 章末クイズに挑戦する(12問・合格ライン70%)</a>
+
+<footer class="nav">
+  <a href="#">← 3-4 基本コマンドII</a>
+  <a href="../../portal/index.html">ポータルへ</a>
+  <a href="#">3-6 パーミッション →</a>
+</footer>
+</div>
+</body>
+</html>

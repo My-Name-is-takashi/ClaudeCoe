@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>クイズプレイヤー | 情シス養成講座</title>
+<style>
+  :root {
+    --bg:#f6f7fb; --card:#fff; --text:#1f2430; --sub:#626b7f;
+    --accent:#4f6df5; --accent-soft:#e8ecfe; --line:#e3e6ee;
+    --ok:#2fa572; --ok-soft:#e2f5ec; --ng:#d64550; --ng-soft:#fdecec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14171f; --card:#1d212c; --text:#e8eaf0; --sub:#99a1b3;
+      --accent:#7b93ff; --accent-soft:#2a3350; --line:#2c3140;
+      --ok:#4cc98f; --ok-soft:#1e3a2e; --ng:#ff7a85; --ng-soft:#43242a; }
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+         background:var(--bg); color:var(--text); line-height:1.7; }
+  .wrap { max-width:720px; margin:0 auto; padding:20px; }
+  header { padding:20px 0 8px; }
+  header h1 { font-size:1.2rem; }
+  .meta { color:var(--sub); font-size:.85rem; margin-bottom:14px; }
+  .progress { background:var(--accent-soft); height:8px; border-radius:99px; overflow:hidden; margin-bottom:20px; }
+  .progress > div { height:100%; background:var(--accent); width:0; transition:width .3s; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; }
+  .qnum { color:var(--accent); font-weight:700; font-size:.85rem; }
+  .stars { color:#e8a13b; font-size:.85rem; margin-left:8px; }
+  .qtext { font-weight:700; margin:8px 0 16px; white-space:pre-wrap; }
+  .qtext code, .choice code, .explain code { background:var(--accent-soft); padding:1px 6px; border-radius:5px;
+         font-family:ui-monospace,Consolas,monospace; font-size:.9em; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin-bottom:10px;
+            border:2px solid var(--line); border-radius:10px; background:var(--card); color:var(--text);
+            cursor:pointer; font-size:.95rem; line-height:1.6; }
+  .choice:hover { border-color:var(--accent); }
+  .choice.selected { border-color:var(--accent); background:var(--accent-soft); }
+  .choice.correct { border-color:var(--ok); background:var(--ok-soft); }
+  .choice.wrong { border-color:var(--ng); background:var(--ng-soft); }
+  input.fill { width:100%; padding:12px 14px; border:2px solid var(--line); border-radius:10px;
+               background:var(--card); color:var(--text); font-size:1rem;
+               font-family:ui-monospace,Consolas,monospace; }
+  .explain { margin-top:16px; padding:14px; border-radius:10px; font-size:.92rem; display:none; }
+  .explain.ok { background:var(--ok-soft); border-left:4px solid var(--ok); }
+  .explain.ng { background:var(--ng-soft); border-left:4px solid var(--ng); }
+  .btnrow { margin-top:18px; display:flex; gap:10px; }
+  button.primary { background:var(--accent); color:#fff; border:none; border-radius:10px;
+                   padding:12px 26px; font-size:1rem; font-weight:700; cursor:pointer; }
+  button.primary:disabled { opacity:.4; cursor:not-allowed; }
+  .result { text-align:center; padding:36px 22px; }
+  .result .score { font-size:3rem; font-weight:800; }
+  .result .msg { margin:10px 0 20px; }
+  .pass { color:var(--ok); } .fail { color:var(--ng); }
+  .review { text-align:left; margin-top:20px; font-size:.9rem; }
+  .review li { margin-bottom:6px; }
+  a { color:var(--accent); }
+  /* スマホ最適化 */
+  @media (max-width: 600px) {
+    .wrap { padding: 14px; }
+    .card { padding: 16px; }
+    .choice { padding: 12px; font-size: .9rem; }
+    button.primary { width: 100%; padding: 14px; }
+    .result .score { font-size: 2.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="quizTitle">クイズ読み込み中…</h1>
+    <div class="meta" id="quizMeta"></div>
+  </header>
+  <div class="progress"><div id="pbar"></div></div>
+  <div class="card" id="stage"></div>
+  <p style="margin-top:16px;font-size:.85rem"><a href="index.html">← 学習ポータルへ戻る</a></p>
+</div>
+
+<script src="../quizzes/part3-ch05-vi.js"></script>
+<script>
+const D = window.QUIZ_DATA;
+let idx = 0, correct = 0, answered = false, selected = new Set();
+const missed = [];
+
+document.getElementById("quizTitle").textContent = D.title;
+document.getElementById("quizMeta").textContent =
+  `全${D.questions.length}問 / 合格ライン ${D.passLine}%`;
+
+function esc(s){ const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+// `code` 記法をコード表示に変換
+function fmt(s){ return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
+
+function show(){
+  answered = false; selected = new Set();
+  const q = D.questions[idx];
+  document.getElementById("pbar").style.width = (idx / D.questions.length * 100) + "%";
+  const stage = document.getElementById("stage");
+  let html = `<div><span class="qnum">Q${idx+1} / ${D.questions.length}</span>
+    <span class="stars">${"★".repeat(q.level)}</span></div>
+    <div class="qtext">${fmt(q.q)}</div>`;
+
+  if (q.type === "fill") {
+    html += `<input class="fill" id="fillIn" placeholder="ここに入力(例: :wq)" autocomplete="off">`;
+  } else {
+    if (q.type === "multi") html += `<div class="meta">※ 当てはまるものをすべて選択</div>`;
+    q.choices.forEach((c,i)=>{ html += `<button class="choice" data-i="${i}">${fmt(c)}</button>`; });
+  }
+  html += `<div class="explain" id="explain"></div>
+    <div class="btnrow"><button class="primary" id="submitBtn" disabled>回答する</button></div>`;
+  stage.innerHTML = html;
+
+  const btn = document.getElementById("submitBtn");
+  if (q.type === "fill") {
+    const inp = document.getElementById("fillIn");
+    inp.focus();
+    inp.addEventListener("input", ()=> btn.disabled = inp.value.trim()==="");
+    inp.addEventListener("keydown", e=>{ if(e.key==="Enter" && !btn.disabled) btn.click(); });
+  } else {
+    stage.querySelectorAll(".choice").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        if (answered) return;
+        const i = +el.dataset.i;
+        if (q.type === "single") {
+          selected.clear(); selected.add(i);
+          stage.querySelectorAll(".choice").forEach(x=>x.classList.remove("selected"));
+          el.classList.add("selected");
+        } else {
+          selected.has(i) ? selected.delete(i) : selected.add(i);
+          el.classList.toggle("selected");
+        }
+        btn.disabled = selected.size === 0;
+      });
+    });
+  }
+  btn.addEventListener("click", judge);
+}
+
+function judge(){
+  if (answered) return;
+  answered = true;
+  const q = D.questions[idx];
+  const stage = document.getElementById("stage");
+  let isCorrect;
+
+  if (q.type === "fill") {
+    const v = document.getElementById("fillIn").value.trim();
+    isCorrect = q.answer.some(a => a === v);
+  } else {
+    const ans = new Set(q.answer);
+    isCorrect = ans.size === selected.size && [...ans].every(i=>selected.has(i));
+    stage.querySelectorAll(".choice").forEach(el=>{
+      const i = +el.dataset.i;
+      if (q.answer.includes(i)) el.classList.add("correct");
+      else if (selected.has(i)) el.classList.add("wrong");
+    });
+  }
+
+  if (isCorrect) correct++; else missed.push(idx);
+  const ex = document.getElementById("explain");
+  ex.className = "explain " + (isCorrect ? "ok" : "ng");
+  ex.innerHTML = `<strong>${isCorrect ? "⭕ 正解!" : "❌ 不正解…"}</strong>` +
+    (q.type==="fill" && !isCorrect ? `(正解: <code>${esc(q.answer[0])}</code>)` : "") +
+    `<br>${fmt(q.explain)}`;
+  ex.style.display = "block";
+
+  const btn = document.getElementById("submitBtn");
+  btn.textContent = idx === D.questions.length-1 ? "結果を見る" : "次の問題へ";
+  btn.disabled = false;
+  const next = btn.cloneNode(true);
+  btn.replaceWith(next);
+  next.addEventListener("click", ()=>{ idx++; idx < D.questions.length ? show() : finish(); });
+  next.focus();
+}
+
+function finish(){
+  document.getElementById("pbar").style.width = "100%";
+  const pct = Math.round(correct / D.questions.length * 100);
+  const pass = pct >= D.passLine;
+  let html = `<div class="result">
+    <div class="score ${pass?"pass":"fail"}">${pct}<span style="font-size:1.4rem">点</span></div>
+    <div class="msg">${pass
+      ? "🎉 <strong>合格です!</strong> いろは「やりましたね!この調子でいきましょう!」"
+      : `もう一歩!合格ラインは ${D.passLine}% です。いろは「解説を読み直して、もう一回挑戦してみましょう!」`}</div>
+    <button class="primary" onclick="location.reload()">もう一度挑戦する</button>`;
+  if (missed.length) {
+    html += `<div class="review"><strong>復習ポイント(間違えた問題):</strong><ul>` +
+      missed.map(i=>`<li>Q${i+1}: ${fmt(D.questions[i].q.split("\n")[0])}</li>`).join("") +
+      `</ul></div>`;
+  }
+  html += `</div>`;
+  document.getElementById("stage").innerHTML = html;
+}
+
+show();
+</script>
+</body>
+</html>
