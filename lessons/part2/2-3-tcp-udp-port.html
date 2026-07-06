@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-3 TCP/UDPとポート番号 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 2 ネットワーク基礎と実践</div>
+  <h1>2-3 TCP/UDPとポート番号</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>TCPとUDPの違いと使い分けを説明できる</li>
+<li>主要なウェルノウンポートを即答できる</li>
+<li>「ポートが開いている」の意味がわかる</li>
+</ul></div>
+
+<h2>1. TCPとUDP 〜書留と速達ハガキ〜</h2>
+<div class="tblwrap"><table>
+<tr><th></th><th>TCP</th><th>UDP</th></tr>
+<tr><td>例えるなら</td><td>書留郵便(受領確認つき)</td><td>速達ハガキ(投げっぱなし)</td></tr>
+<tr><td>接続</td><td>3ウェイハンドシェイクで確立してから送る</td><td>いきなり送る</td></tr>
+<tr><td>信頼性</td><td>届かなければ再送。順序も保証</td><td>再送なし。速さ優先</td></tr>
+<tr><td>主な用途</td><td>Web(HTTP/HTTPS)、メール、ファイル転送</td><td>DNS問い合わせ、音声/ビデオ通話、時刻同期</td></tr>
+</table></div>
+<pre><code><span class="cm"># TCPの3ウェイハンドシェイク(接続のあいさつ)</span>
+PC      → サーバー : SYN     「つないでいい?」
+サーバー → PC      : SYN/ACK 「いいよ、そっちは?」
+PC      → サーバー : ACK     「OK、始めよう」→ データ送受信開始</code></pre>
+<p>Web会議の映像がカクつくのは、UDPが「再送より今この瞬間」を選ぶ設計だから。<strong class="mark">用途によって最適な性質が違う</strong>のです。</p>
+
+<h2>2. ポート番号 〜同じ住所の中の「窓口番号」〜</h2>
+<p>IPアドレスが「建物の住所」なら、ポート番号は「何階の何番窓口か」。1台のサーバーがWeb(443)とメール(587)とSSH(22)を同時に受け付けられるのはポートのおかげです。</p>
+<div class="tblwrap"><table>
+<tr><th>ポート</th><th>プロトコル</th><th>用途</th></tr>
+<tr><td>80 / 443</td><td>HTTP / HTTPS</td><td>Web(443が暗号化)</td></tr>
+<tr><td>22</td><td>SSH</td><td>サーバーの遠隔操作(Part 3-9)</td></tr>
+<tr><td>25 / 587</td><td>SMTP / Submission</td><td>メール送信(587が投稿用)</td></tr>
+<tr><td>110 / 143</td><td>POP3 / IMAP</td><td>メール受信(995/993がSSL版)</td></tr>
+<tr><td>53</td><td>DNS</td><td>名前解決(2-4章)</td></tr>
+<tr><td>67/68</td><td>DHCP</td><td>IP自動配布(2-5章)</td></tr>
+<tr><td>3389</td><td>RDP</td><td>Windowsリモートデスクトップ</td></tr>
+<tr><td>445</td><td>SMB</td><td>Windowsファイル共有</td></tr>
+<tr><td>123 / 161 / 514</td><td>NTP / SNMP / Syslog</td><td>時刻同期 / 監視 / ログ転送</td></tr>
+</table></div>
+<p>「ポートが開いている」とは、<strong class="mark">そのポートで待ち受けているプログラム(サービス)が存在する</strong>ということ。FWの許可設定(Part 6)も、この番号単位で行います。</p>
+
+<h2>3. 自分のPCで確かめる</h2>
+<pre><code><span class="cm"># Windows: 通信中の接続と待ち受けポートを見る</span>
+netstat -an | findstr LISTEN
+
+<span class="cm"># Linux(Part 3の環境ができたら): ssコマンドが現代の定番</span>
+ss -tlnp    <span class="cm"># TCPの待ち受け(Listen)を表示。nginxを入れると:80が現れる</span></code></pre>
+
+<div class="trybox"><strong>💪 やってみよう(10分)</strong>
+<ol>
+<li><code>netstat -an</code> を実行し、「:443」への接続(ESTABLISHED)を探す — 今ブラウザが開いているHTTPS接続の実体です</li>
+<li><a href="../../portal/drill.html?d=port">ポート番号かるた</a>で10問中8問以上を目指す</li>
+</ol></div>
+
+<div class="irohabox">ポート番号は情シスの「九九」。FW設定でもトラブル調査でも毎日出てきます。かるたで遊んでいるうちに勝手に覚えちゃいますよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>TCP=確実(再送・順序保証)、UDP=速さ優先。用途で使い分け</li>
+<li>ポート番号=窓口番号。「開いている」=待ち受けサービスがいる</li>
+<li>443/22/53/25/3389/445 あたりは即答レベルに</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/drill.html?d=port">⚡ ポート番号かるたで特訓する</a>
+<a class="quizlink" href="../../portal/quiz.html?q=part2-ch03">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="2-2-ip-subnet.html">← 2-2 IPアドレスとサブネット</a>
+  <a href="2-4-dns.html">2-4 DNSの仕組み →</a>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-8 ネットワークトラブルシュート実践 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 2 ネットワーク基礎と実践</div>
+  <h1>2-8 ネットワークトラブルシュート実践</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>「つながらない」を層の下から順に切り分ける型を身につける</li>
+<li>ping・ipconfig・nslookup・tracert を組み合わせて原因を特定できる</li>
+</ul></div>
+
+<h2>1. 切り分けの型 〜下から順に、4連ping〜</h2>
+<pre><code><span class="cm"># 「インターネットにつながらない」と言われたら、この順で撃つ</span>
+① ping 127.0.0.1        <span class="cm"># 自分自身(TCP/IPスタックは生きてる?)</span>
+② ping <自分のIP>       <span class="cm"># NICは生きてる?(ipconfigで確認してから)</span>
+③ ping <デフォルトGW>    <span class="cm"># 社内LANの入口までは届く?</span>
+④ ping 8.8.8.8          <span class="cm"># インターネットにIPで届く?</span>
+⑤ ping example.jp       <span class="cm"># 名前でも届く?(=DNSの確認)</span></code></pre>
+<div class="tblwrap"><table>
+<tr><th>どこで失敗?</th><th>疑う場所</th></tr>
+<tr><td>①②で失敗</td><td>端末自身(NIC無効、ドライバー、IP未取得=169.254.x.x)</td></tr>
+<tr><td>③で失敗</td><td>LAN内(ケーブル、スイッチ、VLAN、Wi-Fi、GW設定ミス)</td></tr>
+<tr><td>④で失敗</td><td>出口(ルーター、FW、回線、プロバイダ)</td></tr>
+<tr><td>④は成功、⑤で失敗</td><td><strong class="mark">DNS</strong>(設定・サーバー障害)← 頻出!</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ 169.254.x.x を見たら</strong>: DHCPからIPをもらえなかったサイン(APIPA)。DHCPサーバー・VLAN・ケーブルを疑います。ここ、テストに出ますよ!</div>
+
+<h2>2. ラボ: わざと壊して直す(90分)</h2>
+<p>自宅PCで「壊す→症状を見る→直す」を体験します(すべて元に戻せる操作です)。</p>
+<ol class="plain">
+<li><strong>DNS故障ごっこ</strong>: アダプター設定でDNSサーバーを <code>127.0.0.2</code> に手動設定 → ブラウザは全滅、でも <code>ping 8.8.8.8</code> は通ることを確認(=④○⑤×の状態)→ 自動取得に戻す</li>
+<li><strong>hosts汚染ごっこ</strong>: hostsに <code>127.0.0.1 example.jp</code> を追記 → そのサイトだけ開けないことを確認 → 行を削除(「特定サイトだけダメ」の一因を体験)</li>
+<li><strong>IP手動ミスごっこ</strong>: IPを別サブネットの値に固定 → GWにpingが通らないことを確認 → 自動取得に戻す</li>
+<li>各症状で「4連ping」の結果がどう変わったかを表にまとめる</li>
+</ol>
+
+<h2>3. ヒアリングとエスカレーション</h2>
+<ul class="plain">
+<li>聞くべき3点: <strong>「いつから」「あなただけ?周りも?」「直前に何か変えた?」</strong></li>
+<li>影響範囲で初動が変わる: 1人だけ→端末から / フロア全体→スイッチ・AP / 全社→出口・回線 <strong class="mark">(範囲=疑う機器の高さ)</strong></li>
+<li>回線業者・保守ベンダーへ渡すとき: 発生時刻、影響範囲、4連pingの結果、直前の変更、を1枚にまとめて渡すと解決が数倍速い</li>
+</ul>
+<div class="irohabox">「pingの結果を貼ってもらうだけで、電話の向こうのベンダーさんの声が明るくなる」— 事実の整理は最強の共通言語です。</div>
+
+<div class="casebox"><strong>🎭 ケーススタディで腕試し</strong><br>3つの「つながらない」事件に、時系列で挑みます。4連pingの型を胸に!</div>
+
+<a class="quizlink case" href="../../portal/case.html?c=case2-8-network">🎭 ケーススタディ「つながらない三重奏」を始める</a>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>切り分けは下の層から。「4連ping+DNS確認」を体に叩き込む</li>
+<li>169.254.x.x=DHCP失敗のサイン</li>
+<li>影響範囲が、疑うべき機器の「高さ」を教えてくれる</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="2-7-vpn-remote.html">← 2-7 VPNとリモートアクセス</a>
+  <a href="../../portal/quiz.html?q=part2-test">2-9 Part 2 修了テスト →</a>
+</footer>
+</div>
+</body>
+</html>

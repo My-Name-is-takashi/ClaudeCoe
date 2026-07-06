@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-2 IPアドレスとサブネット | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 2 ネットワーク基礎と実践</div>
+  <h1>2-2 IPアドレスとサブネット</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>IPv4アドレスとサブネットマスク(CIDR表記)を計算できる</li>
+<li>ネットワークアドレス・ブロードキャスト・ホスト数を求められる</li>
+<li>プライベート/グローバルアドレスを判別できる</li>
+</ul>
+<small>📺 動画「IPアドレスは住所、サブネットは町内会」(15分)を先にどうぞ。</small></div>
+
+<h2>1. IPアドレスは「町名+番地」でできている</h2>
+<p>IPv4アドレスは32ビット(8ビット×4区切り)の数値です。<strong class="mark">前半が「ネットワーク部(町名)」、後半が「ホスト部(番地)」</strong>で、その境目を示すのがサブネットマスク(CIDR表記)です。</p>
+<pre><code>192.168.10.130/24
+<span class="cm">└ /24 = 先頭24ビットが町名(ネットワーク部)という意味</span>
+
+2進数で見ると:
+192      .168      .10       .130
+11000000 10101000 00001010 | 10000010
+└──── ネットワーク部(24bit)────┘ └ホスト部(8bit)┘
+
+つまり「192.168.10 町」の「130番地」</code></pre>
+<div class="tblwrap"><table>
+<tr><th>CIDR</th><th>サブネットマスク</th><th>ホスト部</th><th>使えるホスト数</th></tr>
+<tr><td>/24</td><td>255.255.255.0</td><td>8bit</td><td>2⁸−2 = <strong>254</strong></td></tr>
+<tr><td>/25</td><td>255.255.255.128</td><td>7bit</td><td>2⁷−2 = 126</td></tr>
+<tr><td>/26</td><td>255.255.255.192</td><td>6bit</td><td>2⁶−2 = 62</td></tr>
+<tr><td>/27</td><td>255.255.255.224</td><td>5bit</td><td>2⁵−2 = 30</td></tr>
+<tr><td>/30</td><td>255.255.255.252</td><td>2bit</td><td>2²−2 = 2(機器間接続用)</td></tr>
+<tr><td>/16</td><td>255.255.0.0</td><td>16bit</td><td>65,534</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ なぜ「−2」?</strong> 各サブネットの<strong>先頭(ホスト部が全部0)はネットワークアドレス</strong>(町名そのもの)、<strong>末尾(全部1)はブロードキャストアドレス</strong>(町内放送用)で、端末には割り当てられないからです。ここ、テストに出ますよ!</div>
+
+<h2>2. 計算の型:「ブロックサイズ」で考える</h2>
+<p>例題: <code>192.168.10.130/26</code> のネットワークアドレスは?</p>
+<pre><code>手順① /26 → ホスト部6bit → ブロックサイズ = 2⁶ = 64
+手順② 第4オクテットの区間は 0-63 / 64-127 / <strong>128-191</strong> / 192-255
+手順③ 130 は 128-191 の区間 → ネットワークアドレスは 192.168.10.<strong>128</strong>
+       ブロードキャストは 192.168.10.<strong>191</strong>、使える番地は 129〜190(62台)</code></pre>
+<p>2進数に毎回変換しなくても、<strong class="mark">「ブロックサイズの倍数で区切る」</strong>と一瞬で解けます。この型を<a href="../../portal/drill.html?d=subnet">サブネット計算道場</a>で反射になるまで練習しましょう。</p>
+
+<h2>3. プライベートIPとグローバルIP</h2>
+<div class="tblwrap"><table>
+<tr><th>種類</th><th>範囲</th><th>用途</th></tr>
+<tr><td rowspan="3">プライベート<br>(社内・家庭内専用)</td><td>10.0.0.0/8(10.x.x.x)</td><td>大規模社内網</td></tr>
+<tr><td>172.16.0.0/12(172.16〜31.x.x)</td><td>中規模。<strong>172.32以降は対象外</strong>なのが引っかけ頻出</td></tr>
+<tr><td>192.168.0.0/16(192.168.x.x)</td><td>小規模・家庭</td></tr>
+<tr><td>グローバル</td><td>上記以外(おおむね)</td><td>インターネット上で一意。プロバイダから割当て</td></tr>
+</table></div>
+<p>社内はプライベートIPを使い、インターネットに出るときにNAT(2-5章)でグローバルIPに変換します。IPv6は「アドレスが枯渇しない新方式(128ビット、<code>2001:db8::1</code>のような表記)」であることをまず押さえれば、現段階ではOKです。</p>
+
+<h2>4. 情シスの実務では</h2>
+<ul class="plain">
+<li><strong>IPアドレス設計書</strong>: 拠点ごと・用途ごと(サーバー/PC/プリンター/ゲスト)にサブネットを割り当てて台帳化</li>
+<li>例: ミライ商事 東京 <code>192.168.10.0/24</code>(PC)、<code>192.168.20.0/24</code>(サーバー)、大阪 <code>192.168.30.0/24</code>…</li>
+<li>「拠点に60台」なら /26(62台)がぴったり——<strong>将来の増加も見込んで1段大きめ</strong>にするのが現場の知恵</li>
+</ul>
+<div class="irohabox">サブネット計算は自転車と同じで、一度体で覚えたら忘れません。道場で満点が出るまで、通勤時間にコツコツどうぞ!</div>
+
+<a class="quizlink" href="../../portal/drill.html?d=subnet">⚡ サブネット計算道場で特訓する</a>
+<a class="quizlink" href="../../portal/quiz.html?q=part2-ch02">📝 章末クイズに挑戦する(8問)</a>
+<footer class="nav">
+  <a href="2-1-network-overview.html">← 2-1 ネットワークの全体像</a>
+  <a href="2-3-tcp-udp-port.html">2-3 TCP/UDPとポート番号 →</a>
+</footer>
+</div>
+</body>
+</html>

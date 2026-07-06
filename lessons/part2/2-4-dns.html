@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2-4 DNSの仕組み | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 2 ネットワーク基礎と実践</div>
+  <h1>2-4 DNSの仕組み</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>名前解決の流れ(スタブ→キャッシュ→ルート→権威)を説明できる</li>
+<li><code>nslookup</code> / <code>dig</code> で名前解決を調査できる</li>
+<li>主要レコード種別(A/AAAA/CNAME/MX/TXT)を読める</li>
+</ul>
+<small>📺 動画「DNSはインターネットの電話帳」(13分)を先にどうぞ。</small></div>
+
+<h2>1. DNSは「インターネットの電話帳」</h2>
+<p>人間は <code>example.co.jp</code> という名前でアクセスしたい。でも通信の宛先はIPアドレス。この変換(名前解決)を担うのがDNSです。<strong class="mark">Webもメールも、ほぼすべての通信は最初にDNSに聞く</strong>——だからDNSが壊れると「インターネット全部が壊れた」ように見えます。</p>
+<div class="diagram">
+  <div class="row"><span class="box">PC(スタブリゾルバー)</span><span class="arrow">→</span><span class="box g">キャッシュDNS<br><small>(社内 or プロバイダ)</small></span></div>
+  <div class="row"><span class="arrow">↓ 知らなければ代わりに探し回る(再帰問い合わせ)</span></div>
+  <div class="row"><span class="box w">ルートDNS<br><small>「.jpなら あっちへ」</small></span><span class="arrow">→</span><span class="box w">.jp/.co.jpのDNS</span><span class="arrow">→</span><span class="box w">example.co.jpの権威DNS<br><small>「答えは 203.0.113.10」</small></span></div>
+  <small>キャッシュDNSが電話帳係。一度調べた答えはTTLの間キャッシュされる。</small>
+</div>
+
+<h2>2. レコード種別 〜電話帳の項目〜</h2>
+<div class="tblwrap"><table>
+<tr><th>種別</th><th>意味</th><th>実務での登場場面</th></tr>
+<tr><td>A</td><td>名前 → IPv4アドレス</td><td>Webサーバーの引っ越し=Aレコード変更</td></tr>
+<tr><td>AAAA</td><td>名前 → IPv6アドレス</td><td>IPv6対応サイト</td></tr>
+<tr><td>CNAME</td><td>名前 → 別の名前(別名)</td><td>SaaSに独自ドメインを向ける設定で頻出</td></tr>
+<tr><td>MX</td><td>このドメイン宛メールの届け先</td><td>メール移行で最重要。壊すとメールが消える</td></tr>
+<tr><td>TXT</td><td>自由記述</td><td>SPF/DKIM(送信ドメイン認証)、ドメイン所有確認</td></tr>
+<tr><td>NS</td><td>このドメインの権威サーバー</td><td>ドメイン移管時に確認</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ TTLとキャッシュ</strong>: レコードには TTL(キャッシュしてよい秒数)があります。「DNSを変えたのに切り替わらない」のはキャッシュが残っているから。<strong>切り替え作業の前にTTLを短くしておく</strong>のがプロの段取りです。</div>
+
+<h2>3. ラボ: digで名前解決を追いかける(60分)</h2>
+<pre><code><span class="cm"># ① まずは基本の問い合わせ(Windowsは nslookup、Linux/Macは dig)</span>
+nslookup example.jp
+dig example.jp            <span class="cm"># ANSWER SECTION の A レコードとTTLを確認</span>
+
+<span class="cm"># ② レコード種別を指定して調べる</span>
+dig example.jp MX         <span class="cm"># メールの届け先</span>
+dig example.jp TXT        <span class="cm"># SPFなど</span>
+dig www.example.jp CNAME
+
+<span class="cm"># ③ 名前解決の旅路を全部見る(ルートから順に)</span>
+dig +trace example.jp
+
+<span class="cm"># ④ 問い合わせ先DNSを指定する(切り分けの必殺技)</span>
+dig @8.8.8.8 example.jp   <span class="cm"># 社内DNSがおかしい?外のDNSに直接聞いて比較</span></code></pre>
+<ol class="plain">
+<li>①〜④を実行し、それぞれの出力の意味をメモする</li>
+<li>hostsファイル(Windows: <code>C:\Windows\System32\drivers\etc\hosts</code>)に<br><code>127.0.0.1 test.example.local</code> を追記(管理者権限)→ <code>ping test.example.local</code> で効くことを確認 → <strong>行を削除して後片付け</strong></li>
+<li>✅ 確認: 「hostsはDNSより先に参照される」ことを自分の言葉で説明できればクリア</li>
+</ol>
+
+<h2>4. 「DNSを疑うべき症状」パターン集</h2>
+<ul class="plain">
+<li><strong>IP直打ちなら開けるのに、名前だと開けない</strong> → ほぼDNS</li>
+<li>「特定のサイトだけ」「切り替え直後だけ」おかしい → キャッシュ/TTL</li>
+<li>社内サイトだけ引けない → 社内DNSサーバーを疑う(<code>dig @社内DNS</code> と <code>dig @8.8.8.8</code> を比較)</li>
+<li>メールだけ届かない → MX/SPFレコードを確認</li>
+</ul>
+<div class="irohabox">障害の世界には「とりあえずDNSを疑え」という格言があるくらい、DNS起因は多いんです。`dig @` で聞き先を変える技、必ず手に馴染ませてくださいね。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>DNSは名前→IPの電話帳。壊れると「全部壊れた」ように見える</li>
+<li>A/CNAME/MX/TXTは実務頻出。TTLを制する者が切り替え作業を制す</li>
+<li><code>dig</code>(nslookup)+問い合わせ先指定が切り分けの武器</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part2-ch04">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="2-3-tcp-udp-port.html">← 2-3 TCP/UDPとポート</a>
+  <a href="2-5-dhcp-nat-routing.html">2-5 DHCP・NAT・ルーティング →</a>
+</footer>
+</div>
+</body>
+</html>
