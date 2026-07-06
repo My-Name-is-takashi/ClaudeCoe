@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4-1 Windows Serverの役割 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 4 Windows ServerとActive Directory</div>
+  <h1>4-1 Windows Serverの役割と管理ツール</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>Windows Serverが社内で担う役割(AD/DNS/DHCP/ファイル/印刷)を説明できる</li>
+<li>管理ツール群(サーバーマネージャー・MMC・RSAT)の位置づけがわかる</li>
+<li>CAL(ライセンス)の概念を費用感として説明できる</li>
+</ul>
+<small>📺 動画「Windows Serverは会社の“総務部長”」(10分)とあわせてどうぞ。</small></div>
+
+<h2>1. Windows Serverは「役割」の集合体</h2>
+<p>Windows Serverは、必要な機能を<strong>「役割(Role)」として追加</strong>して使うOSです。ミライ商事の社内で担っているのはこの5役:</p>
+<div class="tblwrap"><table>
+<tr><th>役割</th><th>何をする?</th><th>止まると…</th></tr>
+<tr><td><strong>AD DS</strong>(Active Directory)</td><td>社員名簿+認証の元締め(4-2章)</td><td>全員がログオン不能。全社障害級</td></tr>
+<tr><td><strong>DNSサーバー</strong></td><td>社内の名前解決(ADと一心同体)</td><td>サーバー名でアクセス不能、ADも不調に</td></tr>
+<tr><td><strong>DHCPサーバー</strong></td><td>社内へのIP自動配布(2-5章の社内版)</td><td>新規接続端末がIPを取れない</td></tr>
+<tr><td><strong>ファイルサーバー</strong></td><td>部署共有フォルダー(4-4章)</td><td>「共有が開けない」問い合わせ殺到</td></tr>
+<tr><td><strong>印刷サーバー</strong></td><td>プリンターの一元配布</td><td>全社で印刷不能</td></tr>
+</table></div>
+
+<h2>2. 管理ツール図鑑</h2>
+<ul class="plain">
+<li><strong>サーバーマネージャー</strong>: 役割の追加・状態確認の玄関口</li>
+<li><strong>MMC+スナップイン</strong>: 「Active Directory ユーザーとコンピューター(dsa.msc)」「グループポリシー管理(gpmc.msc)」など、◯◯.msc は全部MMCの仲間</li>
+<li><strong>RSAT</strong>: 自分のWindows 11にインストールする管理ツール集。<strong class="mark">サーバーに毎回リモートデスクトップしなくても手元から管理できる</strong>——実務の基本形</li>
+<li><strong>PowerShell</strong>: 一括処理の味方(例: 退職者100人の無効化)。本講座では「存在と用途」を知ればOK</li>
+</ul>
+
+<h2>3. GUIとServer Core</h2>
+<p>Windows ServerにはGUIあり/なし(Server Core)の2形態があります。Coreは軽く攻撃面も小さいためDC(ドメインコントローラー)向きですが、本講座の検証はGUIありで進めます(学習効率優先)。</p>
+
+<h2>4. ライセンスの基本(CAL)</h2>
+<div class="warnbox"><strong>⚠️ サーバー本体のライセンスだけでは使えません</strong><br>
+Windows Serverは本体ライセンス(コア数課金)に加えて、<strong>アクセスする人or端末の数だけCAL(Client Access License)</strong>が必要です。「社員300名がADにログオンする」=300ユーザーCAL。監査で指摘される定番ポイントなので、台帳管理(Part 7-3)とセットで覚えましょう。</div>
+<ul class="plain">
+<li>ユーザーCAL(人単位)とデバイスCAL(端末単位)——多くの会社は1人複数端末なのでユーザーCALが得</li>
+<li>Entra ID(旧Azure AD)とのハイブリッド構成は5-2章で扱います</li>
+</ul>
+<div class="irohabox">Windows Serverは「会社の総務部長」——名簿(AD)を持ち、鍵(認証)を管理し、備品(ファイル・プリンター)を貸し出す。この比喩でPart 4全体が見通せますよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>Windows Serverは役割の集合体。AD DS+DNSが心臓部</li>
+<li>管理はRSATで手元から。◯◯.mscはMMCスナップイン</li>
+<li>CAL(ユーザー/デバイス)を忘れると監査で痛い目に</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part4-ch01">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="../part3/3-12-logs.html">← Part 3</a>
+  <a href="4-2-ad-basics.html">4-2 Active Directory基礎 →</a>
+</footer>
+</div>
+</body>
+</html>

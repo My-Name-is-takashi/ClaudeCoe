@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4-3 グループポリシー(GPO) | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 4 Windows ServerとActive Directory</div>
+  <h1>4-3 グループポリシー(GPO)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>GPOで端末設定を一括統制できる</li>
+<li>適用順序(LSDOU)と継承を理解し、「当たらない」を切り分けられる</li>
+<li><code>gpupdate</code> / <code>gpresult</code> で検証できる</li>
+</ul></div>
+
+<h2>1. GPOは「社内ルールの自動配布装置」</h2>
+<p>「全PCの画面ロックを10分に」「USBメモリ書き込み禁止」——300台に手作業したら日が暮れます。GPO(グループポリシーオブジェクト)は、<strong class="mark">設定のかたまりをOUにリンクして、対象のユーザー/PCに自動適用</strong>する仕組みです。</p>
+<div class="tblwrap"><table>
+<tr><th>構成</th><th>対象</th><th>例</th></tr>
+<tr><td>コンピューターの構成</td><td>PC(誰がログオンしても適用)</td><td>画面ロック強制、USB制限、Windows Update設定</td></tr>
+<tr><td>ユーザーの構成</td><td>人(どのPCでも適用)</td><td>壁紙、ドライブマッピング、スタートメニュー制御</td></tr>
+</table></div>
+
+<h2>2. 適用順序 LSDOU 〜あとから当たったものが勝つ〜</h2>
+<pre><code>L(Local)     ローカルポリシー         ↓ 弱い
+S(Site)      サイト
+D(Domain)    ドメイン                 例: パスワードポリシー
+OU(OU)       OU(入れ子なら親→子の順)  ↓ 強い(最後に適用=優先)
+</code></pre>
+<ul class="plain">
+<li>子OUは親の設定を<strong>継承</strong>する。同じ項目がぶつかったら「後から(=より近いOU)」が勝つ</li>
+<li>例外の道具: 「継承のブロック」「強制(Enforced)」「セキュリティフィルター(特定グループのみ適用)」——便利だが乱用すると追えなくなる</li>
+</ul>
+<div class="warnbox"><strong>⚠️ パスワードポリシーはドメイン直下のみ</strong>: 部署ごとに違うパスワード要件をOUのGPOで作っても効きません(既定ではドメイン単位)。試験にも実務にも出る有名な罠です。</div>
+
+<h2>3. 検証コマンド2点セット</h2>
+<pre><code>gpupdate /force     <span class="cm"># クライアントで即時適用(通常は90分±30分ごとに自動適用)</span>
+gpresult /r         <span class="cm"># このPC/ユーザーに「実際に当たっているGPO」を表示</span></code></pre>
+<p>「GPOが当たらない」切り分けは: ①gpresultで対象GPOが見えるか → ②リンク先OUにそのPC/ユーザーがいるか → ③フィルターで除外されていないか → ④「コンピューター構成」をユーザーOUに当てていないか(対象違い)。</p>
+
+<div class="trybox"><strong>💪 ラボ: GPO演習(120分)</strong>
+<ol>
+<li>グループポリシー管理(gpmc.msc)で「東京」OUに新規GPO <code>PC-Lock-Policy</code> を作成</li>
+<li>コンピューターの構成→「10分でスクリーンセーバーロック」を設定し、PC用OUにリンク</li>
+<li>クライアントで <code>gpupdate /force</code> → 設定が変わったこと、<code>gpresult /r</code> に表示されることを確認</li>
+<li>ユーザーの構成で「壁紙を会社ロゴに固定」→ 別ユーザーでログオンしても壁紙が変わることを確認</li>
+<li>ドライブマッピング: 「Gドライブ=\\dc01\share」をユーザー構成の基本設定で配布(4-4章の伏線)</li>
+<li>実験: 同じ項目を親OUと子OUで違う値にして、子が勝つことをgpresultで確認</li>
+</ol></div>
+<div class="irohabox">GPOのコツは「欲張って1つの巨大GPOにしない」こと。目的ごとに小さく作って名前で分かるようにすると、1年後の自分が泣かずに済みますよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>GPO=設定のかたまり×OUへのリンク。PC向けとユーザー向けは別物</li>
+<li>適用はLSDOU、近いOUが勝つ。パスワードポリシーはドメイン単位</li>
+<li>検証はgpupdate /force → gpresult /r の2点セット</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part4-ch03">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="4-2-ad-basics.html">← 4-2 AD基礎</a>
+  <a href="4-4-fileserver.html">4-4 ファイルサーバー →</a>
+</footer>
+</div>
+</body>
+</html>

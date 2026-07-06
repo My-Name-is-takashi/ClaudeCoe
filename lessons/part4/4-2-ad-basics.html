@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4-2 Active Directory基礎とドメイン構築 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 4 Windows ServerとActive Directory</div>
+  <h1>4-2 Active Directory基礎とドメイン構築</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>ドメイン・OU・ユーザー・グループの階層を設計図として描ける</li>
+<li>検証ドメインを構築し、クライアントをドメイン参加させられる</li>
+<li>AGDLP(グループ設計の原則)を説明できる</li>
+</ul>
+<small>📺 動画「Active Directoryは社員名簿+鍵束」(13分)を先にどうぞ。<br>
+ラボ環境: VirtualBox+Windows Server 2022評価版(180日)+Windows 11クライアントVM。メモリ8GB以下のPCは「画面写真でたどる紙上ラボ」(付録)で代替可。</small></div>
+
+<h2>1. ADは「社員名簿+鍵束」</h2>
+<ul class="plain">
+<li><strong>認証(Authentication)</strong>: 「あなたは本当に未来さん?」— ログオン時にドメインコントローラー(DC)が確認</li>
+<li><strong>認可(Authorization)</strong>: 「未来さんは経理フォルダーを開いていい?」— グループ所属で判断</li>
+<li>この2つを全社で一元管理するのがAD。<strong class="mark">1回のログオンで社内の許されたリソース全てに入れる</strong>(シングルサインオンの社内版)</li>
+</ul>
+<div class="diagram">
+  <div class="row"><span class="box g">ドメイン mirai.local</span></div>
+  <div class="row"><span class="box">OU: 東京<br><small>├ 営業部 ├ 経理部</small></span><span class="box">OU: 大阪<br><small>├ 営業部</small></span><span class="box w">OU: サーバー/PC</span></div>
+  <small>OU(組織単位)=名簿のフォルダー分け。GPO(4-3章)を当てる単位になるのが最重要ポイント。</small>
+</div>
+<div class="tblwrap"><table>
+<tr><th>用語</th><th>意味</th></tr>
+<tr><td>ドメイン</td><td>管理の単位(例: mirai.local)。1社1ドメインが基本形</td></tr>
+<tr><td>DC(ドメインコントローラー)</td><td>ADのデータベースを持つサーバー。<strong>必ず2台以上</strong>で冗長化が実務の鉄則</td></tr>
+<tr><td>OU</td><td>ユーザー・PCを整理するフォルダー。GPOのリンク先</td></tr>
+<tr><td>Kerberos</td><td>ADの認証プロトコル。「チケット」方式(概念だけでOK)</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ ADとDNSは一心同体</strong>: クライアントは「DCの居場所」をDNSで探します。<strong>クライアントのDNS参照先は必ず社内DC</strong>に向けること。「ドメイン参加できない」「ログオンが遅い」の原因第1位はDNS設定ミスです。ここ、テストに出ますよ!</div>
+
+<h2>2. AGDLP 〜グループ設計の原則〜</h2>
+<pre><code>A(Account)   : ユーザーを
+G(Global)    : 部署グループに入れる       例: G-経理部
+DL(DomainLocal): リソース用グループに入れる 例: DL-経理共有-書込
+P(Permission): DLグループに権限を付ける    例: フォルダーACLにDL-経理共有-書込
+</code></pre>
+<p>「ユーザーに直接権限を付けない」のが要点。人事異動が「Gグループの入れ替えだけ」で完結し、権限の棚卸しも一目でできます(4-4章・4-5章で実践)。</p>
+
+<h2>3. ラボ: ミライ商事ドメイン構築(150分)</h2>
+<ol class="plain">
+<li>Windows Server 2022 評価版VMを作成(メモリ4GB/ディスク60GB)→ 固定IP設定・スナップショット</li>
+<li>サーバーマネージャー→「役割と機能の追加」→ <strong>AD DS</strong> を追加</li>
+<li>「このサーバーをドメインコントローラーに昇格」→ 新しいフォレスト <code>mirai.local</code> → DSRMパスワード設定 → 再起動(DNSも自動で入る)</li>
+<li>「Active Directory ユーザーとコンピューター」で OU設計(東京/大阪 × 営業部/経理部/情シス)を作成</li>
+<li>ユーザー <code>mirai-taro</code>(営業部)等を3名、グループ <code>G-eigyo</code> <code>G-keiri</code> を作成し所属させる</li>
+<li>Windows 11 VMのDNSをDCのIPに向け、「設定→システム→ドメイン参加」で <code>mirai.local</code> に参加 → 再起動</li>
+<li><code>mirai\mirai-taro</code> でログオンできれば成功!DC側の「AD ユーザーとコンピューター」にPCが登録されたことも確認</li>
+</ol>
+<details><summary>💡 うまくいかない時(定番3つ)</summary>
+<ul class="plain">
+<li>「ドメインが見つからない」→ クライアントのDNSがDCを向いているか(<code>nslookup mirai.local</code> で確認)</li>
+<li>時刻ズレ → Kerberosは時刻差5分以上で認証失敗。両VMの時刻を確認</li>
+<li>ネットワーク種別 → VM同士が同じホストオンリーネットワークにいるか</li>
+</ul></details>
+<div class="irohabox">自分のドメインに初めてログオンできた瞬間は、Part 3のSSH初成功と並ぶ「情シス2大感動体験」です。おめでとうございます!</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>AD=社員名簿+鍵束。認証と認可を全社で一元化</li>
+<li>OUはGPOを当てる単位。DCは2台以上、DNSとは一心同体</li>
+<li>権限はAGDLP。ユーザーに直接権限を付けない</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part4-ch02">📝 章末クイズに挑戦する(8問)</a>
+<footer class="nav">
+  <a href="4-1-windows-server.html">← 4-1 Windows Serverの役割</a>
+  <a href="4-3-gpo.html">4-3 グループポリシー →</a>
+</footer>
+</div>
+</body>
+</html>

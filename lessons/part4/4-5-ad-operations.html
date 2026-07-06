@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4-5 AD運用実務(入退社・棚卸し) | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 4 Windows ServerとActive Directory</div>
+  <h1>4-5 AD運用実務(入退社・棚卸し)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>入社・異動・退職のアカウントライフサイクルを事故なく回せる</li>
+<li>「無効化」と「削除」を正しく使い分けられる</li>
+<li>定期棚卸しのプロセスを設計できる</li>
+</ul></div>
+
+<h2>1. アカウントライフサイクル</h2>
+<div class="tblwrap"><table>
+<tr><th>イベント</th><th>ADでやること</th><th>落とし穴</th></tr>
+<tr><td>入社</td><td>命名規則どおり作成 → 部署Gグループへ → 初期パスワード(初回変更強制)</td><td>命名規則のブレ(t.yamada / yamada-t 混在)が後年の地獄に</td></tr>
+<tr><td>異動</td><td>Gグループ差し替え+OU移動</td><td>旧部署グループの<strong>外し忘れ</strong>=権限の雪だるま。監査指摘の定番</td></tr>
+<tr><td>休職</td><td>アカウント無効化(期間明記)</td><td>放置してそのまま忘れる</td></tr>
+<tr><td>退職</td><td>退職日に即無効化 → 保持期間後に削除</td><td>「即削除」も「永久放置」もNG(次節)</td></tr>
+</table></div>
+
+<h2>2. 無効化と削除の使い分け</h2>
+<ul class="plain">
+<li><strong>無効化(Disable)</strong>: ログオン不能にするが、アカウントとデータの紐付けは残る。<strong class="mark">退職日はまず無効化</strong>——メール・ファイルの引き継ぎ、監査調査の可能性に備える</li>
+<li><strong>削除(Delete)</strong>: SID(内部ID)ごと消える。復元は面倒で、ファイルのACLには「不明なSID」が残る</li>
+<li>実務の型: <strong>退職日に無効化+専用OU「_退職者」へ移動 → 規程の保持期間(例: 90日〜1年)後に削除</strong>。無効化時はグループも全部外す(権限の凍結)</li>
+</ul>
+<div class="warnbox"><strong>⚠️ 退職者アカウントの放置は重大リスク</strong>: 本人や攻撃者による不正ログオンの入口になり、監査(内部統制・ISMS)では必ず指摘されます。「発見されたら即対応」ではなく「発生しない仕組み(退職連絡→情シスのフロー化)」で守ります。</div>
+
+<h2>3. 棚卸し 〜年2回の健康診断〜</h2>
+<pre><code>棚卸しの定番チェック(半期ごと)
+□ 90日以上ログオンのないアカウント一覧 → 所属長に要否確認
+□ 無効化済みで保持期限切れ → 削除
+□ 特権(Domain Admins等)メンバーの妥当性 → 最小人数か?
+□ グループのメンバー一覧 → 異動の外し忘れ検出
+□ 共有フォルダーACLに個人名が直接載っていないか(AGDLP違反の検出)</code></pre>
+<p>PowerShellを使うと一覧化が一撃です(存在だけ知っておけばOK): <code>Search-ADAccount -AccountInactive -TimeSpan 90.00:00:00</code></p>
+
+<h2>4. 入退社チェックリスト・テンプレート</h2>
+<div class="casebox"><strong>📋 退職対応チェックリスト(抜粋・実務でそのまま使える形)</strong>
+<ul>
+<li>□ 退職日17:00にADアカウント無効化+全グループ除外+_退職者OUへ</li>
+<li>□ メール: 転送設定 or 共有メールボックス化(上長と要相談)/ M365ライセンス回収</li>
+<li>□ 各SaaSアカウントの無効化(SaaS台帳と突合)← 漏れの多発地帯!</li>
+<li>□ 貸与PC・スマホ・入館証の回収 → データ保全 → 初期化</li>
+<li>□ VPN・Wi-Fi(802.1X)の証明書/アカウント失効</li>
+<li>□ 本人が管理者だったシステムの管理者交代</li>
+<li>□ 台帳更新(資産・アカウント・ライセンス)</li>
+</ul></div>
+
+<div class="casebox"><strong>🎭 ケーススタディで腕試し</strong><br>「4月の新入社員20名」「急な退職者」「監査での指摘」の3シナリオに挑戦。判断の順序が問われます。</div>
+<a class="quizlink case" href="../../portal/case.html?c=case4-5-adops">🎭 ケーススタディ「人が動く日、ADも動く」を始める</a>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>異動は「付ける」より「外す」が難しい。グループ差し替えを型にする</li>
+<li>退職は即無効化→保持期間→削除。SaaS側の消し忘れに要注意</li>
+<li>棚卸しは半期ごと。休眠アカウントと特権メンバーを重点確認</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="4-4-fileserver.html">← 4-4 ファイルサーバー</a>
+  <a href="../../portal/quiz.html?q=part4-test">4-6 Part 4 修了テスト →</a>
+</footer>
+</div>
+</body>
+</html>
