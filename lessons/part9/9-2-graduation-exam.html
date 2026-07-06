@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9-2 卒業試験 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 9 総合演習と卒業試験</div>
+  <h1>9-2 卒業試験</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎓 卒業試験の構成</strong>
+<ul>
+<li><strong>知識試験</strong>: 全パート横断30問(80%で合格)</li>
+<li><strong>実技試験</strong>: Linuxサーバー復旧課題(下記)</li>
+<li>両方の合格+9-3の卒業制作提出で「一人前情シス認定」です</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part9-grad">📝 知識試験(30問)を開始する</a>
+
+<h2>実技試験: 壊れたWebサーバーを復旧せよ</h2>
+<div class="casebox"><strong>📋 課題(制限時間: 90分)</strong>
+<p>mirai-lab01 のスナップショットを取得したうえで、以下の「破壊スクリプト」を実行し、自力で完全復旧してください。</p>
+<pre><code><span class="cm"># 破壊スクリプト(3つの故障を注入します。実行前にスナップショット!)</span>
+sudo systemctl stop nginx && sudo systemctl disable nginx
+sudo sed -i 's/}$/#}/' /etc/nginx/sites-enabled/default 2>/dev/null || \
+  sudo sed -i '0,/}/s//#}/' /etc/nginx/nginx.conf
+sudo chmod 000 /var/www/html
+echo "破壊完了。ここから90分で復旧してください。"</code></pre>
+<strong>合格条件(すべて達成)</strong>
+<ul>
+<li>□ <code>curl -I http://localhost</code> が 200 を返す</li>
+<li>□ OS再起動後もnginxが自動起動して200を返す</li>
+<li>□ <code>nginx -t</code> がクリーン</li>
+<li>□ ファイル権限が適切(777を使っていない)</li>
+<li>□ <strong>報告書</strong>: 3つの故障の内容・発見方法(使ったコマンドとログ)・対処・再発防止を A4 1枚に</li>
+</ul>
+<details><summary>💡 ヒント(どうしても詰まったら)</summary>
+<ul class="plain">
+<li>故障は「サービス停止+自動起動OFF」「設定ファイルの構文破壊」「ドキュメントルートの権限剥奪」の3つ</li>
+<li>調査の型: <code>systemctl status</code> → <code>nginx -t</code>(行番号を読む!)→ <code>ls -l /var/www</code> → <code>curl</code></li>
+<li>権限は「なぜ644/755が適切か」を報告書で説明できること</li>
+</ul></details></div>
+
+<h2>不合格だったら</h2>
+<ul class="plain">
+<li>知識試験: 間違えた問題の解説に書かれた章へ戻って復習 → 3日以上あけて再挑戦(問題はシャッフルされます)</li>
+<li>実技: スナップショットに戻して何度でも。<strong class="mark">2回目で30分を切れたら、実務レベルの型が身についた証拠</strong>です</li>
+</ul>
+
+<footer class="nav">
+  <a href="9-1-final-exercise.html">← 9-1 総合演習</a>
+  <a href="9-3-portfolio.html">9-3 卒業制作 →</a>
+</footer>
+</div>
+</body>
+</html>

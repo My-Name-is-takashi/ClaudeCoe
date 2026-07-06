@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8-3 社内規程とIT統制 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 8 情シス実務スキル</div>
+  <h1>8-3 社内規程とIT統制</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>社内IT規程の全体マップを描ける</li>
+<li>「守れる規程」を作る勘所と例外管理を知る</li>
+<li>IT統制(J-SOX)と監査対応の基本を押さえる</li>
+</ul></div>
+
+<h2>1. 規程マップ 〜何をどこに書くか〜</h2>
+<div class="tblwrap"><table>
+<tr><th>規程</th><th>主な内容</th><th>関連章</th></tr>
+<tr><td>情報セキュリティ基本方針</td><td>会社の姿勢(社長名・対外公開も)</td><td>6-7</td></tr>
+<tr><td>PC・IT機器利用規程</td><td>私的利用・ソフト導入・持ち出し・紛失時の報告義務</td><td>1章台</td></tr>
+<tr><td>アカウント・パスワード規程</td><td>発行・変更・退職時、MFA義務</td><td>4-5, 5-4</td></tr>
+<tr><td>リモートワーク規程</td><td>作業環境・公衆Wi-Fi・のぞき見防止</td><td>2-7</td></tr>
+<tr><td>BYOD規程(認める場合)</td><td>MDM登録・紛失時のワイプ同意</td><td>1-4</td></tr>
+<tr><td>SNS利用ガイドライン</td><td>業務情報の投稿禁止・アカウント運用</td><td>—</td></tr>
+<tr><td>データ管理・持ち出し規程</td><td>分類(極秘/社外秘/公開)・暗号化・廃棄</td><td>6-7, 7-3</td></tr>
+</table></div>
+<p>書き分けの原則は6-7章の3階層(方針→基準→手順)。<strong class="mark">更新頻度が違うものを同じ文書に書かない</strong>のがメンテナンスのコツです。</p>
+
+<h2>2. 「守れる規程」の作り方</h2>
+<ul class="plain">
+<li><strong>現場観察から書く</strong>: 実態と乖離した理想論は初日から形骸化する(6-7章の教訓)</li>
+<li><strong>例外は「禁止」でなく「管理」</strong>: 例外申請(理由・期間・承認者・失効日)の仕組みを用意。無管理の例外=闇ルート化</li>
+<li><strong>罰よりも導線</strong>: 「USB禁止」なら代替(安全なファイル便)をセットで提供。導線なき禁止はシャドーITの母(5-6章)</li>
+<li>改訂履歴と周知記録を残す(「知らなかった」を防ぐ+監査証跡)</li>
+</ul>
+
+<h2>3. IT統制(J-SOX)の初歩</h2>
+<p>上場企業(とその子会社)は、財務報告の信頼性のための内部統制=J-SOXの対象。情シスに関係するのは<strong>IT全般統制(ITGC)</strong>です。監査で見られる4領域は、実はこの講座でやってきたことそのもの:</p>
+<div class="tblwrap"><table>
+<tr><th>ITGCの領域</th><th>問われること</th><th>講座の対応章</th></tr>
+<tr><td>アクセス管理</td><td>入退社・異動の権限付与/剥奪が承認・記録されているか</td><td>4-5</td></tr>
+<tr><td>変更管理</td><td>システム変更が承認・テスト・記録されているか</td><td>7-1</td></tr>
+<tr><td>運用管理</td><td>バックアップ・ジョブ・障害対応が管理されているか</td><td>7-5, 7-6</td></tr>
+<tr><td>外部委託管理</td><td>ベンダーの統制を確認しているか</td><td>8-1, 5-6</td></tr>
+</table></div>
+<div class="irohabox">監査対応の裏ワザは存在しません。あるのは「日常業務を記録付きで回す」だけ。この講座を順番にやってきたあなたは、実はもう監査に強い情シスなんです。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>規程はマップで全体を把握し、3階層で書き分ける</li>
+<li>守れる規程=現場観察+例外管理+代替導線。形骸化が最大の敵</li>
+<li>ITGCはアクセス・変更・運用・委託の4領域。日常の記録が武器</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part8-ch03">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="8-2-budget.html">← 8-2 IT予算と稟議</a>
+  <a href="8-4-project.html">8-4 システム導入プロジェクト →</a>
+</footer>
+</div>
+</body>
+</html>

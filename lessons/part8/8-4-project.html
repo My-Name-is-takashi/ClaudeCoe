@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8-4 システム導入プロジェクト管理 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 8 情シス実務スキル</div>
+  <h1>8-4 システム導入プロジェクト管理</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>要件定義→選定→導入→定着の6フェーズを回せる</li>
+<li>小さな会社に合ったプロジェクト管理の最小道具を使える</li>
+<li>「導入したのに使われない」を防ぐ定着施策を打てる</li>
+</ul></div>
+
+<h2>1. 導入プロジェクトの6フェーズ</h2>
+<div class="tblwrap"><table>
+<tr><th>フェーズ</th><th>やること</th><th>典型的な失敗</th></tr>
+<tr><td>①企画・要件定義</td><td>現行業務の棚卸し、必須/歓迎要件の仕分け、体制と予算枠</td><td>現場に聞かず情シスだけで要件を書く</td></tr>
+<tr><td>②選定</td><td>RFP・比較(5-6章の評価軸)・デモは現場に触らせる</td><td>営業トークと画面の綺麗さで即決</td></tr>
+<tr><td>③契約</td><td>範囲・データ移行・SLA・解約条件(8-1章)</td><td>「一式」のまま契約</td></tr>
+<tr><td>④構築・移行</td><td>設定、データ移行、テスト(業務シナリオで)、<strong>並行稼働</strong></td><td>移行データの検証不足、一発切替</td></tr>
+<tr><td>⑤稼働判定・切替</td><td>チェックリストでGo/No-Go判定、切り戻し計画</td><td>「ここまで来たら戻れない」で見切り発車</td></tr>
+<tr><td>⑥定着・評価</td><td>説明会・マニュアル・問い合わせ体制、効果測定</td><td>導入=ゴールと思って放置</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ 要件定義が9割</strong>: 導入失敗の大半は「本当の業務を知らずに作った要件」が原因。現場の1日に張り付いて<strong>現行業務フロー(例外処理・月末だけの作業も!)</strong>を観察してから要件を書きます。Fit&Gap(パッケージに業務を合わせるか、カスタマイズするか)は「原則パッケージに合わせる」が中小の鉄則——カスタマイズは初期費用も将来のアップデートも重くします。</div>
+
+<h2>2. 最小限のPM道具箱</h2>
+<ul class="plain">
+<li><strong>WBS</strong>: 作業を分解して担当と期限を付けた一覧。「誰が・何を・いつまで」以上の複雑さは不要</li>
+<li><strong>課題管理表</strong>: 起票日・内容・担当・期限・状態。会議はこの表を上から見るだけで回る</li>
+<li><strong>体制図</strong>: 決める人(オーナー=業務部門の長)・進める人(PM=あなた)・作る人(ベンダー)。<strong class="mark">「決める人」が業務部門にいないプロジェクトは必ず漂流します</strong></li>
+</ul>
+
+<h2>3. 定着 〜導入はゴールではない〜</h2>
+<ul class="plain">
+<li>説明会は「操作説明」でなく「あなたの仕事がこう楽になる」から話す(8-6章の翻訳力)</li>
+<li>マニュアルは<strong>業務の流れ順</strong>(「申請するには」)。機能一覧順のマニュアルは読まれない</li>
+<li>稼働後2週間は「なんでも聞ける窓口」を明示的に開設。初速のつまずきが定着率を決める</li>
+<li>3ヶ月後に効果測定(処理時間・ミス件数)して経営に報告——次の稟議(8-2章)の信用貯金になる</li>
+</ul>
+
+<div class="casebox"><strong>🎭 ケーススタディで腕試し</strong><br>「勤怠システム導入プロジェクト」: 要件の抜け、現場の抵抗、移行トラブル——導入PMのリアルを6フェーズで体験します。</div>
+<a class="quizlink case" href="../../portal/case.html?c=case8-4-project">🎭 ケーススタディ「勤怠システム導入PJ」を始める</a>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>6フェーズで回す。要件定義=現場観察が9割、カスタマイズは最小限</li>
+<li>道具はWBS・課題管理表・体制図の3つで十分。「決める人」を業務部門に置く</li>
+<li>定着施策(説明会・窓口・効果測定)までがプロジェクト</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="8-3-rules-control.html">← 8-3 社内規程とIT統制</a>
+  <a href="8-5-documentation.html">8-5 ドキュメンテーション →</a>
+</footer>
+</div>
+</body>
+</html>
