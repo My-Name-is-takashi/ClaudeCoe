@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7-1 ITIL入門 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 7 IT運用とヘルプデスク</div>
+  <h1>7-1 ITIL入門(サービスとしてのIT)</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>インシデント管理・問題管理・変更管理の違いを実例で説明できる</li>
+<li>チケット駆動運用とSLAの考え方を理解する</li>
+</ul>
+<small>📺 動画「なぜ“いい人対応”では回らないのか」(12分)を先にどうぞ。</small></div>
+
+<h2>1. なぜプロセスが要るのか</h2>
+<p>「頼まれたら何でもすぐやる親切な情シス」は、一見理想ですが——対応の記録が残らない、人によって品質が違う、休んだら止まる、優先順位が声の大きさで決まる…と<strong class="mark">必ず破綻します</strong>。ITIL は世界中の運用現場のベストプラクティス集。全部覚える必要はなく、まず3つのプロセスを使い分けられれば十分です。</p>
+
+<h2>2. 3大プロセスの使い分け</h2>
+<div class="tblwrap"><table>
+<tr><th>プロセス</th><th>目的</th><th>ミライ商事での例</th></tr>
+<tr><td><strong>インシデント管理</strong></td><td><strong>とにかく早く業務を復旧</strong>させる(原因究明は後)</td><td>「印刷できない」→代替プリンターを案内して業務再開</td></tr>
+<tr><td><strong>問題管理</strong></td><td>再発するインシデントの<strong>根本原因を潰す</strong></td><td>「毎週水曜に印刷障害」→ドライバーの競合を特定し恒久対策</td></tr>
+<tr><td><strong>変更管理</strong></td><td>変更による事故を防ぐ(承認・計画・切り戻し)</td><td>FWルール変更を申請→影響評価→承認→実施→記録</td></tr>
+</table></div>
+<div class="warnbox"><strong>⚠️ インシデント対応中に原因究明へ深入りしない</strong>: ユーザーの業務復旧が最優先(ワークアラウンドでOK)。原因の深掘りは問題管理として切り出す——この分離が「早い」と「賢い」を両立させます。ここ、テストに出ますよ!</div>
+
+<h2>3. チケット駆動運用</h2>
+<ul class="plain">
+<li>合言葉は<strong class="mark">「チケットに書いていないことは存在しない」</strong>。口頭・チャットの依頼も必ずチケット化</li>
+<li>1チケットに「受付日時・依頼者・症状・対応・結果・かかった時間」——これが将来のナレッジとKPIの原石</li>
+<li>効能: 対応漏れ防止 / 引き継ぎ可能 / 「情シス何やってるの?」への定量的な回答(月次レポート)</li>
+</ul>
+
+<h2>4. SLA 〜期待値の合意〜</h2>
+<div class="tblwrap"><table>
+<tr><th>優先度</th><th>例</th><th>一次応答</th><th>目標復旧</th></tr>
+<tr><td>P1(全社停止)</td><td>基幹システム停止、全社ネット断</td><td>15分</td><td>4時間</td></tr>
+<tr><td>P2(部門影響)</td><td>部署の共有フォルダー不能</td><td>1時間</td><td>1営業日</td></tr>
+<tr><td>P3(個人影響)</td><td>1人のPC不調</td><td>4時間</td><td>3営業日</td></tr>
+<tr><td>P4(依頼・質問)</td><td>ソフトインストール依頼</td><td>1営業日</td><td>5営業日</td></tr>
+</table></div>
+<p>SLAは「宣言」であると同時に<strong>自衛</strong>: 「なんでまだやってくれないの!」に「P3は3営業日以内が合意水準です、現在2日目です」と答えられます。</p>
+<div class="irohabox">プロセスは「冷たい仕組み」じゃなくて、「親切を続けるための体力配分」なんです。いい人ほど、早くITILを覚えてほしいんですよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>インシデント=早く復旧、問題=根本を潰す、変更=事故を防ぐ</li>
+<li>チケットに書いていないことは存在しない</li>
+<li>SLA=優先度別の期待値合意。宣言であり自衛でもある</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part7-ch01">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="../part6/6-7-law-isms.html">← Part 6</a>
+  <a href="7-2-helpdesk.html">7-2 ヘルプデスク実践 →</a>
+</footer>
+</div>
+</body>
+</html>

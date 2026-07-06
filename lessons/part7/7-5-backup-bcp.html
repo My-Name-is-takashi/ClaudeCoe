@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7-5 バックアップとBCP/DR | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 7 IT運用とヘルプデスク</div>
+  <h1>7-5 バックアップとBCP/DR</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>3-2-1ルールでバックアップを設計できる</li>
+<li>RPO/RTOで経営と会話できる</li>
+<li>リストア訓練の重要性を体験で理解する</li>
+</ul></div>
+
+<h2>1. 3-2-1ルール 〜設計の黄金律〜</h2>
+<div class="diagram">
+  <div class="row"><span class="box g">3つのコピー<br><small>本体+バックアップ2つ</small></span><span class="box">2種類の媒体<br><small>例: NAS+クラウド</small></span><span class="box w">1つはオフサイト<br><small>社外(クラウド/遠隔地)に</small></span></div>
+  <small>+現代の追加要件:「1つはオフライン or イミュータブル(書き換え不可)」— ランサム対策(6-6章の教訓)。</small>
+</div>
+<div class="tblwrap"><table>
+<tr><th>方式</th><th>内容</th><th>トレードオフ</th></tr>
+<tr><td>フル</td><td>全部を毎回</td><td>確実だが容量・時間大</td></tr>
+<tr><td>差分</td><td>前回フルからの変更分</td><td>復元はフル+最新差分の2つで済む</td></tr>
+<tr><td>増分</td><td>前回バックアップからの変更分</td><td>取得は速いが、復元はチェーン全部が必要</td></tr>
+</table></div>
+<p>定番設計: <strong>週次フル+日次差分(または増分)、月次を長期保管</strong>。世代管理は3-8章のスクリプトで体験済みですね。</p>
+
+<h2>2. RPO / RTO 〜経営との共通言語〜</h2>
+<ul class="plain">
+<li><strong>RPO(目標復旧時点)</strong>: どこまでのデータ損失を許容するか。「日次バックアップ=最悪24時間分消える」</li>
+<li><strong>RTO(目標復旧時間)</strong>: どれだけの停止を許容するか。「テープ取り寄せ+リストアで2日」</li>
+<li>経営への問いかけ方: <strong class="mark">「販売データが24時間分消えても大丈夫ですか? ダメなら追加費用◯円で1時間に縮められます」</strong>——技術でなくビジネスの選択として提示する(8-2章の稟議につながる)</li>
+</ul>
+
+<h2>3. 「バックアップはあるのに戻せない」を防ぐ</h2>
+<div class="warnbox"><strong>⚠️ バックアップ運用の三大罠</strong>
+<ol class="plain">
+<li><strong>成功していると思い込む</strong>: ジョブが数ヶ月前から失敗していた——監視(7-4章)でバックアップ成否を必ず拾う</li>
+<li><strong>戻し方を知らない</strong>: 初めてのリストアが本番障害の日、は最悪。<strong>年1回以上のリストア訓練</strong>で手順書化</li>
+<li><strong>対象漏れ</strong>: 「そのフォルダーは対象外でした」。新システム追加時にバックアップ対象への追加をチェックリスト化</li>
+</ol></div>
+
+<div class="trybox"><strong>💪 演習①: リストア訓練(60分)</strong>
+<ol>
+<li>Part 3-8で作ったバックアップ(tar.gz)から、別ディレクトリへ完全復元する</li>
+<li>復元手順を「深夜に寝ぼけた自分でも実行できる」手順書として書く(コマンド+確認方法)</li>
+<li>ストップウォッチで所要時間を計測=あなたの環境の実測RTOです</li>
+</ol></div>
+
+<h2>4. BCP/DR 〜ITを超えた継続計画〜</h2>
+<ul class="plain">
+<li><strong>BCP</strong>=事業継続計画(会社全体)、<strong>DR</strong>=IT復旧(その一部)。停電・災害・パンデミック・サイバー攻撃が対象</li>
+<li>ITのBCP検討事項: 安否確認手段 / 社内システムが全滅した時の連絡手段(個人携帯の電話網など<strong>社内ITに依存しない経路</strong>)/ 代替拠点・在宅への切替 / 重要システムの優先復旧順位</li>
+</ul>
+<div class="trybox"><strong>💪 演習②: BCP机上訓練(30分)</strong>
+<p>「本社ビルが明日、終日計画停電。サーバー室も止まる」——ミライ商事の情シスとして、①今日中にやること ②当日の業務継続方法 ③停電明けの復旧手順、を箇条書きで作成してください。(ヒント: UPSは何分もつ? 正しいシャットダウン順序は? 社員への周知は?)</p></div>
+<div class="irohabox">「バックアップの価値は、取ったときではなく戻せたときに生まれる」——リストア訓練、面倒でも年1回だけはやりましょう。未来のあなたが泣いて感謝します。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>3-2-1+オフライン1。ランサムはバックアップを狙ってくる</li>
+<li>RPO/RTOは経営に「選ばせる」ための言葉</li>
+<li>成否監視・リストア訓練・対象漏れ防止の3点で「戻せる」を保証する</li>
+</ul></div>
+
+<a class="quizlink" href="../../portal/quiz.html?q=part7-ch05">📝 章末クイズに挑戦する(6問)</a>
+<footer class="nav">
+  <a href="7-4-monitoring.html">← 7-4 監視とアラート</a>
+  <a href="7-6-incident-drill.html">7-6 障害対応総合訓練 →</a>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7-4 監視とアラート | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 7 IT運用とヘルプデスク</div>
+  <h1>7-4 監視とアラート</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>監視の4種類(死活・リソース・ログ・外形)を設計できる</li>
+<li>監視ツールを実際に立てて発報を体験する</li>
+<li>「アラート疲れ」を起こさない閾値設計を学ぶ</li>
+</ul></div>
+
+<h2>1. 監視の4種類</h2>
+<div class="tblwrap"><table>
+<tr><th>種類</th><th>見るもの</th><th>例</th><th>気づける障害</th></tr>
+<tr><td>死活監視</td><td>生きてる?</td><td>ping / ポート応答</td><td>サーバー・機器のダウン</td></tr>
+<tr><td>リソース監視</td><td>余力ある?</td><td>CPU / メモリ / <strong>ディスク使用率</strong></td><td>ディスクフル前の予兆(3-12章の悲劇を防ぐ!)</td></tr>
+<tr><td>ログ監視</td><td>変な記録は?</td><td>エラー多発、認証失敗の連続</td><td>アプリ異常・攻撃の兆候</td></tr>
+<tr><td>外形監視</td><td>ユーザーから見えてる?</td><td>URLへのHTTPS応答・応答時間</td><td>「中は正常なのに外から見えない」(証明書切れ・DNS)</td></tr>
+</table></div>
+<p><strong class="mark">「監視されていないシステムは、止まっていても気づけない」</strong>。ユーザーからの「つながらないんですけど」が検知手段になっている状態を卒業するのがこの章です。</p>
+
+<h2>2. 閾値設計 〜オオカミ少年を作らない〜</h2>
+<ul class="plain">
+<li>2段階で切る: <strong>Warning(翌営業日対応でよい)/ Critical(今すぐ動く)</strong>。例: ディスク 80%でW、90%でC</li>
+<li>「瞬間値」でなく「継続時間」で発報(CPU 90%が5分継続、など)——スパイクでの誤報を防ぐ</li>
+<li><strong>アラート疲れが最大の敵</strong>: 対応不要な通知が混ざると、本物も無視されるようになる。「鳴ったら必ず何かする」通知だけ残し、それ以外はレポートに落とす</li>
+<li>通知先の設計: Critical=電話/プッシュ、Warning=チャット、情報=日次サマリー</li>
+</ul>
+
+<div class="trybox"><strong>💪 ラボ: はじめての監視構築(120分)</strong>
+<ol>
+<li>mirai-lab01(Part 3のVM)に軽量監視ツール <strong>Uptime Kuma</strong> を導入(Docker: <code>docker run -d -p 3001:3001 louislam/uptime-kuma</code> ※Docker未導入なら <code>sudo apt install docker.io</code>)</li>
+<li>監視を3つ登録: ①ping(VM自身)②HTTP(<code>http://localhost</code> のnginx)③TCP(22番)</li>
+<li><code>sudo systemctl stop nginx</code> → ダウン検知と通知(画面)を確認 → start で復旧検知</li>
+<li>通知チャネル(メール等)を設定し、実際に通知を受け取る</li>
+<li>発展: 本格ツール(Zabbix)ではリソース監視・閾値・グラフまで扱えることをドキュメントで確認</li>
+<li>設計演習: ミライ商事の資産(AD×2、ファイルサーバー、社内ポータル、VPN装置、各拠点ルーター)に対する監視項目表を作る</li>
+</ol></div>
+<div class="warnbox"><strong>⚠️ 監視の監視</strong>: 監視サーバー自体が落ちたら全部見えなくなります。外形監視だけは外部サービス(クラウド側)から行う、監視サーバーの死活を別系統で見る、の二重化を忘れずに。</div>
+<div class="irohabox">初めて「ダウン通知」が自分のスマホに届いた瞬間、あなたは「気づかされる側」から「気づく側」になります。これ、情シスとしてすごく大きな一歩なんですよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>監視は死活・リソース・ログ・外形の4点セット。特にディスクは予兆で捕まえる</li>
+<li>閾値は2段階+継続時間。「鳴ったら必ず動く」通知だけを残す</li>
+<li>監視サーバー自身の監視(外部からの外形)を忘れない</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="7-3-asset-license.html">← 7-3 IT資産管理</a>
+  <a href="7-5-backup-bcp.html">7-5 バックアップとBCP/DR →</a>
+</footer>
+</div>
+</body>
+</html>
