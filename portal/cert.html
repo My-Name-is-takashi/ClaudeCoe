@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一人前情シス認定証 | 情シス養成講座</title>
+<style>
+  body { font-family:"Hiragino Mincho ProN","Yu Mincho",serif; background:#e9e6df; margin:0; padding:20px;
+         display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .controls { font-family:sans-serif; font-size:.9rem; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .controls input { padding:8px 12px; font-size:1rem; border:1px solid #bbb; border-radius:8px; }
+  .controls button { padding:8px 18px; font-size:.95rem; border:none; border-radius:8px;
+                     background:#4f6df5; color:#fff; font-weight:700; cursor:pointer; }
+  .cert { background:#fffdf5; width:100%; max-width:760px; aspect-ratio:1.414/1; padding:6%;
+          border:14px double #b8963e; box-shadow:0 10px 30px rgba(0,0,0,.2);
+          display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#3a3428; }
+  .cert .title { font-size:2rem; letter-spacing:.4em; text-indent:.4em; border-bottom:2px solid #b8963e; padding-bottom:8px; }
+  .cert .name { font-size:1.7rem; margin:26px 0 4px; border-bottom:1px solid #999; padding:0 30px 4px; min-width:50%; }
+  .cert .name small { font-size:.75rem; color:#999; }
+  .cert .body { font-size:.95rem; line-height:2.1; margin-top:18px; }
+  .cert .date { margin-top:24px; font-size:.9rem; }
+  .cert .issuer { margin-top:6px; font-size:1.05rem; }
+  .cert .seal { margin-top:10px; width:64px; height:64px; border:3px solid #c0392b; border-radius:50%;
+                color:#c0392b; display:flex; align-items:center; justify-content:center;
+                font-size:.8rem; font-weight:700; transform:rotate(-8deg); }
+  @media print {
+    body { background:#fff; padding:0; }
+    .controls, .note { display:none; }
+    .cert { box-shadow:none; max-width:none; }
+  }
+  .note { font-family:sans-serif; font-size:.8rem; color:#777; }
+</style>
+</head>
+<body>
+<div class="controls">
+  <input id="name" placeholder="氏名を入力" value="">
+  <input id="date" type="date">
+  <button onclick="apply()">認定証に反映</button>
+  <button onclick="window.print()">🖨️ 印刷 / PDF保存</button>
+</div>
+
+<div class="cert">
+  <div class="title">認 定 証</div>
+  <div class="name" id="certName">未来 太郎<br><small>(上の欄に氏名を入力してください)</small></div>
+  <div class="body">
+    あなたは 情シス養成講座「ゼロから一人前の情シスへ」の<br>
+    全課程(全10パート・70章・約200時間)を修了し<br>
+    卒業試験(知識・実技)に合格したことをここに証し<br>
+    <strong>一人前情シス(レベル4)</strong> として認定します
+  </div>
+  <div class="date" id="certDate"></div>
+  <div class="issuer">情シス養成講座 ナビゲーター いろは</div>
+  <div class="seal">認定<br>之印</div>
+</div>
+
+<p class="note">※ 印刷時はブラウザの印刷設定で「横向き・背景のグラフィック ON」を推奨します。</p>
+
+<script>
+function apply(){
+  const n = document.getElementById("name").value.trim();
+  if (n) document.getElementById("certName").innerHTML = n;
+  const d = document.getElementById("date").value;
+  const dt = d ? new Date(d) : new Date();
+  document.getElementById("certDate").textContent =
+    `${dt.getFullYear()}年${dt.getMonth()+1}月${dt.getDate()}日`;
+}
+document.getElementById("date").valueAsDate = new Date();
+apply();
+</script>
+</body>
+</html>

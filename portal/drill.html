@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ドリル道場 | 情シス養成講座</title>
+<link rel="stylesheet" href="../lessons/assets/lesson.css">
+<style>
+  .stage { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; }
+  .dq { font-size:1.15rem; font-weight:700; margin:10px 0 18px; white-space:pre-wrap; }
+  .dq code { font-size:1em; }
+  .choice { display:block; width:100%; text-align:left; padding:12px 14px; margin-bottom:10px;
+            border:2px solid var(--line); border-radius:10px; background:var(--card); color:var(--text);
+            cursor:pointer; font-size:1rem; }
+  .choice:hover { border-color:var(--accent); }
+  .choice.correct { border-color:var(--ok); background:var(--ok-soft); }
+  .choice.wrong { border-color:var(--ng); background:var(--ng-soft); }
+  input.ans { width:100%; padding:12px 14px; border:2px solid var(--line); border-radius:10px;
+              background:var(--card); color:var(--text); font-size:1.05rem;
+              font-family:ui-monospace,Consolas,monospace; }
+  .fb { margin-top:12px; padding:12px; border-radius:10px; display:none; font-size:.95rem; }
+  .fb.ok { background:var(--ok-soft); border-left:4px solid var(--ok); display:block; }
+  .fb.ng { background:var(--ng-soft); border-left:4px solid var(--ng); display:block; }
+  .hud { display:flex; justify-content:space-between; font-size:.85rem; color:var(--sub); margin-bottom:10px; }
+  button.primary { background:var(--accent); color:#fff; border:none; border-radius:10px;
+                   padding:12px 26px; font-size:1rem; font-weight:700; cursor:pointer; margin-top:14px; }
+  .result { text-align:center; padding:30px 10px; }
+  .result .big { font-size:2.6rem; font-weight:800; color:var(--accent); }
+  @media (max-width:600px){ button.primary { width:100%; } }
+</style>
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">ドリル道場(1回10問・スキマ時間5分)</div>
+  <h1 id="title">読み込み中…</h1>
+</header>
+<div class="wrap">
+  <p id="desc" style="color:var(--sub);font-size:.9rem"></p>
+  <div class="stage" id="stage"></div>
+  <p style="margin-top:16px;font-size:.85rem"><a href="index.html">← 学習ポータルへ戻る</a></p>
+</div>
+
+<script>
+let D, qs = [], i = 0, score = 0, locked = false;
+const did = (new URLSearchParams(location.search).get("d") || "vi")
+              .replace(/[^a-zA-Z0-9_-]/g, "");
+const bestKey = "drill-best-" + did;
+
+const s = document.createElement("script");
+s.src = "../drills/" + did + ".js";
+s.onload = start;
+s.onerror = () => document.getElementById("stage").textContent = "ドリルが見つかりません: " + did;
+document.head.appendChild(s);
+
+function shuffle(a){ for(let j=a.length-1;j>0;j--){ const k=Math.floor(Math.random()*(j+1)); [a[j],a[k]]=[a[k],a[j]]; } return a; }
+function esc(t){ const d=document.createElement("div"); d.textContent=t; return d.innerHTML; }
+function fmt(t){ return esc(t).replace(/`([^`]+)`/g,"<code>$1</code>"); }
+
+function start(){
+  D = window.DRILL_DATA;
+  document.getElementById("title").textContent = D.title;
+  document.getElementById("desc").textContent = D.desc || "";
+  qs = D.gen ? Array.from({length:10}, ()=>D.gen())
+             : shuffle([...D.questions]).slice(0,10);
+  i = 0; score = 0;
+  show();
+}
+
+function show(){
+  locked = false;
+  const q = qs[i];
+  let html = `<div class="hud"><span>Q${i+1} / ${qs.length}</span>
+    <span>スコア ${score} | 自己ベスト ${localStorage.getItem(bestKey) ?? "-"}</span></div>
+    <div class="dq">${fmt(q.q)}</div>`;
+  if (q.choices) {
+    // 4択: 選択肢はシャッフルして表示
+    const order = shuffle(q.choices.map((c,idx)=>idx));
+    html += order.map(idx=>`<button class="choice" data-ok="${idx===q.answer?1:0}">${fmt(q.choices[idx])}</button>`).join("");
+  } else {
+    html += `<input class="ans" id="ans" placeholder="キー/コマンドを入力して Enter" autocomplete="off">`;
+  }
+  html += `<div class="fb" id="fb"></div>`;
+  const stage = document.getElementById("stage");
+  stage.innerHTML = html;
+  if (q.choices) {
+    stage.querySelectorAll(".choice").forEach(b=>b.addEventListener("click", ()=>judgeChoice(b, q)));
+  } else {
+    const inp = document.getElementById("ans");
+    inp.focus();
+    inp.addEventListener("keydown", e=>{ if(e.key==="Enter") judgeType(inp, q); });
+  }
+}
+
+function judgeChoice(btn, q){
+  if (locked) return; locked = true;
+  const ok = btn.dataset.ok === "1";
+  if (ok) { score++; btn.classList.add("correct"); }
+  else {
+    btn.classList.add("wrong");
+    document.querySelectorAll(".choice").forEach(b=>{ if(b.dataset.ok==="1") b.classList.add("correct"); });
+  }
+  feedback(ok, q);
+}
+
+function judgeType(inp, q){
+  if (locked) return; locked = true;
+  const v = inp.value.trim();
+  const ok = q.a.some(a=>a===v);
+  if (ok) score++;
+  inp.style.borderColor = ok ? "var(--ok)" : "var(--ng)";
+  feedback(ok, q, ok ? "" : `正解: <code>${esc(q.a[0])}</code>`);
+}
+
+function feedback(ok, q, extra=""){
+  const fb = document.getElementById("fb");
+  fb.className = "fb " + (ok?"ok":"ng");
+  fb.innerHTML = (ok?"⭕ 正解! ":"❌ ") + (extra||"") + (q.fb ? " " + fmt(q.fb) : "");
+  setTimeout(next, ok ? 700 : 1800);
+}
+
+function next(){
+  i++;
+  if (i < qs.length) { show(); return; }
+  const best = Math.max(score, +(localStorage.getItem(bestKey) || 0));
+  localStorage.setItem(bestKey, best);
+  const msg = score===10 ? "パーフェクト!いろは「師範代クラスです!」"
+    : score>=8 ? "合格レベル!いろは「その調子、その調子!」"
+    : "もう一周しましょう!反復こそドリルの王道です。";
+  document.getElementById("stage").innerHTML = `<div class="result">
+    <div class="big">${score} / ${qs.length}</div>
+    <p>${msg}</p><p style="color:var(--sub);font-size:.85rem">自己ベスト: ${best}</p>
+    <button class="primary" onclick="start()">もう一回挑戦する</button></div>`;
+}
+</script>
+</body>
+</html>

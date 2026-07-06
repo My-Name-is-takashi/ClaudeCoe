@@ -75,15 +75,27 @@
   <p style="margin-top:16px;font-size:.85rem"><a href="index.html">← 学習ポータルへ戻る</a></p>
 </div>
 
-<script src="../quizzes/part3-ch05-vi.js"></script>
 <script>
-const D = window.QUIZ_DATA;
+// URLパラメータ ?q=<クイズID> で quizzes/<ID>.js を読み込む(省略時はサンプル)
+let D;
 let idx = 0, correct = 0, answered = false, selected = new Set();
 const missed = [];
-
-document.getElementById("quizTitle").textContent = D.title;
-document.getElementById("quizMeta").textContent =
-  `全${D.questions.length}問 / 合格ライン ${D.passLine}%`;
+const qid = (new URLSearchParams(location.search).get("q") || "part3-ch05-vi")
+              .replace(/[^a-zA-Z0-9_-]/g, "");
+const loader = document.createElement("script");
+loader.src = "../quizzes/" + qid + ".js";
+loader.onload = () => {
+  D = window.QUIZ_DATA;
+  document.getElementById("quizTitle").textContent = D.title;
+  document.getElementById("quizMeta").textContent =
+    `全${D.questions.length}問 / 合格ライン ${D.passLine}%`;
+  show();
+};
+loader.onerror = () => {
+  document.getElementById("quizTitle").textContent = "クイズが見つかりません";
+  document.getElementById("stage").textContent = "クイズデータを読み込めませんでした: " + qid;
+};
+document.head.appendChild(loader);
 
 function esc(s){ const d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
 // `code` 記法をコード表示に変換
@@ -189,8 +201,6 @@ function finish(){
   html += `</div>`;
   document.getElementById("stage").innerHTML = html;
 }
-
-show();
 </script>
 </body>
 </html>
