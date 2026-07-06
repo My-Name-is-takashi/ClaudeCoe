@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1-5 ハードウェアトラブルシュート | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 1 コンピュータとOSの基礎</div>
+  <h1>1-5 ハードウェアトラブルシュート</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>切り分けの3原則(再現性・直前の変更・最小構成)を使えるようになる</li>
+<li>3大トラブル「起動しない・遅い・映らない」の切り分けフローを身につける</li>
+</ul></div>
+
+<h2>1. 切り分けの3原則</h2>
+<div class="tblwrap"><table>
+<tr><th>原則</th><th>問いかけ</th><th>例</th></tr>
+<tr><td>① 再現性</td><td>「毎回?ときどき?特定の操作で?」</td><td>毎回→設定/故障、ときどき→熱/接触/負荷を疑う</td></tr>
+<tr><td>② 直前の変更</td><td>「昨日までは動いていた?何か変えた?」</td><td>更新・ソフト追加・席替え(ケーブル)後の不調は変更が原因の筆頭</td></tr>
+<tr><td>③ 最小構成</td><td>「余計なものを全部外したらどうなる?」</td><td>周辺機器を全部抜く、別ケーブル・別モニターで試す</td></tr>
+</table></div>
+<p>あわせて重要なのが<strong class="mark">ヒアリング力</strong>。「壊れた」「変です」を、<strong>事実(いつから・何をしたら・どんな表示)</strong>に翻訳するのが情シスの腕です。</p>
+
+<h2>2. 3大トラブルの切り分けフロー</h2>
+<h3>A.「PCが起動しない」</h3>
+<pre><code>電源ランプは点く?
+├─ 点かない → 電源ケーブル/ACアダプタ/コンセント/バッテリー(=電源系)
+├─ 点くが画面真っ暗 → メーカーロゴは出る?
+│   ├─ 出ない → ハードウェア(メモリ/マザーボード)。ビープ音を確認しメーカー保守へ
+│   └─ 出るのにOSが立ち上がらない → OS/ディスク系。回復環境・セーフモード・ディスク診断
+└─ 起動途中で再起動ループ → 直前の更新を疑う(更新のアンインストール)</code></pre>
+<h3>B.「PCが遅い」</h3>
+<pre><code>タスクマネージャーで CPU / メモリ / ディスク のどれが100%?
+├─ CPU → 犯人プロセスを特定(ウイルススキャン中?暴走?)
+├─ メモリ → 常駐/ブラウザのタブ地獄 → 再起動と増設判断
+├─ ディスク → HDDなら寿命/SSD化を検討。空き容量10%未満も要対処
+└─ どれも平常 → ネットワークが遅い可能性(Part 2-8へ)/熱でクロック低下</code></pre>
+<h3>C.「外部モニターが映らない」</h3>
+<pre><code>① ケーブル・入力切替(モニター側のINPUT)を確認 ←最多原因
+② Win+P で出力モード(複製/拡張)を確認
+③ 別ケーブル・別ポート・別モニターで切り分け(どこを替えたら直る?)
+④ それでもダメならグラフィックドライバー更新</code></pre>
+
+<h2>3. 修理か交換かの判断</h2>
+<ul class="plain">
+<li><strong>保証期間内</strong> → 迷わずメーカー保守(勝手に分解すると保証が飛ぶ)</li>
+<li><strong>購入4〜5年超</strong> → 修理より交換が合理的(標準更新サイクルを決めておく)</li>
+<li><strong>ディスク故障の疑い</strong> → 作業より先に<strong class="mark">データ保全</strong>(バックアップ確認)</li>
+</ul>
+<div class="irohabox">「まずケーブル」「まず再起動」は雑に聞こえて、統計的には最強の一手です。ただし再起動の前に「保存していない作業はないか」を必ず聞くこと!</div>
+
+<div class="casebox"><strong>🎭 ケーススタディで腕試し</strong><br>
+ミライ商事のサポート受付日誌から、リアルな3つの事件に挑戦しましょう。選択によって結果が変わります。</div>
+
+<a class="quizlink case" href="../../portal/case.html?c=case1-5-hw">🎭 ケーススタディ「サポート受付日誌」を始める</a>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>切り分けは「再現性・直前の変更・最小構成」の3原則</li>
+<li>起動しない=電源→POST→OSの順、遅い=タスクマネージャーで資源特定、映らない=ケーブルから</li>
+<li>ハード故障の疑いでは、修理よりまずデータ保全</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="1-4-kitting-mdm.html">← 1-4 キッティングとMDM</a>
+  <a href="../../portal/quiz.html?q=part1-test">1-6 Part 1 修了テスト →</a>
+</footer>
+</div>
+</body>
+</html>
