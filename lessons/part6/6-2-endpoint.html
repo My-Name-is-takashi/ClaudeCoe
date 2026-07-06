@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6-2 マルウェアとエンドポイント防御 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 6 情報セキュリティ</div>
+  <h1>6-2 マルウェアとエンドポイント防御</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この章で学ぶこと</strong>
+<ul>
+<li>AV(アンチウイルス)とEDRの違いを説明できる</li>
+<li>感染疑い端末の初動(隔離)を正しく実行できる</li>
+</ul>
+<small>📺 動画「アンチウイルスはもう古い?EDRの世界」(10分)とあわせてどうぞ。</small></div>
+
+<h2>1. マルウェアの種類(ざっくり図鑑)</h2>
+<ul class="plain">
+<li><strong>ランサムウェア</strong>: 暗号化して身代金要求。現在の主役</li>
+<li><strong>情報窃取型(インフォスティーラー)</strong>: ブラウザ保存のパスワード等を根こそぎ送信</li>
+<li><strong>トロイの木馬/RAT</strong>: 正規ソフトを装い、遠隔操作の裏口を開く</li>
+<li><strong>ワーム</strong>: ネットワーク経由で自己増殖(だから感染時は隔離が最優先)</li>
+</ul>
+
+<h2>2. AVからEDRへ 〜検知の考え方が変わった〜</h2>
+<div class="tblwrap"><table>
+<tr><th></th><th>AV(従来型)</th><th>EDR</th></tr>
+<tr><td>検知方法</td><td>シグネチャ(既知の指名手配写真)と照合</td><td><strong>振る舞い</strong>を常時記録・分析(不審な行動を検知)</td></tr>
+<tr><td>得意</td><td>既知のマルウェア</td><td>未知・ファイルレス攻撃、侵入後の横展開</td></tr>
+<tr><td>事後対応</td><td>駆除して終わり</td><td><strong>侵入経路・影響範囲の調査、遠隔隔離</strong>ができる</td></tr>
+<tr><td>運用</td><td>入れて放置されがち</td><td>アラート監視が必要(自社で無理なら MDR=監視の外部委託)</td></tr>
+</table></div>
+<div class="diagram">
+  <div class="row"><span class="box">OS標準(Defender)</span><span class="arrow">+</span><span class="box">EPP/AV<br><small>入口で防ぐ</small></span><span class="arrow">+</span><span class="box g">EDR<br><small>入られた後に気づく・追う</small></span><span class="arrow">+</span><span class="box w">MDR<br><small>24時間監視の外部委託</small></span></div>
+  <small>現代の前提は「侵入は起こり得る」。入口対策と侵入後対策の二段構え。</small>
+</div>
+
+<h2>3. 感染疑いの初動 〜最初の3手〜</h2>
+<pre><code>①【隔離】ネットワークから切り離す(LANケーブルを抜く/Wi-FiをOFF/EDRの遠隔隔離)
+   ※ 電源は切らない!(メモリ上の証拠が消える。ランサムの場合は暗号化進行と天秤)
+②【記録】いつ・誰が・何をした直後か、画面の表示をスマホで撮影
+③【報告】情シス(または上長・CSIRT)へ即時報告。自分で駆除を試みない</code></pre>
+<div class="warnbox"><strong>⚠️ 「駆除できました」で終わらせない</strong>: EDRで検知・駆除しても、「どこから入ったか」「他の端末は無事か」「認証情報は盗まれていないか」の調査までがワンセット。入口が塞がっていなければ、明日また入られます。</div>
+
+<h2>4. 社内展開のポイント</h2>
+<ul class="plain">
+<li>キッティング標準(1-4章)にEDR導入を組み込み、<strong>導入率100%をダッシュボードで監視</strong>(未導入端末=穴)</li>
+<li>「疑わしい時は自分で何とかしない・怒られない」文化をつくる(報告が遅れる方が被害拡大)</li>
+<li>標準ユーザー運用(1-3章)+パッチ運用(6-4章)+EDRの三点セットで大半の攻撃に耐える</li>
+</ul>
+<div class="irohabox">ユーザーへの合言葉は「抜いて、撮って、呼ぶ」。ポスターにして貼っておくと、本番で本当に効きますよ。</div>
+
+<div class="goalbox"><strong>📌 まとめ</strong>
+<ul>
+<li>AV=既知を入口で防ぐ、EDR=侵入後に気づいて追う。両輪で使う</li>
+<li>初動は「隔離・記録・報告」。電源は切らない、自力駆除しない</li>
+<li>駆除で終わらせず、侵入経路と影響範囲の調査までがワンセット</li>
+</ul></div>
+
+<footer class="nav">
+  <a href="6-1-security-basics.html">← 6-1 セキュリティの基礎</a>
+  <a href="6-3-network-zerotrust.html">6-3 ネットワークセキュリティ →</a>
+</footer>
+</div>
+</body>
+</html>

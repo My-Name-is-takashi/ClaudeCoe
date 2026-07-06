@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6-5 標的型攻撃メール対応訓練 | 情シス養成講座</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<style>
+  .mail { border:1px solid var(--line); border-radius:12px; background:var(--card); padding:16px; margin:14px 0; }
+  .mail .head { font-size:.86rem; line-height:1.8; border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:10px; }
+  .mail .head b { display:inline-block; min-width:4.2em; color:var(--sub); font-weight:400; }
+  .mail .body { font-size:.92rem; white-space:pre-wrap; }
+  .mail .link { color:var(--accent); text-decoration:underline; cursor:help; }
+  .btns { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .btns button { flex:1 1 120px; padding:12px; border-radius:10px; border:2px solid var(--line);
+    background:var(--card); color:var(--text); font-weight:700; cursor:pointer; font-size:.95rem; }
+  .btns button:hover { border-color:var(--accent); }
+  .verdict { border-radius:10px; padding:13px; margin-top:12px; font-size:.9rem; display:none; }
+  .verdict.ok { display:block; background:var(--ok-soft); border-left:4px solid var(--ok); }
+  .verdict.ng { display:block; background:var(--ng-soft); border-left:4px solid var(--ng); }
+  .hud { display:flex; justify-content:space-between; color:var(--sub); font-size:.85rem; margin:10px 0; }
+  .primary { background:var(--accent); color:#fff; border:none; border-radius:10px; padding:12px 26px;
+    font-weight:700; font-size:1rem; cursor:pointer; margin-top:12px; }
+  .result { text-align:center; padding:24px; }
+  .result .big { font-size:2.6rem; font-weight:800; color:var(--accent); }
+</style>
+</head>
+<body>
+<header class="lesson">
+  <div class="crumb">Part 6 情報セキュリティ</div>
+  <h1>6-5 標的型攻撃メール対応訓練 〜受信トレイ・シミュレーター〜</h1>
+</header>
+<div class="wrap">
+
+<div class="goalbox"><strong>🎯 この演習のゴール</strong>
+<ul>
+<li>不審メールのチェックポイント(送信元・リンク先・文面の圧力)を体で覚える</li>
+<li>「開いてしまった後」の正しい行動を反射で言える</li>
+</ul>
+<small>あなたはミライ商事の経理・未来さんの受信トレイを訓練でチェックします。各メールを「安全」か「不審」か判定してください。リンクにカーソルを乗せる(スマホは長押し)と、実際のリンク先URLが見えます。</small></div>
+
+<div class="hud"><span id="mNum"></span><span id="mScore"></span></div>
+<div id="mailStage"></div>
+
+<h2>開いてしまったら? 〜1分でやること〜</h2>
+<div class="warnbox"><strong>⚠️ 添付を開いた/リンクを踏んだ/情報を入れてしまったら</strong>
+<ol class="plain">
+<li><strong>抜く</strong>: ネットワークから切断(Wi-Fi OFF / LANケーブル抜く)。電源は切らない</li>
+<li><strong>撮る</strong>: 画面・メールをスマホで撮影(証拠保全)</li>
+<li><strong>呼ぶ</strong>: 情シスへ即報告。<strong class="mark">入力してしまったパスワードは即変更(他で使い回していれば全部)</strong></li>
+</ol>
+報告した人を絶対に責めない——「早く言える文化」が会社を守ります(報告遅れが最大の被害拡大要因)。</div>
+
+<h2>情シス側の仕事: 注意喚起テンプレート</h2>
+<pre><code>件名:【注意喚起】取引先を装った不審メールについて(開封しても慌てず連絡を)
+
+本日、複数の社員に「◯◯株式会社 請求書」を装う不審メールが届いています。
+・心当たりのない請求書・パスワード変更依頼は開かずに情シスへ転送してください
+・リンクを押した/添付を開いた場合も、慌てず 内線XXX へ。連絡いただいた方に
+  不利益は一切ありません。早い連絡がいちばんの防御です。
+                                                    情報システム課</code></pre>
+
+<footer class="nav">
+  <a href="6-4-vuln-patch.html">← 6-4 脆弱性管理</a>
+  <a href="6-6-incident.html">6-6 インシデント対応 →</a>
+</footer>
+</div>
+
+<script>
+const MAILS = [
+ { from:"経理システム <noreply@keiri-mirai-portal.com>", to:"mirai@example.co.jp",
+   subj:"【緊急】給与振込エラー:本日中に確認が必要です",
+   body:"未来様\n\n給与振込処理でエラーが発生しました。本日17時までに確認いただけない場合、今月の振込が停止されます。\n\n▼至急こちらからログインしてください\n", link:{text:"https://keiri.example.co.jp/login", href:"http://keiri-mirai-portal.com/x/login.php"},
+   bad:true,
+   why:"①社内システムなのに送信元が外部ドメイン(keiri-mirai-portal.com) ②表示URLと実際のリンク先が不一致 ③「本日中」「停止されます」という時間圧力。3拍子そろった典型的フィッシングです。" },
+ { from:"総務部 田中 <tanaka-s@example.co.jp>", to:"all@example.co.jp",
+   subj:"【全社】年末調整書類の提出期限について(11/30まで)",
+   body:"各位\n\n年末調整の書類提出期限は11月30日(月)です。書類は総務部フロアの提出箱、または社内ポータルの総務ページからお願いします。\n\n不明点は内線2100までお気軽にどうぞ。",
+   bad:false,
+   why:"社内ドメインからの通常連絡。リンクもなく、期限はあるが不自然な緊急性・行動の強制がありません。" },
+ { from:"Microsoft アカウントチーム <account-security@micros0ft-support.net>", to:"mirai@example.co.jp",
+   subj:"異常なサインインが検出されました",
+   body:"お使いのアカウントで異常なサインインを検出しました。24時間以内に本人確認が完了しない場合、アカウントは永久にロックされます。\n\n", link:{text:"今すぐ本人確認", href:"http://micros0ft-support.net/verify?id=8842"},
+   bad:true,
+   why:"送信元ドメインが「micros0ft」(oがゼロ)の偽装。正規の通知は自社テナントのドメイン経由で届き、「永久にロック」のような脅しは使いません。" },
+ { from:"匠 課長 <takumi@example.co.jp>", to:"mirai@example.co.jp",
+   subj:"Re: 来週の棚卸しの件",
+   body:"未来さん\n\n先日の打ち合わせの続きです。棚卸しリストのドラフト、共有フォルダーの「20_経理部/棚卸し2026」に置いたので、木曜までにコメントもらえますか。\n\n匠",
+   bad:false,
+   why:"社内ドメイン・進行中の業務文脈・共有フォルダー参照(外部リンクなし)。返信型の自然な業務メールです。" },
+ { from:"佐藤 社長 <ceo.mirai.sato@gmail.com>", to:"mirai@example.co.jp",
+   subj:"至急対応(内密に)",
+   body:"未来さん、今商談中で電話に出られない。至急の送金が必要になった。860万円を下記口座へ今日中に振り込んでほしい。この件は極秘案件のため、誰にも相談しないように。\n\n三菱XX銀行 XX支店 普通 1234567",
+   bad:true,
+   why:"BEC(ビジネスメール詐欺)の典型。①社長がなぜかGmail ②至急+高額送金 ③「誰にも相談するな」。実在の役職者を装う攻撃で、電話など別経路での本人確認が唯一の防御です。" },
+ { from:"IT資産管理システム <asset@example.co.jp>", to:"mirai@example.co.jp",
+   subj:"【自動通知】貸与PCの棚卸し確認(今月末まで)",
+   body:"このメールはシステムからの自動送信です。\n\n貸与PC(管理番号 MIRAI-NB-0087)の利用状況確認期間です。社内ポータル > 資産管理 から今月末までに確認をお願いします。\n※本メールにリンクはありません。必ずポータルからアクセスしてください。",
+   bad:false,
+   why:"社内ドメインからの定例自動通知。「リンクを載せず、ポータルから直接アクセスさせる」のはむしろ模範的な社内通知の形です。" },
+ { from:"宅配便サービス <delivery-notice@sagawa-tracking-jp.info>", to:"mirai@example.co.jp",
+   subj:"お荷物のお届けにあがりましたが不在のため持ち帰りました",
+   body:"お客様宛のお荷物をお届けに上がりましたが、ご不在のため持ち帰りました。\n再配達のご依頼はこちら\n", link:{text:"https://sagawa-tracking-jp.info/redelivery", href:"https://sagawa-tracking-jp.info/redelivery"},
+   bad:true,
+   why:"実在の運送会社を装う偽ドメイン(正規は sagawa-exp.co.jp)。会社アドレスに個人の荷物通知が届く時点でも不自然。スミッシング(SMS版)も同じ手口です。" },
+ { from:"nginx公式メールマガジン <news@nginx.com>", to:"mirai@example.co.jp",
+   subj:"nginx 1.29 リリースノート",
+   body:"nginx 1.29 がリリースされました。主な変更点:\n- HTTP/3 の改善\n- セキュリティ修正 2件(CVE-2026-XXXX)\n\n詳細は公式サイトのリリースノートをご覧ください。",
+   bad:false,
+   why:"自分で購読した技術情報メール。むしろ「セキュリティ修正2件」は6-4章のパッチ運用として確認すべき情報です。判断に迷う場合は、メール内リンクを使わずブックマークから公式サイトへ行くのが安全な作法。" },
+];
+let mi=0, mOk=0, done=false;
+function mailShow(){
+  done=false;
+  const m = MAILS[mi];
+  document.getElementById("mNum").textContent = `メール ${mi+1} / ${MAILS.length}`;
+  document.getElementById("mScore").textContent = `正答 ${mOk}`;
+  let body = m.body.replace(/</g,"&lt;");
+  let linkHtml = m.link ? `<span class="link" title="実際のリンク先: ${m.link.href}">${m.link.text}</span><br><small style="color:var(--sub)">(カーソルを乗せる/長押しでリンク先URLを確認: <code>${m.link.href}</code>)</small>` : "";
+  document.getElementById("mailStage").innerHTML = `
+   <div class="mail">
+     <div class="head">
+       <div><b>差出人:</b> ${m.from.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+       <div><b>宛先:</b> ${m.to}</div>
+       <div><b>件名:</b> <strong>${m.subj}</strong></div>
+     </div>
+     <div class="body">${body}${linkHtml}</div>
+     <div class="btns">
+       <button id="btnSafe">✅ 安全(通常対応)</button>
+       <button id="btnBad">🚨 不審(開かず情シスへ)</button>
+     </div>
+     <div class="verdict" id="verdict"></div>
+     <div id="nextArea"></div>
+   </div>`;
+  document.getElementById("btnSafe").addEventListener("click",()=>judge(false));
+  document.getElementById("btnBad").addEventListener("click",()=>judge(true));
+}
+function judge(saidBad){
+  if(done) return; done=true;
+  const m = MAILS[mi];
+  const ok = saidBad === m.bad;
+  if(ok) mOk++;
+  const v = document.getElementById("verdict");
+  v.className = "verdict " + (ok?"ok":"ng");
+  v.innerHTML = `<strong>${ok?"⭕ 正解!":"❌ 不正解…"} このメールは${m.bad?"【不審】":"【安全】"}</strong><br>${m.why}`;
+  document.getElementById("mScore").textContent = `正答 ${mOk}`;
+  document.getElementById("nextArea").innerHTML = `<button class="primary" id="nx">${mi===MAILS.length-1?"結果を見る":"次のメールへ ▶"}</button>`;
+  document.getElementById("nx").addEventListener("click",()=>{ mi++; mi<MAILS.length?mailShow():finish(); });
+  document.getElementById("nx").focus();
+}
+function finish(){
+  const pct = Math.round(mOk/MAILS.length*100);
+  document.getElementById("mailStage").innerHTML = `<div class="mail result">
+    <div class="big">${mOk} / ${MAILS.length}</div>
+    <p>${pct===100?"全問正解!あなたの受信トレイは鉄壁です。":pct>=75?"合格レベル!間違えたメールの解説をもう一度読みましょう。":"攻撃者の思うツボかも…。チェックポイント(送信元ドメイン・リンク先・時間圧力)を復習してもう一周!"}</p>
+    <button class="primary" onclick="mi=0;mOk=0;mailShow()">もう一度訓練する</button></div>`;
+}
+mailShow();
+</script>
+</body>
+</html>
