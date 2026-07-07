@@ -1,0 +1,212 @@
+[
+  {
+    "id": "0-1_a5c9",
+    "title": "0-1 情シスってどんな仕事?",
+    "blocks": 15,
+    "duration": 239.5,
+    "file": "videos/output/0-1_a5c9.mp4"
+  },
+  {
+    "id": "3-5-1_e1f1",
+    "title": "3-5① viはなぜ難しい?モードを理解すれば怖くない",
+    "blocks": 14,
+    "duration": 255.3,
+    "file": "videos/output/3-5-1_e1f1.mp4"
+  },
+  {
+    "id": "0-1-2_7329",
+    "title": "0-1② ようこそミライ商事へ",
+    "blocks": 6,
+    "duration": 91.7,
+    "file": "videos/output/0-1-2_7329.mp4"
+  },
+  {
+    "id": "0-2_a70a",
+    "title": "0-2 情シスの1日密着(平常日/障害日)",
+    "blocks": 9,
+    "duration": 127.4,
+    "file": "videos/output/0-2_a70a.mp4"
+  },
+  {
+    "id": "1-1-1_b02f",
+    "title": "1-1① パソコンの中身、ぜんぶ見せます",
+    "blocks": 8,
+    "duration": 111.2,
+    "file": "videos/output/1-1-1_b02f.mp4"
+  },
+  {
+    "id": "1-1-2_eeb1",
+    "title": "1-1② スペック表の読み方",
+    "blocks": 5,
+    "duration": 81.5,
+    "file": "videos/output/1-1-2_eeb1.mp4"
+  },
+  {
+    "id": "1-2_df5c",
+    "title": "1-2 OSはPCの何をしているの?",
+    "blocks": 7,
+    "duration": 110.4,
+    "file": "videos/output/1-2_df5c.mp4"
+  },
+  {
+    "id": "1-4_9278",
+    "title": "1-4 キッティング完全実演",
+    "blocks": 9,
+    "duration": 119.9,
+    "file": "videos/output/1-4_9278.mp4"
+  },
+  {
+    "id": "2-1-1_ecca",
+    "title": "2-1① メールが届くまでの大冒険",
+    "blocks": 7,
+    "duration": 100.9,
+    "file": "videos/output/2-1-1_ecca.mp4"
+  },
+  {
+    "id": "2-1-2_b2a6",
+    "title": "2-1② オフィスのネットワークを describe する",
+    "blocks": 6,
+    "duration": 71.8,
+    "file": "videos/output/2-1-2_b2a6.mp4"
+  },
+  {
+    "id": "2-2_34b8",
+    "title": "2-2 IPアドレスは住所、サブネットは町内会",
+    "blocks": 7,
+    "duration": 120.8,
+    "file": "videos/output/2-2_34b8.mp4"
+  },
+  {
+    "id": "2-4_c26e",
+    "title": "2-4 DNSはインターネットの電話帳",
+    "blocks": 7,
+    "duration": 117.5,
+    "file": "videos/output/2-4_c26e.mp4"
+  },
+  {
+    "id": "2-6_04d1",
+    "title": "2-6 VLANでオフィスを仕切る",
+    "blocks": 7,
+    "duration": 100.7,
+    "file": "videos/output/2-6_04d1.mp4"
+  },
+  {
+    "id": "3-1_3e8e",
+    "title": "3-1 世界はLinuxでできている",
+    "blocks": 6,
+    "duration": 89.4,
+    "file": "videos/output/3-1_3e8e.mp4"
+  },
+  {
+    "id": "3-2_e165",
+    "title": "3-2 仮想化ってなに?",
+    "blocks": 5,
+    "duration": 70.0,
+    "file": "videos/output/3-2_e165.mp4"
+  },
+  {
+    "id": "3-5-2_b3a5",
+    "title": "3-5② vi実演: nginx設定を編集してみよう",
+    "blocks": 7,
+    "duration": 90.2,
+    "file": "videos/output/3-5-2_b3a5.mp4"
+  },
+  {
+    "id": "3-10-1_5afc",
+    "title": "3-10① nginxってなに?Webサーバーとリバースプロキシ",
+    "blocks": 6,
+    "duration": 80.2,
+    "file": "videos/output/3-10-1_5afc.mp4"
+  },
+  {
+    "id": "3-10-2_ae61",
+    "title": "3-10② nginx.conf 読解ツアー",
+    "blocks": 8,
+    "duration": 130.7,
+    "file": "videos/output/3-10-2_ae61.mp4"
+  },
+  {
+    "id": "4-1_175a",
+    "title": "4-1 Windows Serverは会社の“総務部長”",
+    "blocks": 6,
+    "duration": 87.2,
+    "file": "videos/output/4-1_175a.mp4"
+  },
+  {
+    "id": "4-2_a488",
+    "title": "4-2 Active Directoryは社員名簿+鍵束",
+    "blocks": 7,
+    "duration": 112.0,
+    "file": "videos/output/4-2_a488.mp4"
+  },
+  {
+    "id": "5-1_0230",
+    "title": "5-1 ピザで学ぶ IaaS/PaaS/SaaS",
+    "blocks": 7,
+    "duration": 107.1,
+    "file": "videos/output/5-1_0230.mp4"
+  },
+  {
+    "id": "5-2_f869",
+    "title": "5-2 M365管理センターツアー",
+    "blocks": 7,
+    "duration": 98.2,
+    "file": "videos/output/5-2_f869.mp4"
+  },
+  {
+    "id": "5-4_2423",
+    "title": "5-4 パスワード100個問題とSSO",
+    "blocks": 6,
+    "duration": 108.4,
+    "file": "videos/output/5-4_2423.mp4"
+  },
+  {
+    "id": "5-5_dacf",
+    "title": "5-5 AWSの地図",
+    "blocks": 7,
+    "duration": 114.0,
+    "file": "videos/output/5-5_dacf.mp4"
+  },
+  {
+    "id": "6-1-1_0598",
+    "title": "6-1① 攻撃者は誰で、何が目的か",
+    "blocks": 6,
+    "duration": 97.2,
+    "file": "videos/output/6-1-1_0598.mp4"
+  },
+  {
+    "id": "6-1-2_642c",
+    "title": "6-1② 攻撃の教科書:侵入から暗号化まで",
+    "blocks": 7,
+    "duration": 109.7,
+    "file": "videos/output/6-1-2_642c.mp4"
+  },
+  {
+    "id": "6-2_49b8",
+    "title": "6-2 アンチウイルスはもう古い?EDRの世界",
+    "blocks": 6,
+    "duration": 91.7,
+    "file": "videos/output/6-2_49b8.mp4"
+  },
+  {
+    "id": "6-5_d15d",
+    "title": "6-5 開いてしまった!そのあと1分でやること",
+    "blocks": 6,
+    "duration": 73.1,
+    "file": "videos/output/6-5_d15d.mp4"
+  },
+  {
+    "id": "7-1_c774",
+    "title": "7-1 なぜ“いい人対応”では回らないのか",
+    "blocks": 7,
+    "duration": 106.3,
+    "file": "videos/output/7-1_c774.mp4"
+  },
+  {
+    "id": "8-6_ad0a",
+    "title": "8-6 その説明、伝わっていません",
+    "blocks": 6,
+    "duration": 106.3,
+    "file": "videos/output/8-6_ad0a.mp4"
+  }
+]
