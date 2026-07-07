@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動画ライブラリ | 情シス養成講座</title>
+<style>
+  :root { --bg:#f6f7fb; --card:#fff; --text:#1f2430; --sub:#626b7f;
+    --accent:#4f6df5; --accent-soft:#e8ecfe; --line:#e3e6ee; }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#14171f; --card:#1d212c; --text:#e8eaf0;
+    --sub:#99a1b3; --accent:#7b93ff; --accent-soft:#2a3350; --line:#2c3140; } }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.7;}
+  header{background:linear-gradient(120deg,var(--accent),#8a5cf6);color:#fff;padding:28px 20px;text-align:center;}
+  header h1{font-size:1.4rem;}
+  header p{opacity:.9;font-size:.9rem;margin-top:6px;}
+  .wrap{max-width:1000px;margin:0 auto;padding:20px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;margin-top:10px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .card video{width:100%;display:block;background:#000;aspect-ratio:9/16;object-fit:cover;}
+  .card .meta{padding:11px 14px;}
+  .card .t{font-weight:700;font-size:.9rem;line-height:1.4;}
+  .card .d{color:var(--sub);font-size:.78rem;margin-top:4px;}
+  .part-h{grid-column:1/-1;font-weight:800;font-size:1.05rem;margin:18px 0 2px;padding-left:10px;
+    border-left:4px solid var(--accent);}
+  .note{color:var(--sub);font-size:.82rem;margin:8px 0 0;}
+  a.back{color:var(--accent);font-size:.9rem;}
+  footer{text-align:center;color:var(--sub);font-size:.78rem;padding:24px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎬 動画ライブラリ</h1>
+  <p>ナレーション: VOICEVOX 春日部つむぎ(いろは)/ 全30本・約55分</p>
+</header>
+<div class="wrap">
+  <p><a class="back" href="index.html">← 学習ポータルへ戻る</a></p>
+  <p class="note">各動画はスマホ縦型。タップで再生できます。読み込みが重い場合はWi-Fi環境でどうぞ。</p>
+  <div class="grid" id="grid"></div>
+</div>
+<footer>音声合成: VOICEVOX(春日部つむぎ) — 利用規約に基づきクレジット表記しています。</footer>
+
+<script>
+const PARTS = {
+  "Part 0 オリエンテーション":["0-1_a5c9","0-1-2_7329","0-2_a70a"],
+  "Part 1 コンピュータとOSの基礎":["1-1-1_b02f","1-1-2_eeb1","1-2_df5c","1-4_9278"],
+  "Part 2 ネットワーク":["2-1-1_ecca","2-1-2_b2a6","2-2_34b8","2-4_c26e","2-6_04d1"],
+  "Part 3 Linuxサーバー":["3-1_3e8e","3-2_e165","3-5-1_e1f1","3-5-2_b3a5","3-10-1_5afc","3-10-2_ae61"],
+  "Part 4 Windows Server / AD":["4-1_175a","4-2_a488"],
+  "Part 5 クラウドとSaaS":["5-1_0230","5-2_f869","5-4_2423","5-5_dacf"],
+  "Part 6 情報セキュリティ":["6-1-1_0598","6-1-2_642c","6-2_49b8","6-5_d15d"],
+  "Part 7-8 運用・実務":["7-1_c774","8-6_ad0a"],
+};
+fetch("../videos/output/manifest.json").then(r=>r.json()).then(man=>{
+  const byId={}; man.forEach(m=>byId[m.id]=m);
+  const grid=document.getElementById("grid");
+  for(const [part,ids] of Object.entries(PARTS)){
+    const h=document.createElement("div");h.className="part-h";h.textContent=part;grid.appendChild(h);
+    ids.forEach(id=>{
+      const m=byId[id]; if(!m)return;
+      const c=document.createElement("div");c.className="card";
+      const mm=Math.floor(m.duration/60), ss=Math.round(m.duration%60);
+      c.innerHTML=`<video controls preload="none" playsinline src="../videos/output/${id}.mp4"></video>
+        <div class="meta"><div class="t">${m.title}</div>
+        <div class="d">⏱ ${mm}分${ss}秒 ・ ${m.blocks}シーン</div></div>`;
+      grid.appendChild(c);
+    });
+  }
+});
+</script>
+</body>
+</html>
