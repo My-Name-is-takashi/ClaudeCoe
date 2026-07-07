@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動画プレイヤー | 情シス養成講座</title>
+<style>
+  :root{--bg:#0f1117;--card:#1b1f2a;--text:#e8eaf0;--sub:#9aa2b5;--accent:#7b93ff;--soft:#2a3350;--line:#2b3040;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;background:var(--bg);color:var(--text);}
+  .top{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#141824;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line);}
+  .top a.back{color:var(--accent);text-decoration:none;font-weight:700;font-size:.9rem;white-space:nowrap;}
+  .top .t{font-size:.9rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .stage{max-width:520px;margin:0 auto;padding:16px;}
+  video{width:100%;border-radius:14px;background:#000;display:block;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+  h1{font-size:1.15rem;margin:16px 2px 4px;line-height:1.4;}
+  .meta{color:var(--sub);font-size:.85rem;margin:0 2px 16px;}
+  .row{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap;}
+  .btn{flex:1 1 120px;text-align:center;padding:13px;border-radius:12px;text-decoration:none;font-weight:700;font-size:.92rem;
+       background:var(--soft);color:var(--accent);border:1px solid var(--line);}
+  .btn.prim{background:var(--accent);color:#141824;border:none;}
+  .btn:disabled,.btn.dis{opacity:.35;pointer-events:none;}
+  .also{margin-top:22px;}
+  .also h2{font-size:.9rem;color:var(--sub);margin:0 2px 10px;font-weight:700;}
+  .vlink{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--card);border:1px solid var(--line);
+         border-radius:12px;margin-bottom:9px;text-decoration:none;color:var(--text);}
+  .vlink.cur{border-color:var(--accent);}
+  .vlink .ico{font-size:1.3rem;}
+  .vlink .vt{font-size:.9rem;font-weight:600;flex:1;line-height:1.4;}
+  .vlink .vd{font-size:.78rem;color:var(--sub);white-space:nowrap;}
+</style>
+</head>
+<body>
+<div class="top">
+  <a class="back" href="videos.html">☰ 一覧</a>
+  <a class="back" href="index.html">🏠 ポータル</a>
+  <div class="t" id="topT">動画</div>
+</div>
+<div class="stage">
+  <video id="player" controls autoplay playsinline></video>
+  <h1 id="vtitle">読み込み中…</h1>
+  <div class="meta" id="vmeta"></div>
+  <div class="row">
+    <a class="btn" id="prevBtn">← 前の動画</a>
+    <a class="btn" id="nextBtn">次の動画 →</a>
+  </div>
+  <div class="row">
+    <a class="btn prim" id="lessonBtn" target="_self">📖 この章の教材を読む</a>
+    <a class="btn" id="quizBtn">📝 章末クイズ</a>
+  </div>
+  <div class="also" id="alsoWrap"></div>
+</div>
+
+<script src="js/videos-data.js"></script>
+<script>
+const VDIR = "../videos/output/";
+// 章ID → 教材/クイズのリンク(index.htmlのCURRICULUMと対応)
+const CHAP_LINKS = {
+ "0-1":["../lessons/part0/0-1-what-is-joshi.html","part0-ch01"],
+ "0-2":["../lessons/part0/0-2-daily-yearly.html",null],
+ "1-1":["../lessons/part1/1-1-computer-basics.html","part1-ch01"],
+ "1-2":["../lessons/part1/1-2-os-basics.html","part1-ch02"],
+ "1-4":["../lessons/part1/1-4-kitting-mdm.html",null],
+ "2-1":["../lessons/part2/2-1-network-overview.html","part2-ch01"],
+ "2-2":["../lessons/part2/2-2-ip-subnet.html","part2-ch02"],
+ "2-4":["../lessons/part2/2-4-dns.html","part2-ch04"],
+ "2-6":["../lessons/part2/2-6-switch-vlan-wifi.html","part2-ch06"],
+ "3-1":["../lessons/part3/3-01-what-is-linux.html","part3-ch01"],
+ "3-2":["../lessons/part3/3-02-build-lab.html",null],
+ "3-5":["../lessons/part3/3-05-vi.html","part3-ch05-vi"],
+ "3-10":["../lessons/part3/3-10-nginx.html","part3-ch10"],
+ "4-1":["../lessons/part4/4-1-windows-server.html","part4-ch01"],
+ "4-2":["../lessons/part4/4-2-ad-basics.html","part4-ch02"],
+ "5-1":["../lessons/part5/5-1-cloud-basics.html","part5-ch01"],
+ "5-2":["../lessons/part5/5-2-m365.html","part5-ch02"],
+ "5-4":["../lessons/part5/5-4-sso-mfa.html","part5-ch04"],
+ "5-5":["../lessons/part5/5-5-aws.html","part5-ch05"],
+ "6-1":["../lessons/part6/6-1-security-basics.html","part6-ch01"],
+ "6-2":["../lessons/part6/6-2-endpoint.html",null],
+ "6-5":["../lessons/part6/6-5-phishing-sim.html",null],
+ "7-1":["../lessons/part7/7-1-itil.html","part7-ch01"],
+ "8-6":["../lessons/part8/8-6-communication.html",null],
+};
+// 全動画をフラット化(再生順)
+const ORDER = Object.keys(window.VIDEOS_BY_CHAPTER).sort((a,b)=>{
+  const pa=a.split("-").map(Number),pb=b.split("-").map(Number);
+  return pa[0]-pb[0]||pa[1]-pb[1];
+});
+const FLAT=[];
+ORDER.forEach(ch=>window.VIDEOS_BY_CHAPTER[ch].forEach(v=>FLAT.push({...v,chap:ch})));
+
+function fmt(s){const m=Math.floor(s/60),x=s%60;return `${m}:${String(x).padStart(2,"0")}`;}
+function qs(){return new URLSearchParams(location.search);}
+function findIndex(file){return FLAT.findIndex(v=>v.file===file);}
+
+function load(i){
+  i=Math.max(0,Math.min(FLAT.length-1,i));
+  const v=FLAT[i];
+  const player=document.getElementById("player");
+  player.src=VDIR+v.file; player.load();
+  document.getElementById("vtitle").textContent=v.title;
+  document.getElementById("topT").textContent=v.title;
+  document.getElementById("vmeta").textContent=`⏱ ${fmt(v.dur)} ・ 音声: VOICEVOX 春日部つむぎ`;
+  history.replaceState(null,"","?v="+encodeURIComponent(v.file));
+  // 前後
+  const pb=document.getElementById("prevBtn"),nb=document.getElementById("nextBtn");
+  if(i<=0)pb.classList.add("dis");else{pb.classList.remove("dis");pb.href="?v="+encodeURIComponent(FLAT[i-1].file);pb.onclick=e=>{e.preventDefault();load(i-1);};}
+  if(i>=FLAT.length-1)nb.classList.add("dis");else{nb.classList.remove("dis");nb.href="?v="+encodeURIComponent(FLAT[i+1].file);nb.onclick=e=>{e.preventDefault();load(i+1);};}
+  // 教材/クイズ
+  const cl=CHAP_LINKS[v.chap]||[null,null];
+  const lb=document.getElementById("lessonBtn"),qb=document.getElementById("quizBtn");
+  if(cl[0]){lb.href=cl[0];lb.classList.remove("dis");}else lb.classList.add("dis");
+  if(cl[1]){qb.href="quiz.html?q="+cl[1];qb.classList.remove("dis");}else qb.classList.add("dis");
+  // 同じ章の他の動画
+  const same=window.VIDEOS_BY_CHAPTER[v.chap]||[];
+  const aw=document.getElementById("alsoWrap");
+  if(same.length>1){
+    aw.innerHTML='<h2>この章の動画</h2>'+same.map(s=>
+      `<a class="vlink ${s.file===v.file?"cur":""}" href="?v=${encodeURIComponent(s.file)}" onclick="event.preventDefault();load(findIndex('${s.file}'))">
+        <span class="ico">🎬</span><span class="vt">${s.title}</span><span class="vd">${fmt(s.dur)}</span></a>`).join("");
+  } else aw.innerHTML="";
+  // 自動で次へ
+  player.onended=()=>{ if(i<FLAT.length-1) load(i+1); };
+  window.scrollTo(0,0);
+}
+let start=qs().get("v"); let si=start?findIndex(start):0; if(si<0)si=0;
+load(si);
+</script>
+</body>
+</html>
